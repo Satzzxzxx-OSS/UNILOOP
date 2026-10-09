@@ -15,8 +15,9 @@
 - [x] Add isolated Next.js App Router application under apps/web.
 - [x] Add semantic navbar, discovery UI, transparent empty states.
 - [x] Add basic pure-function tests for safe public URL parsing.
-- [ ] Install dependencies, generate and commit pnpm lockfile.
-- [ ] Pass typecheck, ESLint, production build and browser E2E.
+- [x] Resolve dependencies in GitHub Actions and commit pnpm lockfile.
+- [x] Pass unit tests, typecheck, ESLint, and production build in GitHub Actions (pre-lockfile run).
+- [ ] Reverify quality gates with frozen lockfile and complete browser E2E.
 - [ ] Add reviewed Space UI components after source, bundle and accessibility checks.
 
 ## Next vertical slice

@@ -12,14 +12,13 @@ demo is preserved as a reference; the Next.js app lives at \`apps/web\`.
 
 \`\`\`bash
 corepack enable
-pnpm install --no-frozen-lockfile
+pnpm install --frozen-lockfile
 pnpm dev
 \`\`\`
 
 Open http://localhost:3000.
 
-Review the dependency resolution and **commit a verified pnpm-lock.yaml**
-before merging to main. Then change CI installation to
+The dependency lockfile is committed. CI installs using
 \`pnpm install --frozen-lockfile\` for repeatable builds.
 
 ## Quality gates
