@@ -308,4 +308,60 @@ begin
  end if;
 end $$;
 
+
+-- A member from another conversation must not send in a guessed thread.
+begin;
+set local role authenticated;
+select set_config('request.jwt.claim.sub','cccccccc-cccc-4ccc-8ccc-cccccccccccc',true);
+do $$
+declare
+  guessed_thread uuid;
+begin
+  select id into guessed_thread from public.sale_conversations
+    where buyer_id = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
+  begin
+    perform public.send_sale_message(guessed_thread,'I should not be here.',
+      'eeeeeeee-2222-4333-8444-eeeeeeeeeeee');
+    raise exception 'Other buyer sent into private thread';
+  exception when insufficient_privilege then null;
+  end;
+end $$;
+rollback;
+
+-- Suspending the seller must stop NEW contact to that seller immediately.
+update public.profiles set account_status = 'suspended'
+  where id = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+begin;
+set local role authenticated;
+select set_config('request.jwt.claim.sub','cccccccc-cccc-4ccc-8ccc-cccccccccccc',true);
+do $$
+declare thread_id uuid;
+begin
+  select id into thread_id from public.sale_conversations
+    where buyer_id = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
+  begin
+    perform public.send_sale_message(thread_id, 'Seller is not eligible.',
+      'ffffffff-2222-4333-8444-ffffffffffff');
+    raise exception 'Suspended counterparty could still receive new messages';
+  exception when insufficient_privilege then null;
+  end;
+end $$;
+rollback;
+
+-- Blocks must never be assignable on behalf of another user.
+begin;
+set local role authenticated;
+select set_config('request.jwt.claim.sub','cccccccc-cccc-4ccc-8ccc-cccccccccccc',true);
+do $$
+begin
+  begin
+    insert into public.user_blocks(blocker_id, blocked_id)
+    values ('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+            'cccccccc-cccc-4ccc-8ccc-cccccccccccc');
+    raise exception 'User impersonated another blocker';
+  exception when insufficient_privilege then null;
+  end;
+end $$;
+rollback;
+
 select 'Step 04 secure sale interactions: passed' as result;
