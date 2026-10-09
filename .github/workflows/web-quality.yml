@@ -153,3 +153,17 @@ jobs:
           psql -X -d uniloop_rentals_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261010010000_rental_media.sql
       - name: Verify rental dates, exclusion, approvals and handovers
         run: psql -X -d uniloop_rentals_ci -v ON_ERROR_STOP=1 -f supabase/tests/07_rentals_rls.sql
+
+      - name: Provision sale exchange test database
+        run: createdb uniloop_sale_deals_ci
+      - name: Apply sale exchange prerequisites and migration
+        run: |
+          psql -X -d uniloop_sale_deals_ci -v ON_ERROR_STOP=1 -f supabase/tests/00_auth_fixture.sql
+          psql -X -d uniloop_sale_deals_ci -v ON_ERROR_STOP=1 -f supabase/tests/03_storage_fixture.sql
+          psql -X -d uniloop_sale_deals_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009170000_identity_foundation.sql
+          psql -X -d uniloop_sale_deals_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009200000_sale_listings.sql
+          psql -X -d uniloop_sale_deals_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009210000_listing_media.sql
+          psql -X -d uniloop_sale_deals_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009220000_sale_interactions.sql
+          psql -X -d uniloop_sale_deals_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261010020000_sale_transactions.sql
+      - name: Verify mutual sale handover and verified reviews
+        run: psql -X -d uniloop_sale_deals_ci -v ON_ERROR_STOP=1 -f supabase/tests/08_sale_transactions_rls.sql
