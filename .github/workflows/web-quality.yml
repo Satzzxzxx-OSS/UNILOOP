@@ -49,6 +49,8 @@ jobs:
         run: pnpm lint
       - name: Production build
         run: pnpm build
+      - name: Production HTTP smoke without database credentials
+        run: node apps/web/tests/http-smoke.mjs
 
   verify-identity-db:
     runs-on: ubuntu-latest
