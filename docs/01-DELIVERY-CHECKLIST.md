@@ -51,3 +51,17 @@ Never represent planning, a static UI, or unrun tests as launched functionality.
 - [ ] Hosted Supabase Auth/Storage integration tests and real browser E2E.
 - [ ] Signed-image privacy, image processing, load and accessibility reviews.
 - [ ] Approved product policy for active selling, then audited pilot enablement.
+
+## Gate 05 — Messaging and sale offers (Step 04)
+- [x] One private sale conversation per listing+buyer.
+- [x] Persisted text messages, sender derived from auth.uid(), nonce idempotency.
+- [x] Row-level buyer/seller-only reads and narrow authorized write RPCs.
+- [x] Offer/counter-offer/accept/reject/withdraw state machine.
+- [x] Single accepted offer per listing; other pending offers retired on acceptance.
+- [x] Block/unblock and suspended/revoked counterparty restrictions.
+- [x] New Inbox, conversation and Offers UI with manual refresh.
+- [x] SQL allow/deny tests on disposable PostgreSQL.
+- [ ] Hosted Supabase staging login, RPC and authorization verification.
+- [ ] Abuse moderation, rate limiting, content reporting and alerts.
+- [ ] Private Realtime authorization and live browser test coverage.
+- [ ] Payments, completed-sale confirmation and rental booking are not implemented.

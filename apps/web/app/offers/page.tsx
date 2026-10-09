@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getSaleInbox } from "@/lib/interactions/data";
+import { getSaleOfferInbox } from "@/lib/interactions/data";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Offers", robots: { index: false } };
 
 export default async function OffersPage() {
-  const inbox = await getSaleInbox();
+  const inbox = await getSaleOfferInbox();
   return <div className="container conversation-page">
     <p className="eyebrow">PRICE NEGOTIATION</p>
     <h1>Offers</h1>
