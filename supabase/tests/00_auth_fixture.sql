@@ -1,6 +1,6 @@
 -- CI-only Supabase Auth facade, run on disposable PostgreSQL 16.
 -- DO NOT execute in a hosted Supabase project.
-do $
+do $$
 begin
   if not exists (select 1 from pg_roles where rolname = 'anon') then
     create role anon nologin;
@@ -8,7 +8,7 @@ begin
   if not exists (select 1 from pg_roles where rolname = 'authenticated') then
     create role authenticated nologin;
   end if;
-end $;
+end $$;
 create schema auth;
 create table auth.users (
   id uuid primary key,
