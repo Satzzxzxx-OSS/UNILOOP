@@ -7,5 +7,8 @@ export async function proxy(request: NextRequest) {
 
 // Only session-reliant routes; never run auth network work for static assets.
 export const config = {
-  matcher: ["/account/:path*", "/auth/:path*"],
+  matcher: [
+    "/", "/account/:path*", "/auth/:path*", "/explore/:path*",
+    "/post/:path*", "/my/:path*", "/listing/:path*",
+  ],
 };

@@ -95,7 +95,16 @@ for select to authenticated
 using (
   (select auth.uid()) is not null
   and private.can_access_campus(campus_id)
-  and (status = 'active' or owner_id = (select auth.uid()))
+  and (
+    owner_id = (select auth.uid())
+    or (
+      status = 'active'
+      and exists (
+        select 1 from public.categories c
+        where c.slug = category_slug and c.enabled
+      )
+    )
+  )
 );
 
 create policy listing_insert_draft on public.listings
@@ -121,6 +130,10 @@ using (
 with check (
   owner_id = (select auth.uid()) and
   private.can_access_campus(campus_id) and status in ('draft', 'active', 'paused')
+  and exists (
+    select 1 from public.categories c
+    where c.slug = category_slug and c.enabled
+  )
 );
 
 -- Explicitly controlled lifecycle transitions.
