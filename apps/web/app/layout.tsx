@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
+import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import "./globals.css";
 
@@ -36,9 +37,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               <p>A better way to keep useful things in the loop.</p>
             </div>
             <div className="footer-links" aria-label="Footer">
-              <a href="/explore?mode=buy">Explore</a>
-              <a href="/explore?mode=rent">Rent</a>
-              <a href="/#how-it-works">How it works</a>
+              <Link href="/explore?mode=buy">Explore</Link>
+              <Link href="/explore?mode=rent">Rent</Link>
+              <Link href="/#how-it-works">How it works</Link>
             </div>
             <p className="footer-note">An evolving marketplace. Features are released only when ready.</p>
           </div>
