@@ -61,7 +61,7 @@ GO
 CREATE TABLE universities (
     id          INT          IDENTITY(1,1) PRIMARY KEY,
     name        VARCHAR(150) NOT NULL,
-    short_name  VARCHAR(20)  NOT NULL UNIQUE,   -- e.g. 'LPU'
+    short_name  VARCHAR(20)  NOT NULL UNIQUE,   -- e.g. 'DEMO'
     city        VARCHAR(80),
     state       VARCHAR(80),
     country     VARCHAR(80)  NOT NULL DEFAULT 'India',
@@ -71,7 +71,7 @@ CREATE TABLE universities (
 GO
 
 INSERT INTO universities (name, short_name, city, state)
-VALUES ('Lovely Professional University', 'LPU', 'Phagwara', 'Punjab');
+VALUES ('Example University', 'DEMO', 'Phagwara', 'Punjab');
 GO
 
 
@@ -107,10 +107,10 @@ GO
 
 INSERT INTO users (university_id, full_name, lpu_reg_no, email, hostel_block, is_verified)
 VALUES
-    (1, 'Aarav Sharma',  '12307641', 'aarav.sharma@lpu.in',  'H-4',  1),
-    (1, 'Priya Nair',    '12307642', 'priya.nair@lpu.in',    'GH-2', 1),
-    (1, 'Rohan Verma',   '12307643', 'rohan.verma@lpu.in',   'H-6',  1),
-    (1, 'Sneha Kapoor',  '12307644', 'sneha.kapoor@lpu.in',  'GH-1', 1);
+    (1, 'Aarav Sharma',  '12307641', 'aarav.sharma@example.invalid',  'H-4',  1),
+    (1, 'Priya Nair',    '12307642', 'priya.nair@example.invalid',    'GH-2', 1),
+    (1, 'Rohan Verma',   '12307643', 'rohan.verma@example.invalid',   'H-6',  1),
+    (1, 'Sneha Kapoor',  '12307644', 'sneha.kapoor@example.invalid',  'GH-1', 1);
 GO
 
 
@@ -423,7 +423,7 @@ GO
 
 -- ----------------------------------------------------------------
 --  TABLE 17 — OAUTH_ACCOUNTS
---  Social login — Google (LPU uses Google Workspace), Microsoft, GitHub.
+--  Social login — Google (DEMO uses Google Workspace), Microsoft, GitHub.
 --  One user can link multiple providers.
 -- ----------------------------------------------------------------
 CREATE TABLE oauth_accounts (
