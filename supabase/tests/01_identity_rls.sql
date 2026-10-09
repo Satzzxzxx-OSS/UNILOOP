@@ -137,7 +137,7 @@ rollback;
 begin;
 set local role authenticated;
 select set_config('request.jwt.claim.sub','aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',true);
-do $
+do $$
 declare
   affected integer;
 begin
@@ -179,7 +179,7 @@ begin
   if affected <> 0 then
     raise exception 'Client edited another user profile';
   end if;
-end $;
+end $$;
 rollback;
 
 -- Even with a verified membership, a suspension must deny access immediately.
@@ -191,12 +191,12 @@ update public.profiles set account_status = 'suspended'
 begin;
 set local role authenticated;
 select set_config('request.jwt.claim.sub','aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',true);
-do $
+do $$
 begin
   if private.can_access_campus('11111111-1111-4111-8111-111111111111') then
     raise exception 'Suspended member retains marketplace access';
   end if;
-end $;
+end $$;
 rollback;
 
 select 'identity RLS tests: passed' as result;
