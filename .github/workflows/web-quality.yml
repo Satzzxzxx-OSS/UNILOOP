@@ -38,6 +38,11 @@ jobs:
       - name: Install dependencies
         # TEMPORARY: commit a lockfile before merging, then switch to --frozen-lockfile.
         run: pnpm install --no-frozen-lockfile
+      - name: Export dependency lockfile for deterministic build review
+        run: |
+          echo 'UNILOOP_LOCK_BEGIN'
+          base64 -w 76 pnpm-lock.yaml | sed 's/^/UNILOOP_LOCK_DATA:/'
+          echo 'UNILOOP_LOCK_END'
       - name: Unit tests
         run: pnpm test
       - name: Type check
