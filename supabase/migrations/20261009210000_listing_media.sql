@@ -78,7 +78,7 @@ create function private.can_register_listing_photo(photo_path text)
 returns boolean
 language sql stable security definer
 set search_path = ''
-as $
+as $$
   select exists (
     select 1 from public.listings l
     where l.id = private.photo_listing_id(photo_path)
@@ -86,7 +86,7 @@ as $
       and private.can_access_campus(l.campus_id)
       and l.status in ('draft','paused')
   );
-$;
+$$;
 
 create function private.photo_object_owned_by_caller(photo_path text)
 returns boolean
