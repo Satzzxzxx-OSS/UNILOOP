@@ -131,4 +131,72 @@ begin
 end $$;
 rollback;
 
+
+-- Negative mutation tests: grants AND RLS must prevent self-verification,
+-- privilege escalation, cross-account edits, and allowlist reads.
+begin;
+set local role authenticated;
+select set_config('request.jwt.claim.sub','aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',true);
+do $
+declare
+  affected integer;
+begin
+  begin
+    update public.profiles set account_status = 'active'
+      where id = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+    raise exception 'Client unexpectedly changed privileged profile field';
+  exception when insufficient_privilege then
+    null;
+  end;
+
+  begin
+    update public.campus_memberships set status = 'verified', verified_at = now()
+      where user_id = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
+    raise exception 'Client unexpectedly updated verification';
+  exception when insufficient_privilege then
+    null;
+  end;
+
+  begin
+    insert into public.campus_memberships(user_id,campus_id,status)
+    values ('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+            '22222222-2222-4222-8222-222222222222', 'pending');
+    raise exception 'Client unexpectedly inserted a membership';
+  exception when insufficient_privilege then
+    null;
+  end;
+
+  begin
+    perform count(*) from private.enabled_campuses;
+    raise exception 'Client unexpectedly read private allowlist';
+  exception when insufficient_privilege then
+    null;
+  end;
+
+  update public.profiles set display_name = 'Intruder'
+    where id = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
+  get diagnostics affected = row_count;
+  if affected <> 0 then
+    raise exception 'Client edited another user profile';
+  end if;
+end $;
+rollback;
+
+-- Even with a verified membership, a suspension must deny access immediately.
+update public.campus_memberships set status = 'verified', verified_at = now()
+  where user_id = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+update public.profiles set account_status = 'suspended'
+  where id = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+
+begin;
+set local role authenticated;
+select set_config('request.jwt.claim.sub','aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',true);
+do $
+begin
+  if private.can_access_campus('11111111-1111-4111-8111-111111111111') then
+    raise exception 'Suspended member retains marketplace access';
+  end if;
+end $;
+rollback;
+
 select 'identity RLS tests: passed' as result;
