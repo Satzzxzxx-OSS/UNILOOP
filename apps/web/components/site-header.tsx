@@ -18,6 +18,7 @@ export function SiteHeader() {
           <Link href="/#categories">Categories</Link>
           <Link href="/my/listings">My listings</Link>
           <Link href="/inbox">Inbox</Link>
+          <Link href="/saved">Saved</Link>
           <Link href="/#how-it-works">How it works</Link>
         </nav>
         <div className="header-actions">
@@ -41,6 +42,7 @@ export function SiteHeader() {
         <Link href="/post">Post</Link>
         <Link href="/inbox">Inbox</Link>
         <Link href="/offers">Offers</Link>
+        <Link href="/saved">Saved</Link>
         <Link href="/account">Account</Link>
       </nav>
     </header>

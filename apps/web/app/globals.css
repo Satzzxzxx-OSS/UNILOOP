@@ -336,3 +336,24 @@ button { cursor: pointer; }
 .interaction-action p { font-size: 12px; color: #8a423f; }
 @media(max-width:900px) { .conversation-layout { grid-template-columns: 1fr; } }
 @media(max-width:560px) { .conversation-pane,.negotiation-pane { padding: 18px; } .conversation-heading { flex-direction: column; gap: 10px; } }
+
+/* User settings and trust/safety actions */
+.settings-page,.moderation-page { padding: 75px 0 105px; }
+.settings-page h1,.moderation-page h1 { font-size: clamp(34px,4vw,50px); letter-spacing: -.05em; }
+.settings-page .post-form { margin-bottom: 22px; }
+.checkbox-option { display: flex; align-items: center; gap: 12px; font-size: 14px; }
+.checkbox-option input { width: 19px; height: 19px; accent-color: #243855; }
+.account-policy { max-width: 700px; padding: 22px 0; color: #61718a; }
+.account-policy h2 { color: var(--foreground); }
+.account-quicklinks { display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap; margin-bottom: 24px; }
+.mini-form { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+.mini-form p { font-size: 12px; color: #60708a; margin: 0; }
+.moderation-queue { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 17px; }
+.moderation-case { padding: 26px; border: 1px solid var(--border); background: white; border-radius: 20px; }
+.moderation-case h2 { font-size: 20px; }
+.moderation-case p { line-height: 1.7; overflow-wrap: anywhere; }
+.moderation-case time { font-size: 12px; color: #627087; }
+.review-form { display: grid; gap: 12px; margin-top: 21px; }
+.review-form select { padding: 12px; border: 1px solid #cbd5e1; border-radius: 10px; }
+.review-form button { justify-self: start; }
+@media(max-width:750px) { .moderation-queue { grid-template-columns: 1fr; } }

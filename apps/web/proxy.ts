@@ -11,5 +11,6 @@ export const config = {
     "/", "/account/:path*", "/auth/:path*", "/explore/:path*",
     "/post/:path*", "/my/:path*", "/listing/:path*",
     "/inbox/:path*", "/offers/:path*",
+    "/saved/:path*", "/settings/:path*", "/report/:path*", "/admin/:path*",
   ],
 };

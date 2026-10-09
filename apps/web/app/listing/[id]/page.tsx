@@ -5,6 +5,8 @@ import Image from "next/image";
 import { ListingPhotoUpload } from "@/components/listing-photo-upload";
 import { getListing } from "@/lib/listings/data";
 import { ListingStatusForm } from "@/components/listing-status-form";
+import { SavedToggle } from "@/components/trust-forms";
+import { serverSupabase } from "@/lib/supabase/server";
 import { StartSaleConversation } from "@/components/sale-interaction-forms";
 
 export const dynamic = "force-dynamic";
@@ -20,6 +22,11 @@ export default async function ListingDetails({
   if (!result) notFound();
   const { listing, userId, photos, photoCount } = result;
   const owner = userId === listing.owner_id;
+  const trustEnabled = process.env.ENABLE_MARKETPLACE_USER_ACTIONS === "true";
+  const privateClient = trustEnabled ? await serverSupabase() : null;
+  const saved = !owner && privateClient ? Boolean((await privateClient.from("favorites")
+    .select("listing_id").eq("listing_id", listing.id).eq("user_id", userId)
+    .maybeSingle()).data) : false;
   const writeControlsEnabled = process.env.ENABLE_MARKETPLACE_WRITES === "true";
   const interactionsEnabled = process.env.ENABLE_MARKETPLACE_INTERACTIONS === "true";
   const price = new Intl.NumberFormat("en-IN", {
@@ -56,9 +63,12 @@ export default async function ListingDetails({
           <div className="feed-notice listing-contact-notice">
             <h2>Connect about this item</h2>
             <p>Message the seller, or discuss a price in a private conversation.</p>
+            {trustEnabled && listing.status === "active" &&
+              <SavedToggle listingId={listing.id} saved={saved}/>}
             {listing.status === "active" && interactionsEnabled ?
               <StartSaleConversation listingId={listing.id} /> :
               <p>Messaging and offers are not available for this listing yet.</p>}
+            {listing.status === "active" && trustEnabled && <Link href={"/report/"+listing.id} className="text-link">Report this listing →</Link>}
           </div>
         }
       </div>

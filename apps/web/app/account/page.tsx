@@ -70,6 +70,11 @@ export default async function AccountPage({
         ? "Your marketplace access is enabled."
         : "Marketplace access is not yet enabled for this account."}</p>
       <p className="auth-email">{user.email ?? "Email unavailable"}</p>
+      <div className="account-quicklinks">
+        <Link href="/settings" className="text-link">Settings →</Link>
+        <Link href="/saved" className="text-link">Saved items →</Link>
+        <Link href="/my/listings" className="text-link">My listings →</Link>
+      </div>
       <AccountSignOut />
     </div>
   );
