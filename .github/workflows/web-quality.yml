@@ -1,0 +1,191 @@
+name: Web quality gates
+
+on:
+  pull_request:
+    paths:
+      - "apps/web/**"
+      - "package.json"
+      - "pnpm-workspace.yaml"
+      - "pnpm-lock.yaml"
+      - "supabase/**"
+      - "README.md"
+      - "docs/**"
+      - ".github/workflows/web-quality.yml"
+  push:
+    branches:
+      - "main"
+      - "feat/**"
+    paths:
+      - "apps/web/**"
+      - "package.json"
+      - "pnpm-workspace.yaml"
+      - "pnpm-lock.yaml"
+      - "supabase/**"
+      - "README.md"
+      - "docs/**"
+      - ".github/workflows/web-quality.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  verify-web:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.18.3
+          run_install: false
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Unit tests
+        run: pnpm test
+      - name: Type check
+        run: pnpm typecheck
+      - name: Lint
+        run: pnpm lint
+      - name: Production build
+        run: pnpm build
+      - name: Production HTTP smoke without database credentials
+        run: node apps/web/tests/http-smoke.mjs
+
+  verify-identity-db:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: uniloop_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d uniloop_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      PGHOST: localhost
+      PGPORT: "5432"
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: uniloop_ci
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-client
+      - name: Setup disposable Supabase Auth fixtures
+        run: psql -X -v ON_ERROR_STOP=1 -f supabase/tests/00_auth_fixture.sql
+      - name: Apply identity migration
+        run: psql -X -v ON_ERROR_STOP=1 -f supabase/migrations/20261009170000_identity_foundation.sql
+      - name: Assert row level security
+        run: psql -X -v ON_ERROR_STOP=1 -f supabase/tests/01_identity_rls.sql
+
+      - name: Provision fresh database for listing tests
+        run: createdb uniloop_listings_ci
+      - name: Setup Auth fixture in listing test database
+        run: psql -X -d uniloop_listings_ci -v ON_ERROR_STOP=1 -f supabase/tests/00_auth_fixture.sql
+      - name: Apply identity schema to listing test database
+        run: psql -X -d uniloop_listings_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009170000_identity_foundation.sql
+      - name: Apply listing schema
+        run: psql -X -d uniloop_listings_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009200000_sale_listings.sql
+      - name: Assert listing access and transitions
+        run: psql -X -d uniloop_listings_ci -v ON_ERROR_STOP=1 -f supabase/tests/02_listings_rls.sql
+
+      - name: Provision fresh media test database
+        run: createdb uniloop_media_ci
+      - name: Setup Auth fixture for media tests
+        run: psql -X -d uniloop_media_ci -v ON_ERROR_STOP=1 -f supabase/tests/00_auth_fixture.sql
+      - name: Setup disposable Storage fixture
+        run: psql -X -d uniloop_media_ci -v ON_ERROR_STOP=1 -f supabase/tests/03_storage_fixture.sql
+      - name: Apply identity migration for media tests
+        run: psql -X -d uniloop_media_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009170000_identity_foundation.sql
+      - name: Apply sale listings migration for media tests
+        run: psql -X -d uniloop_media_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009200000_sale_listings.sql
+      - name: Apply listing media migration
+        run: psql -X -d uniloop_media_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009210000_listing_media.sql
+      - name: Assert storage RLS and photo requirements
+        run: psql -X -d uniloop_media_ci -v ON_ERROR_STOP=1 -f supabase/tests/04_media_rls.sql
+
+      - name: Provision fresh sale interaction test database
+        run: createdb uniloop_interactions_ci
+      - name: Setup disposable Auth and Storage fixtures
+        run: |
+          psql -X -d uniloop_interactions_ci -v ON_ERROR_STOP=1 -f supabase/tests/00_auth_fixture.sql
+          psql -X -d uniloop_interactions_ci -v ON_ERROR_STOP=1 -f supabase/tests/03_storage_fixture.sql
+      - name: Apply all prerequisite migrations and interaction migration
+        run: |
+          psql -X -d uniloop_interactions_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009170000_identity_foundation.sql
+          psql -X -d uniloop_interactions_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009200000_sale_listings.sql
+          psql -X -d uniloop_interactions_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009210000_listing_media.sql
+          psql -X -d uniloop_interactions_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009220000_sale_interactions.sql
+      - name: Verify private chat, offer negotiation and abuse controls
+        run: psql -X -d uniloop_interactions_ci -v ON_ERROR_STOP=1 -f supabase/tests/05_interactions_rls.sql
+
+      - name: Provision trust and saved-data test database
+        run: createdb uniloop_trust_ci
+      - name: Apply trust test migrations
+        run: |
+          psql -X -d uniloop_trust_ci -v ON_ERROR_STOP=1 -f supabase/tests/00_auth_fixture.sql
+          psql -X -d uniloop_trust_ci -v ON_ERROR_STOP=1 -f supabase/tests/03_storage_fixture.sql
+          psql -X -d uniloop_trust_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009170000_identity_foundation.sql
+          psql -X -d uniloop_trust_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009200000_sale_listings.sql
+          psql -X -d uniloop_trust_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009210000_listing_media.sql
+          psql -X -d uniloop_trust_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009220000_sale_interactions.sql
+          psql -X -d uniloop_trust_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009230000_market_trust.sql
+      - name: Verify favorites, reports and admin authorization
+        run: psql -X -d uniloop_trust_ci -v ON_ERROR_STOP=1 -f supabase/tests/06_trust_saved_rls.sql
+
+      - name: Provision rental test database
+        run: createdb uniloop_rentals_ci
+      - name: Apply rental prerequisites and migration
+        run: |
+          psql -X -d uniloop_rentals_ci -v ON_ERROR_STOP=1 -f supabase/tests/00_auth_fixture.sql
+          psql -X -d uniloop_rentals_ci -v ON_ERROR_STOP=1 -f supabase/tests/03_storage_fixture.sql
+          psql -X -d uniloop_rentals_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009170000_identity_foundation.sql
+          psql -X -d uniloop_rentals_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009200000_sale_listings.sql
+          psql -X -d uniloop_rentals_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261010000000_rentals.sql
+          psql -X -d uniloop_rentals_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261010010000_rental_media.sql
+      - name: Verify rental dates, exclusion, approvals and handovers
+        run: psql -X -d uniloop_rentals_ci -v ON_ERROR_STOP=1 -f supabase/tests/07_rentals_rls.sql
+
+      - name: Provision sale exchange test database
+        run: createdb uniloop_sale_deals_ci
+      - name: Apply sale exchange prerequisites and migration
+        run: |
+          psql -X -d uniloop_sale_deals_ci -v ON_ERROR_STOP=1 -f supabase/tests/00_auth_fixture.sql
+          psql -X -d uniloop_sale_deals_ci -v ON_ERROR_STOP=1 -f supabase/tests/03_storage_fixture.sql
+          psql -X -d uniloop_sale_deals_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009170000_identity_foundation.sql
+          psql -X -d uniloop_sale_deals_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009200000_sale_listings.sql
+          psql -X -d uniloop_sale_deals_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009210000_listing_media.sql
+          psql -X -d uniloop_sale_deals_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009220000_sale_interactions.sql
+          psql -X -d uniloop_sale_deals_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261010020000_sale_transactions.sql
+      - name: Verify mutual sale handover and verified reviews
+        run: psql -X -d uniloop_sale_deals_ci -v ON_ERROR_STOP=1 -f supabase/tests/08_sale_transactions_rls.sql
+
+      - name: Provision full-chain notification test database
+        run: createdb uniloop_notifications_ci
+      - name: Apply ALL schema migrations in order
+        run: |
+          psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/00_auth_fixture.sql
+          psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/03_storage_fixture.sql
+          for migration in supabase/migrations/*.sql; do
+            echo "Applying $migration"
+            psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f "$migration"
+          done
+      - name: Verify persisted in-app notifications and recipient RLS
+        run: psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/09_notifications_rls.sql
+      - name: Verify cross-domain sale/rental state safeguards
+        run: psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/10_transaction_guardrails.sql
