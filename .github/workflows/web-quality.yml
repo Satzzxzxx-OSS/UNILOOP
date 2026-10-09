@@ -6,6 +6,8 @@ on:
       - "apps/web/**"
       - "package.json"
       - "pnpm-workspace.yaml"
+      - "pnpm-lock.yaml"
+      - "supabase/**"
       - ".github/workflows/web-quality.yml"
   push:
     branches:
@@ -45,3 +47,39 @@ jobs:
         run: pnpm lint
       - name: Production build
         run: pnpm build
+
+  verify-identity-db:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: uniloop_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d uniloop_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      PGHOST: localhost
+      PGPORT: "5432"
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: uniloop_ci
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-client
+      - name: Setup disposable Supabase Auth fixtures
+        run: psql -X -v ON_ERROR_STOP=1 -f supabase/tests/00_auth_fixture.sql
+      - name: Apply identity migration
+        run: psql -X -v ON_ERROR_STOP=1 -f supabase/migrations/20261009170000_identity_foundation.sql
+      - name: Assert row level security
+        run: psql -X -v ON_ERROR_STOP=1 -f supabase/tests/01_identity_rls.sql
