@@ -182,3 +182,5 @@ jobs:
           done
       - name: Verify persisted in-app notifications and recipient RLS
         run: psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/09_notifications_rls.sql
+      - name: Verify cross-domain sale/rental state safeguards
+        run: psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/10_transaction_guardrails.sql
