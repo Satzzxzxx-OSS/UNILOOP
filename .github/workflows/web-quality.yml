@@ -146,8 +146,10 @@ jobs:
       - name: Apply rental prerequisites and migration
         run: |
           psql -X -d uniloop_rentals_ci -v ON_ERROR_STOP=1 -f supabase/tests/00_auth_fixture.sql
+          psql -X -d uniloop_rentals_ci -v ON_ERROR_STOP=1 -f supabase/tests/03_storage_fixture.sql
           psql -X -d uniloop_rentals_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009170000_identity_foundation.sql
           psql -X -d uniloop_rentals_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009200000_sale_listings.sql
           psql -X -d uniloop_rentals_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261010000000_rentals.sql
+          psql -X -d uniloop_rentals_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261010010000_rental_media.sql
       - name: Verify rental dates, exclusion, approvals and handovers
         run: psql -X -d uniloop_rentals_ci -v ON_ERROR_STOP=1 -f supabase/tests/07_rentals_rls.sql

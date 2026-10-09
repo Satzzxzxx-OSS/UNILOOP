@@ -38,6 +38,24 @@ begin
   raise exception 'Client can insert unverified bookings';
  end if;
 end $$;
+do $$
+begin
+ begin
+  perform public.change_rental_listing(
+    '11111111-aaaa-4111-8111-111111111111','active');
+  raise exception 'Rental could publish without photos';
+ exception when check_violation then null;
+ end;
+end $$;
+insert into storage.objects(bucket_id,name,owner_id) values (
+ 'rental-media',
+ '11111111-aaaa-4111-8111-111111111111/22222222-aaaa-4222-8222-222222222222.jpg',
+ 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
+);
+insert into public.rental_photos(rental_id,storage_path,position) values (
+ '11111111-aaaa-4111-8111-111111111111',
+ '11111111-aaaa-4111-8111-111111111111/22222222-aaaa-4222-8222-222222222222.jpg',1
+);
 select public.change_rental_listing(
  '11111111-aaaa-4111-8111-111111111111','active');
 commit;
@@ -253,4 +271,25 @@ begin
    raise exception 'Client can skip conflict check by creating blocks';
  end if;
 end $$;
+
+-- Photographs are private to verified buyers and the owner, not anonymous users.
+begin;
+set local role authenticated;
+select set_config('request.jwt.claim.sub','dddddddd-dddd-4ddd-8ddd-dddddddddddd',true);
+do $$
+begin
+ if exists(select 1 from public.rental_photos) or
+    exists(select 1 from storage.objects) then
+    raise exception 'Unverified member read rental media';
+ end if;
+end $$;
+rollback;
+do $$
+begin
+ if has_table_privilege('anon','public.rental_photos','SELECT')
+   or has_table_privilege('authenticated','public.rental_photos','DELETE') then
+  raise exception 'Media permissions too broad';
+ end if;
+end $$;
+
 select 'rental lifecycle & date exclusion: passed' as result;
