@@ -79,23 +79,21 @@ select set_config('request.jwt.claim.sub','cccccccc-cccc-4ccc-8ccc-cccccccccccc'
 do $$
 declare
   rental_uuid uuid := '33333333-aaaa-4333-8333-333333333333';
-  from_day date;
-  until_day date;
+  from_day date := current_date+5;
+  until_day date := current_date+7;
 begin
-  select lower(booking_period),upper(booking_period)
-    into from_day,until_day
-    from public.rental_bookings where rental_id=rental_uuid
-    and status='approved';
-  if from_day is null then raise exception 'Missing booked rental fixture'; end if;
+  if exists(select 1 from public.rental_bookings) then
+    raise exception 'A different renter can see private bookings';
+  end if;
   begin
     perform public.request_rental_booking(rental_uuid,from_day,until_day,
       'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee');
     raise exception 'Request succeeded on occupied rental dates';
   exception when check_violation then null;
   end;
-  if (select count(*) from public.rental_bookings
-      where rental_id=rental_uuid)<>1 then
-    raise exception 'Invalid rental attempt generated a booking row';
+  if exists (select 1 from public.rental_bookings
+      where rental_id=rental_uuid) then
+    raise exception 'Invalid rental attempt generated a visible booking row';
   end if;
 end;
 $$;
