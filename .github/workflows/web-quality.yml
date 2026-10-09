@@ -1,0 +1,48 @@
+name: Web quality gates
+
+on:
+  pull_request:
+    paths:
+      - "apps/web/**"
+      - "package.json"
+      - "pnpm-workspace.yaml"
+      - ".github/workflows/web-quality.yml"
+  push:
+    branches:
+      - "feat/**"
+    paths:
+      - "apps/web/**"
+      - "package.json"
+      - "pnpm-workspace.yaml"
+      - ".github/workflows/web-quality.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  verify-web:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.18.3
+          run_install: false
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install dependencies
+        # TEMPORARY: commit a lockfile before merging, then switch to --frozen-lockfile.
+        run: pnpm install --no-frozen-lockfile
+      - name: Unit tests
+        run: pnpm test
+      - name: Type check
+        run: pnpm typecheck
+      - name: Lint
+        run: pnpm lint
+      - name: Production build
+        run: pnpm build
