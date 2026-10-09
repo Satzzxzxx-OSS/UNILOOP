@@ -8,9 +8,12 @@ on:
       - "pnpm-workspace.yaml"
       - "pnpm-lock.yaml"
       - "supabase/**"
+      - "README.md"
+      - "docs/**"
       - ".github/workflows/web-quality.yml"
   push:
     branches:
+      - "main"
       - "feat/**"
     paths:
       - "apps/web/**"
@@ -18,6 +21,8 @@ on:
       - "pnpm-workspace.yaml"
       - "pnpm-lock.yaml"
       - "supabase/**"
+      - "README.md"
+      - "docs/**"
       - ".github/workflows/web-quality.yml"
 
 permissions:
