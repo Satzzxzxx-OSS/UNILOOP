@@ -17,9 +17,11 @@ export function SiteHeader() {
           <Link href="/explore?mode=rent">Rent</Link>
           <Link href="/#categories">Categories</Link>
           <Link href="/my/listings">My listings</Link>
+          <Link href="/inbox">Inbox</Link>
           <Link href="/#how-it-works">How it works</Link>
         </nav>
         <div className="header-actions">
+          <Link href="/inbox" className="account-link">Inbox</Link>
           <Link href="/account" className="account-link">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" width="18" height="18">
               <circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.7" />
@@ -37,6 +39,8 @@ export function SiteHeader() {
         <Link href="/explore?mode=rent">Rent</Link>
         <Link href="/#categories">Categories</Link>
         <Link href="/post">Post</Link>
+        <Link href="/inbox">Inbox</Link>
+        <Link href="/offers">Offers</Link>
         <Link href="/account">Account</Link>
       </nav>
     </header>

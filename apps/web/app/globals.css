@@ -285,3 +285,54 @@ button { cursor: pointer; }
 .photo-upload label { font-size: 13px; font-weight: 750; }
 .photo-upload input[type=file] { max-width: 100%; font-size: 13px; }
 .photo-upload p, .photo-help { margin: 0; font-size: 12px; color: #68788e; line-height: 1.65; }
+
+
+/* Step 04 — durable private chat and negotiation. Plain readable layout,
+   no animations or fake delivery/read receipts. */
+.conversation-page { padding-top: 75px; padding-bottom: 105px; }
+.conversation-page > h1, .conversation-heading h1 { font-size: clamp(35px, 4vw, 50px); letter-spacing: -.05em; margin: 0 0 10px; }
+.conversation-intro { color: #67748a; font-size: 14px; line-height: 1.7; margin: 0 0 28px; }
+.thread-list { display: grid; gap: 12px; max-width: 850px; }
+.thread-link { display: flex; align-items: center; gap: 20px; padding: 22px; border: 1px solid var(--border); background: white; border-radius: 19px; }
+.thread-link:hover { border-color: #d1ad73; background: #fffbf3; }
+.thread-indicator { display: grid; place-items: center; background: #edf2f7; color: #243b5c; border-radius: 15px; width: 47px; height: 47px; font-size: 26px; }
+.thread-link strong,.thread-link small { display: block; }
+.thread-link strong { font-size: 16px; }
+.thread-link small { font-size: 12px; color: #77849a; margin-top: 5px; }
+.thread-arrow { margin-left: auto; font-weight: 700; }
+.conversation-heading { display: flex; gap: 22px; justify-content: space-between; align-items: start; margin-top: 25px; }
+.refresh-conversation { padding: 12px; border: 1px solid var(--border); border-radius: 10px; background: white; cursor: pointer; }
+.conversation-layout { display: grid; grid-template-columns: minmax(0,1.35fr) minmax(300px,.65fr); gap: 20px; }
+.conversation-pane, .negotiation-pane { background: white; border: 1px solid var(--border); border-radius: 22px; padding: 25px; min-width: 0; }
+.conversation-pane h2,.negotiation-pane h2 { margin: 0 0 21px; font-size: 22px; letter-spacing: -.03em; }
+.message-history { min-height: 190px; max-height: 460px; overflow-y: auto; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; align-items: start; gap: 14px; padding: 8px 0 24px; }
+.message-bubble { background: #edf2f9; padding: 14px 18px; border-radius: 17px; max-width: min(85%,410px); overflow-wrap: anywhere; }
+.message-bubble.mine { align-self: end; background: #eaf1fc; }
+.message-sender { font-size: 10px; font-weight: 800; color: #536889; }
+.message-bubble p { font-size: 14px; line-height: 1.55; margin: 8px 0; white-space: pre-wrap; }
+.message-bubble time { font-size: 10px; color: #66748b; }
+.message-compose,.offer-compose { display: flex; flex-direction: column; gap: 12px; margin-top: 22px; }
+.message-compose label, .offer-compose label { font-size: 13px; font-weight: 750; }
+.message-compose textarea, .offer-compose input { font: inherit; padding: 13px; min-width: 0; border: 1px solid #cad5e2; border-radius: 12px; resize: vertical; }
+.message-compose button { align-self: start; }
+.interaction-notice { padding: 15px; background: #f3f6fb; border: 1px solid var(--border); border-radius: 12px; font-size: 13px; color: #4f5f78; }
+.interaction-note,.conversation-empty { font-size: 13px; color: #6c788d; line-height: 1.65; }
+.offer-history { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+.offer-card { display: flex; flex-direction: column; gap: 7px; background: #f8fafc; border: 1px solid var(--border); border-radius: 13px; padding: 14px; }
+.offer-card strong { font-size: 21px; }
+.offer-tag,.offer-state { font-size: 11px; color: #687993; text-transform: capitalize; }
+.status-accepted { color: #176b50; font-weight: 700; }
+.status-rejected,.status-withdrawn { color: #934a45; }
+.offer-form-row,.offer-controls { display: flex; gap: 10px; flex-wrap: wrap; }
+.offer-form-row input { flex: 1 1 120px; max-width: 240px; }
+.button-outline { background: white; color: #273b59; border-color: #b7c4d4; }
+.decision-form { display: flex; flex-direction: column; gap: 4px; }
+.decision-form .button { min-height: 40px; padding: 8px 12px; font-size: 12px; }
+.interaction-feedback { font-size: 12px; color: #8a423f; margin: 0; }
+.conversation-safety { border-top: 1px solid var(--border); padding-top: 18px; margin-top: 24px; }
+.conversation-safety h3 { font-size: 16px; }
+.conversation-safety p { font-size: 12px; color: #69798d; line-height: 1.7; }
+.block-form button { padding: 6px; border: 0; background: none; cursor: pointer; }
+.interaction-action p { font-size: 12px; color: #8a423f; }
+@media(max-width:900px) { .conversation-layout { grid-template-columns: 1fr; } }
+@media(max-width:560px) { .conversation-pane,.negotiation-pane { padding: 18px; } .conversation-heading { flex-direction: column; gap: 10px; } }

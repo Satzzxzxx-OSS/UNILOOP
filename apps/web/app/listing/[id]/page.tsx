@@ -5,6 +5,7 @@ import Image from "next/image";
 import { ListingPhotoUpload } from "@/components/listing-photo-upload";
 import { getListing } from "@/lib/listings/data";
 import { ListingStatusForm } from "@/components/listing-status-form";
+import { StartSaleConversation } from "@/components/sale-interaction-forms";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Listing details", robots: { index: false } };
@@ -20,6 +21,7 @@ export default async function ListingDetails({
   const { listing, userId, photos, photoCount } = result;
   const owner = userId === listing.owner_id;
   const writeControlsEnabled = process.env.ENABLE_MARKETPLACE_WRITES === "true";
+  const interactionsEnabled = process.env.ENABLE_MARKETPLACE_INTERACTIONS === "true";
   const price = new Intl.NumberFormat("en-IN", {
     style: "currency", currency: "INR", maximumFractionDigits: 0,
   }).format(listing.price_inr);
@@ -52,8 +54,11 @@ export default async function ListingDetails({
             <Link className="text-link" href="/my/listings">Manage all my listings →</Link>
           </> :
           <div className="feed-notice listing-contact-notice">
-            <h2>Contact options are being prepared</h2>
-            <p>Messaging and offers will become available once their real, secure workflows launch.</p>
+            <h2>Connect about this item</h2>
+            <p>Message the seller, or discuss a price in a private conversation.</p>
+            {listing.status === "active" && interactionsEnabled ?
+              <StartSaleConversation listingId={listing.id} /> :
+              <p>Messaging and offers are not available for this listing yet.</p>}
           </div>
         }
       </div>
