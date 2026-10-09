@@ -72,3 +72,17 @@ https://supabase.com/docs/guides/storage/security/access-control
 https://supabase.com/docs/guides/storage/security/ownership
 https://supabase.com/docs/guides/storage/buckets/creating-buckets
 https://nextjs.org/docs/app/guides/forms
+
+## Feature flag and real data boundary
+
+\`ENABLE_MARKETPLACE_WRITES\` gates only the **application** form/actions,
+not direct Supabase client API requests. The actual security boundary is
+PostgreSQL RLS, verified membership and the private Storage RLS policies.
+Untrusted accounts must never be provisioned into enabled scopes before
+moderation, upload quotas, abuse controls and live policy testing are ready.
+No service key or privileged role is used in the browser. Never mistake
+a disabled React control for a database authorization rule.
+
+Current Step 03 implementation is a testable vertical slice, **not** a
+verified or launched production marketplace. Signed links are short-lived
+bearer URLs; avoid exposing them to third-party embeds or analytics.

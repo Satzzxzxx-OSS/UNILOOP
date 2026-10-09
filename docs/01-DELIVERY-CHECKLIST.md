@@ -37,3 +37,17 @@ Never represent planning, a static UI, or unrun tests as launched functionality.
 - [ ] Configure SMTP, PKCE email link template, approved accounts and redirects.
 - [ ] Test real email login, session refresh, signout, account bans and eligibility.
 - [ ] Browser E2E, mobile accessibility and human security review.
+
+## Gate 04 — Sale marketplace vertical slice (Step 03)
+- [x] Curated taxonomy and listing table (draft/active/paused/sold/removed).
+- [x] Owner/campus-aware RLS and server-side validated draft creation.
+- [x] SQL-controlled listing lifecycle and invalid/concurrent transition checks.
+- [x] Private photo bucket; MIME/size/path restrictions; metadata-backed display.
+- [x] Publish requires at least one registered real image (database trigger).
+- [x] Web routes: Sell draft, My Listings, Details, Buy discovery, image upload.
+- [x] Negative tests for third-party access, cross-scope visibility, revocation.
+- [x] GitHub CI: Next.js unit/typecheck/lint/build and 3 PG test databases.
+- [ ] Production abuse moderation, quotas, cleanup, account deletion safeguards.
+- [ ] Hosted Supabase Auth/Storage integration tests and real browser E2E.
+- [ ] Signed-image privacy, image processing, load and accessibility reviews.
+- [ ] Approved product policy for active selling, then audited pilot enablement.
