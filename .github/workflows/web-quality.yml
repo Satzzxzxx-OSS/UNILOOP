@@ -96,3 +96,18 @@ jobs:
         run: psql -X -d uniloop_listings_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009200000_sale_listings.sql
       - name: Assert listing access and transitions
         run: psql -X -d uniloop_listings_ci -v ON_ERROR_STOP=1 -f supabase/tests/02_listings_rls.sql
+
+      - name: Provision fresh media test database
+        run: createdb uniloop_media_ci
+      - name: Setup Auth fixture for media tests
+        run: psql -X -d uniloop_media_ci -v ON_ERROR_STOP=1 -f supabase/tests/00_auth_fixture.sql
+      - name: Setup disposable Storage fixture
+        run: psql -X -d uniloop_media_ci -v ON_ERROR_STOP=1 -f supabase/tests/03_storage_fixture.sql
+      - name: Apply identity migration for media tests
+        run: psql -X -d uniloop_media_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009170000_identity_foundation.sql
+      - name: Apply sale listings migration for media tests
+        run: psql -X -d uniloop_media_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009200000_sale_listings.sql
+      - name: Apply listing media migration
+        run: psql -X -d uniloop_media_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009210000_listing_media.sql
+      - name: Assert storage RLS and photo requirements
+        run: psql -X -d uniloop_media_ci -v ON_ERROR_STOP=1 -f supabase/tests/04_media_rls.sql
