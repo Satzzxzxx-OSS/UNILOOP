@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { categories } from "@/lib/catalog";
 import type { Listing } from "@/lib/listings/data";
 
@@ -7,9 +8,11 @@ export function ListingCard({ listing }: { listing: Listing }) {
   return (
     <article className="listing-card">
       <Link href={"/listing/" + listing.id} className="listing-card-link">
-        <div className="listing-card-visual" aria-hidden="true">
-          <span className="listing-illustration">✳</span>
-          <span className="listing-media-note">Photos not added</span>
+        <div className="listing-card-visual">
+          {listing.photo_url ? <Image src={listing.photo_url} alt={listing.title}
+            width={520} height={390} unoptimized className="listing-cover-photo" /> :
+            <><span className="listing-illustration">✳</span>
+            <span className="listing-media-note">Photos not available</span></>}
         </div>
         <div className="listing-card-body">
           <p className="listing-category">{label}</p>

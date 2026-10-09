@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
+import { ListingPhotoUpload } from "@/components/listing-photo-upload";
 import { getListing } from "@/lib/listings/data";
 import { ListingStatusForm } from "@/components/listing-status-form";
 
@@ -15,7 +17,7 @@ export default async function ListingDetails({
   const { id } = await params;
   const result = await getListing(id);
   if (!result) notFound();
-  const { listing, userId } = result;
+  const { listing, userId, photos, photoCount } = result;
   const owner = userId === listing.owner_id;
   const price = new Intl.NumberFormat("en-IN", {
     style: "currency", currency: "INR", maximumFractionDigits: 0,
@@ -24,9 +26,11 @@ export default async function ListingDetails({
   return <article className="container listing-detail-page">
     <Link href="/explore" className="text-link">← Back to explore</Link>
     <div className="listing-detail-grid">
-      <div className="listing-detail-photo" aria-label="This item has no uploaded photographs yet">
-        <span aria-hidden="true">✳</span>
-        <p>Photos not yet available</p>
+      <div className="listing-detail-photo">
+        {photos.length ? <div className="listing-photo-gallery">{photos.map((url,index) =>
+          <Image key={url} src={url} alt={"Photo " + (index + 1) + " of " + listing.title}
+            width={700} height={580} unoptimized className="listing-detail-image" />
+        )}</div> : <><span aria-hidden="true">✳</span><p>Photos not yet available</p></>}
       </div>
       <div className="listing-detail-content">
         <p className="eyebrow">SALE LISTING</p>
@@ -41,7 +45,9 @@ export default async function ListingDetails({
         {owner ?
           <>
             <p className="listing-owner-note">You own this listing. Only approved and active listings are discoverable by other accounts.</p>
-            <ListingStatusForm id={listing.id} current={listing.status}/>
+            {(listing.status === "draft" || listing.status === "paused") &&
+              <ListingPhotoUpload listingId={listing.id} count={photoCount}/>}
+            <ListingStatusForm id={listing.id} current={listing.status} hasPhoto={photoCount > 0}/>
             <Link className="text-link" href="/my/listings">Manage all my listings →</Link>
           </> :
           <div className="feed-notice listing-contact-notice">
