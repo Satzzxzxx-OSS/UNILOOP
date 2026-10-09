@@ -76,7 +76,7 @@ begin
     raise exception 'One-sided handover marked completed';
   end if;
   begin
-    perform public.review_completed_sale(first_tx,5,'Good and quick trade, thank you.');
+    perform public.review_completed_sale(first_tx,5::smallint,'Good and quick trade, thank you.');
     raise exception 'Review allowed before mutual handover';
   exception when insufficient_privilege then null;
   end;
@@ -124,9 +124,9 @@ do $$
 declare deal_id uuid;
 begin
   select id into deal_id from public.sale_transactions;
-  perform public.review_completed_sale(deal_id,5,'Item matched the stated description perfectly.');
+  perform public.review_completed_sale(deal_id,5::smallint,'Item matched the stated description perfectly.');
   begin
-    perform public.review_completed_sale(deal_id,1,'Another unauthorized duplicate review text.');
+    perform public.review_completed_sale(deal_id,1::smallint,'Another unauthorized duplicate review text.');
     raise exception 'User posted duplicate sale review';
   exception when unique_violation then null;
   end;
