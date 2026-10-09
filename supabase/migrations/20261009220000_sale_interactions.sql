@@ -99,14 +99,14 @@ $$;
 create function private.sale_counterparty_eligible(other_user uuid, requested_campus uuid)
 returns boolean language sql stable security definer
 set search_path = ''
-as $
+as $$
   select exists (
     select 1 from public.profiles p
     join public.campus_memberships cm on cm.user_id = p.id
     where p.id = other_user and p.account_status = 'active'
       and cm.campus_id = requested_campus and cm.status = 'verified'
   );
-$;
+$$;
 
 revoke all on function private.can_read_sale_conversation(uuid)
   from public, anon, authenticated;
