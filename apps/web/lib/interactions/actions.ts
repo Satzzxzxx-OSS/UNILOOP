@@ -120,7 +120,7 @@ export async function changeBlock(
 
   const query = context.client.from("user_blocks");
   const { error } = action === "block"
-    ? await query.upsert({ blocker_id: context.userId, blocked_id: other })
+    ? await query.insert({ blocker_id: context.userId, blocked_id: other })
     : await query.delete().eq("blocker_id",context.userId).eq("blocked_id",other);
   if (error) return { message: "Unable to change contact preference." };
   revalidatePath("/inbox/" + thread);
