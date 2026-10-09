@@ -108,4 +108,58 @@ begin
  end if;
 end $$;
 
+
+-- Another authorized account cannot upload into the seller's listing,
+-- even if it supplies its own object owner_id.
+begin;
+set local role authenticated;
+select set_config('request.jwt.claim.sub','bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',true);
+do $$
+begin
+  begin
+    insert into storage.objects(bucket_id,name,owner_id) values (
+      'listing-media',
+      '11111111-aaaa-4111-8111-111111111111/33333333-aaaa-4333-8333-333333333333.png',
+      'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'
+    );
+    raise exception 'Non-owner uploaded to another listing';
+  exception when insufficient_privilege then null;
+  end;
+  delete from storage.objects
+  where name = '11111111-aaaa-4111-8111-111111111111/22222222-aaaa-4222-8222-222222222222.jpg';
+  if found then
+    raise exception 'A registered object was deleted by a client';
+  end if;
+end $$;
+rollback;
+
+-- Disabling a category hides existing listings from other members.
+update public.categories set enabled = false where slug = 'books-study';
+begin;
+set local role authenticated;
+select set_config('request.jwt.claim.sub','bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',true);
+do $$
+begin
+  if exists (select 1 from public.listings) then
+    raise exception 'Disabled-category sale listing remains public';
+  end if;
+end $$;
+rollback;
+update public.categories set enabled = true where slug = 'books-study';
+
+-- A revoked member loses read access without waiting for a JWT refresh.
+update public.campus_memberships set status = 'revoked', verified_at = null
+where user_id = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
+begin;
+set local role authenticated;
+select set_config('request.jwt.claim.sub','bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',true);
+do $$
+begin
+  if exists(select 1 from public.listing_photos) or
+     exists(select 1 from storage.objects) then
+    raise exception 'Revoked member can still read media';
+  end if;
+end $$;
+rollback;
+
 select 'listing media RLS and publish gate: passed' as result;
