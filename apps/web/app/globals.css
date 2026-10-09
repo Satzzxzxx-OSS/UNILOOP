@@ -396,3 +396,18 @@ button { cursor: pointer; }
   .booking-summary,.rental-control-panel,.rental-condition-section { padding: 18px; }
   .booking-summary dl>div { grid-template-columns: 1fr; gap: 5px; }
 }
+
+/* Real notification inbox. No simulated counters. */
+.notification-list { max-width: 880px; display: grid; gap: 10px; }
+.notification-entry { display: flex; align-items: flex-start; gap: 18px; padding: 20px; background: #fff; border: 1px solid var(--border); border-radius: 17px; }
+.notification-entry.unread { border-color: #ddc79e; background: #fffdf7; }
+.notification-symbol { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 13px; background: #eef2f7; color: #495d7c; }
+.notification-body { display: grid; gap: 7px; flex: 1; min-width: 0; }
+.notification-body a:hover { text-decoration: underline; }
+.notification-body strong { font-size: 15px; }
+.notification-type { color: #976b2e; font-size: 10px; font-weight: 850; text-transform: uppercase; letter-spacing: .1em; }
+.notification-body time { color: #75829a; font-size: 11px; }
+.notification-read-form { display: grid; gap: 5px; }
+.notification-read-form button { white-space: nowrap; border: 0; background: transparent; cursor: pointer; }
+.notification-read-form p { max-width: 160px; font-size: 11px; color: #a64f40; margin: 0; }
+@media(max-width:560px){ .notification-entry { flex-wrap: wrap; } }

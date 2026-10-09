@@ -73,6 +73,7 @@ export default async function AccountPage({
       <div className="account-quicklinks">
         <Link href="/settings" className="text-link">Settings →</Link>
         <Link href="/saved" className="text-link">Saved items →</Link>
+        <Link href="/notifications" className="text-link">Notifications →</Link>
         <Link href="/my/listings" className="text-link">My listings →</Link>
       </div>
       <AccountSignOut />

@@ -18,12 +18,20 @@ export function SiteHeader() {
           <Link href="/#categories">Categories</Link>
           <Link href="/my/listings">My listings</Link>
           <Link href="/rentals">Rentals</Link>
+          <Link href="/transactions">Exchanges</Link>
           <Link href="/transactions">Transactions</Link>
           <Link href="/inbox">Inbox</Link>
           <Link href="/saved">Saved</Link>
+          <Link href="/notifications">Activity</Link>
           <Link href="/#how-it-works">How it works</Link>
         </nav>
         <div className="header-actions">
+          <Link href="/notifications" className="account-link" aria-label="Notifications">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M18 8a6 6 0 0 0-12 0c0 8-3 9-3 9h18s-3-1-3-9ZM10 21h4"
+                stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"/>
+            </svg>
+          </Link>
           <Link href="/inbox" className="account-link">Inbox</Link>
           <Link href="/account" className="account-link">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" width="18" height="18">
@@ -44,6 +52,7 @@ export function SiteHeader() {
         <Link href="/post">Post</Link>
         <Link href="/inbox">Inbox</Link>
         <Link href="/offers">Offers</Link>
+        <Link href="/notifications">Activity</Link>
         <Link href="/rentals">Rentals</Link>
         <Link href="/saved">Saved</Link>
         <Link href="/account">Account</Link>

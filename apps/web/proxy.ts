@@ -13,5 +13,6 @@ export const config = {
     "/inbox/:path*", "/offers/:path*",
     "/saved/:path*", "/settings/:path*", "/report/:path*", "/admin/:path*",
     "/rent/:path*", "/rentals/:path*", "/transactions/:path*",
+    "/notifications/:path*",
   ],
 };
