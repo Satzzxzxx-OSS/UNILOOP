@@ -401,4 +401,30 @@ grant execute on function public.block_rental_period(uuid,date,date,uuid) to aut
 grant execute on function public.decide_rental_booking(uuid,text) to authenticated;
 grant execute on function public.add_rental_condition_note(uuid,text,text) to authenticated;
 
+
+-- Availability reveals only busy dates, never renter identities or prices.
+create function public.get_rental_busy_periods(requested_rental uuid)
+returns table(start_date date, return_date date)
+language plpgsql stable security definer set search_path=''
+as $$
+declare
+  item public.rental_listings%rowtype;
+begin
+  select * into item from public.rental_listings where id=requested_rental;
+  if not found or not private.can_access_campus(item.campus_id)
+     or (item.status<>'active' and item.owner_id<>(select auth.uid()))
+  then raise exception 'Not authorized' using errcode='42501'; end if;
+
+  return query
+  select lower(b.unavailable_period),upper(b.unavailable_period)
+    from public.rental_blocks b where b.rental_id=requested_rental
+  union all
+  select lower(v.booking_period),upper(v.booking_period)
+    from public.rental_bookings v
+    where v.rental_id=requested_rental and v.status in ('approved','active');
+end;
+$$;
+revoke all on function public.get_rental_busy_periods(uuid) from public,anon,authenticated;
+grant execute on function public.get_rental_busy_periods(uuid) to authenticated;
+
 commit;
