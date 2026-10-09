@@ -199,7 +199,7 @@ end;
 $$;
 
 create function public.request_rental_booking(
-  requested_rental uuid,start_date date,return_date date,request_nonce uuid
+  requested_rental uuid,start_date date,return_date date,p_nonce uuid
 )
 returns uuid language plpgsql volatile security definer set search_path=''
 as $$
@@ -211,7 +211,7 @@ declare
   previous uuid;
   new_booking uuid;
 begin
-  if caller is null or requested_rental is null or request_nonce is null
+  if caller is null or requested_rental is null or p_nonce is null
     or start_date is null or return_date is null then
     raise exception 'Invalid request' using errcode='22023';
   end if;
@@ -223,7 +223,7 @@ begin
   then raise exception 'Rental unavailable' using errcode='42501'; end if;
 
   select id into previous from public.rental_bookings
-    where renter_id=caller and request_nonce=request_nonce;
+    where renter_id=caller and request_nonce=p_nonce;
   if found then return previous; end if;
 
   duration:=return_date-start_date;
@@ -241,14 +241,14 @@ begin
     daily_rate_snapshot_inr,rental_total_inr,deposit_snapshot_inr,request_nonce
   ) values (
     r.id,r.owner_id,caller,dates,duration,r.daily_rate_inr,
-    duration::bigint*r.daily_rate_inr,r.refundable_deposit_inr,request_nonce
+    duration::bigint*r.daily_rate_inr,r.refundable_deposit_inr,p_nonce
   ) returning id into new_booking;
   return new_booking;
 end;
 $$;
 
 create function public.block_rental_period(
-  requested_rental uuid,start_date date,return_date date,request_nonce uuid
+  requested_rental uuid,start_date date,return_date date,p_nonce uuid
 )
 returns uuid language plpgsql volatile security definer set search_path=''
 as $$
@@ -261,11 +261,11 @@ begin
   select * into r from public.rental_listings where id=requested_rental for update;
   if not found or r.owner_id<>(select auth.uid())
     or not private.can_access_campus(r.campus_id)
-    or r.status='removed' or request_nonce is null
+    or r.status='removed' or p_nonce is null
     or start_date is null or return_date is null
   then raise exception 'Not authorized' using errcode='42501'; end if;
   select id into previous from public.rental_blocks
-   where owner_id=(select auth.uid()) and request_nonce=request_nonce;
+   where owner_id=(select auth.uid()) and request_nonce=p_nonce;
   if found then return previous; end if;
   if start_date<current_date or return_date>current_date+180
     or return_date<=start_date then
@@ -277,7 +277,7 @@ begin
   then raise exception 'Confirmed booking overlaps' using errcode='22023'; end if;
 
   insert into public.rental_blocks(rental_id,owner_id,unavailable_period,request_nonce)
-  values(r.id,(select auth.uid()),dates,request_nonce) returning id into result_id;
+  values(r.id,(select auth.uid()),dates,p_nonce) returning id into result_id;
   return result_id;
 end;
 $$;
