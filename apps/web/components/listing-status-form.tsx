@@ -13,7 +13,7 @@ export function ListingStatusForm({
   const targets = current === "draft" ? [
     ["active", "Publish"], ["removed", "Remove draft"],
   ] : current === "active" ? [
-    ["paused", "Pause"], ["sold", "Mark sold"], ["removed", "Remove"],
+    ["paused", "Pause"], ["sold", "Mark sold (self-reported)"], ["removed", "Remove"],
   ] : current === "paused" ? [
     ["active", "Resume"], ["removed", "Remove"],
   ] : [];

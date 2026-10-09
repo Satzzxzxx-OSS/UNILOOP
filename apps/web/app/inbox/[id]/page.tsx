@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSaleThread } from "@/lib/interactions/data";
+import {StartDealForm} from "@/components/sale-deal-forms";
 import {
   ConversationRefresh, SendSaleMessage, SaleOfferForm,
   SaleOfferDecision, ConversationBlockForm,
@@ -90,7 +91,12 @@ export default async function ConversationPage({ params }: {
             <SaleOfferForm conversationId={thread.id} nonce={randomUUID()} /> :
             <p className="interaction-note">Waiting for the buyer to submit an offer.</p>
         )}
-        {acceptedOffer && <p className="interaction-notice">Offer accepted. Arrange a safe handover separately.</p>}
+        {acceptedOffer && <>
+          <p className="interaction-notice">Offer accepted. This does not mean payment or handover has occurred.</p>
+          {process.env.ENABLE_SALE_TRANSACTIONS === "true" &&
+            <StartDealForm offerId={acceptedOffer.id}/>}
+          <Link className="text-link" href="/transactions">View sale exchange records →</Link>
+        </>}
         <div className="conversation-safety">
           <h3>Stay safe</h3>
           <p>Inspect the item first. Never share passwords, OTPs or sensitive payment information in messages.</p>

@@ -18,6 +18,7 @@ export function SiteHeader() {
           <Link href="/#categories">Categories</Link>
           <Link href="/my/listings">My listings</Link>
           <Link href="/rentals">Rentals</Link>
+          <Link href="/transactions">Transactions</Link>
           <Link href="/inbox">Inbox</Link>
           <Link href="/saved">Saved</Link>
           <Link href="/#how-it-works">How it works</Link>
