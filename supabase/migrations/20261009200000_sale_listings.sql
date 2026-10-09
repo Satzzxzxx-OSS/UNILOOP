@@ -85,7 +85,7 @@ create policy category_read_enabled on public.categories
 -- Listings are *never* anonymously enumerable during this controlled rollout.
 -- All visible item data must pass live eligibility and campus checks.
 grant select on public.listings to authenticated;
-grant insert (owner_id, campus_id, category_slug, mode, title, description,
+grant insert (id, owner_id, campus_id, category_slug, mode, title, description,
   price_inr, item_condition) on public.listings to authenticated;
 grant update (title, description, category_slug, price_inr, item_condition)
   on public.listings to authenticated;
