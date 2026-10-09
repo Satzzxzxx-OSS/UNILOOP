@@ -111,3 +111,18 @@ jobs:
         run: psql -X -d uniloop_media_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009210000_listing_media.sql
       - name: Assert storage RLS and photo requirements
         run: psql -X -d uniloop_media_ci -v ON_ERROR_STOP=1 -f supabase/tests/04_media_rls.sql
+
+      - name: Provision fresh sale interaction test database
+        run: createdb uniloop_interactions_ci
+      - name: Setup disposable Auth and Storage fixtures
+        run: |
+          psql -X -d uniloop_interactions_ci -v ON_ERROR_STOP=1 -f supabase/tests/00_auth_fixture.sql
+          psql -X -d uniloop_interactions_ci -v ON_ERROR_STOP=1 -f supabase/tests/03_storage_fixture.sql
+      - name: Apply all prerequisite migrations and interaction migration
+        run: |
+          psql -X -d uniloop_interactions_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009170000_identity_foundation.sql
+          psql -X -d uniloop_interactions_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009200000_sale_listings.sql
+          psql -X -d uniloop_interactions_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009210000_listing_media.sql
+          psql -X -d uniloop_interactions_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009220000_sale_interactions.sql
+      - name: Verify private chat, offer negotiation and abuse controls
+        run: psql -X -d uniloop_interactions_ci -v ON_ERROR_STOP=1 -f supabase/tests/05_interactions_rls.sql
