@@ -1,0 +1,78 @@
+"use client";
+
+import { useState, type FormEvent } from "react";
+import { browserSupabase } from "@/lib/supabase/browser";
+
+export function EmailSignIn() {
+  const [email, setEmail] = useState("");
+  const [working, setWorking] = useState(false);
+  const [message, setMessage] = useState("");
+  const [sent, setSent] = useState(false);
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (working) return;
+    setWorking(true);
+    setMessage("");
+
+    try {
+      const supabase = browserSupabase();
+      if (!supabase) {
+        setMessage("Sign-in is not available right now.");
+        return;
+      }
+
+      const { error } = await supabase.auth.signInWithOtp({
+        email: email.trim().toLowerCase(),
+        options: {
+          // Default-deny enrollment: the app never auto-creates public accounts.
+          shouldCreateUser: false,
+          emailRedirectTo: new URL("/auth/confirm", window.location.origin).toString(),
+        },
+      });
+
+      if (error) {
+        // Avoid propagating provider errors that could enumerate accounts.
+        setMessage("Unable to send a sign-in email. Please try later.");
+      } else {
+        setSent(true);
+        setMessage("If this account is enabled, check your inbox for a sign-in link.");
+      }
+    } catch {
+      setMessage("Unable to connect right now. Please try again later.");
+    } finally {
+      setWorking(false);
+    }
+  }
+
+  return (
+    <form className="auth-form" onSubmit={submit}>
+      <label htmlFor="email-sign-in">Email address</label>
+      <input
+        type="email"
+        id="email-sign-in"
+        name="email"
+        autoComplete="email"
+        value={email}
+        onChange={(event) => setEmail(event.target.value)}
+        maxLength={254}
+        required
+        disabled={working || sent}
+        placeholder="you@example.com"
+      />
+      <button type="submit" className="button button-dark" disabled={working || sent}>
+        {working ? "Sending…" : sent ? "Email requested" : "Email me a sign-in link"}
+      </button>
+      <p className="auth-feedback" role="status" aria-live="polite">{message}</p>
+      {sent && (
+        <button
+          type="button"
+          className="text-link auth-reset"
+          onClick={() => { setSent(false); setMessage(""); }}
+        >
+          Use a different email
+        </button>
+      )}
+    </form>
+  );
+}
