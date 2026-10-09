@@ -126,3 +126,17 @@ jobs:
           psql -X -d uniloop_interactions_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009220000_sale_interactions.sql
       - name: Verify private chat, offer negotiation and abuse controls
         run: psql -X -d uniloop_interactions_ci -v ON_ERROR_STOP=1 -f supabase/tests/05_interactions_rls.sql
+
+      - name: Provision trust and saved-data test database
+        run: createdb uniloop_trust_ci
+      - name: Apply trust test migrations
+        run: |
+          psql -X -d uniloop_trust_ci -v ON_ERROR_STOP=1 -f supabase/tests/00_auth_fixture.sql
+          psql -X -d uniloop_trust_ci -v ON_ERROR_STOP=1 -f supabase/tests/03_storage_fixture.sql
+          psql -X -d uniloop_trust_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009170000_identity_foundation.sql
+          psql -X -d uniloop_trust_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009200000_sale_listings.sql
+          psql -X -d uniloop_trust_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009210000_listing_media.sql
+          psql -X -d uniloop_trust_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009220000_sale_interactions.sql
+          psql -X -d uniloop_trust_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009230000_market_trust.sql
+      - name: Verify favorites, reports and admin authorization
+        run: psql -X -d uniloop_trust_ci -v ON_ERROR_STOP=1 -f supabase/tests/06_trust_saved_rls.sql
