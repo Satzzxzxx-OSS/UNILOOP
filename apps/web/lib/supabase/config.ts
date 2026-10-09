@@ -16,7 +16,7 @@ export function parsePublicSupabaseConfig(
       return null;
     }
     if (parsed.username || parsed.password || parsed.search || parsed.hash) return null;
-    if (publishableKey.startsWith("sb_secret_")) return null;
+    if (!publishableKey.startsWith("sb_publishable_")) return null;
     if (publishableKey.length < 16) return null;
     return { url: parsed.origin, publishableKey };
   } catch {

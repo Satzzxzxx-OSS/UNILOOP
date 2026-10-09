@@ -214,3 +214,16 @@ button { cursor: pointer; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
+
+/* Step 02 account form. All messages reflect actual Auth API outcomes. */
+.auth-form { width: min(100%, 410px); display: flex; flex-direction: column; gap: 12px; text-align: left; margin-top: 6px; }
+.auth-form label { font-size: 14px; font-weight: 700; }
+.auth-form input { min-height: 50px; width: 100%; background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 13px 15px; color: var(--foreground); }
+.auth-form input:focus-visible { outline: 3px solid #b4772269; outline-offset: 2px; }
+.auth-form button:disabled { opacity: .64; cursor: not-allowed; transform: none; }
+.auth-form .auth-feedback { min-height: 22px; font-size: 13px; margin: 0; color: #526078; line-height: 1.6; }
+.auth-form .auth-reset { background: transparent; border: 0; align-self: flex-start; padding: 6px 0; cursor: pointer; }
+.auth-error { color: #a12d30 !important; font-weight: 650; }
+.quiet-page .auth-email { font-size: 13px; background: #e9eff5; color: #4b596e; padding: 10px 16px; border-radius: 11px; overflow-wrap: anywhere; }
+.account-sign-out { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.account-sign-out p { margin: 0; font-size: 13px; color: #667489; }

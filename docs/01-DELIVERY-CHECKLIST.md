@@ -26,3 +26,14 @@
 - Profile and access policy before allowing real interactions.
 
 Never represent planning, a static UI, or unrun tests as launched functionality.
+
+## Gate 03 — Identity foundation (Step 02)
+- [x] Supabase PostgreSQL identity migration with private launch scope.
+- [x] Automated real PostgreSQL migration and RLS allow/deny checks.
+- [x] Client/server cookie SSR wiring, sign-in link and safe auth callback.
+- [x] No public self-enrollment: signInWithOtp shouldCreateUser=false.
+- [x] Pin dependency lockfile and enforce frozen installs.
+- [ ] Hosted Supabase preview project provisioning and migration dry-run.
+- [ ] Configure SMTP, PKCE email link template, approved accounts and redirects.
+- [ ] Test real email login, session refresh, signout, account bans and eligibility.
+- [ ] Browser E2E, mobile accessibility and human security review.

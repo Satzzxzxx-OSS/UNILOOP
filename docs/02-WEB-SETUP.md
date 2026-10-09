@@ -56,3 +56,14 @@ Do not execute \`uniloop_completeALL.sql\` against a production or Supabase
 database. It is a destructive SQL Server-specific artifact, not a PostgreSQL
 migration. A separately reviewed Postgres migration series must be created
 before real accounts or marketplace operations.
+
+## Identity foundation (Step 02)
+
+Optional secure Auth activation requires actual hosted Supabase project credentials:
+copy \`apps/web/.env.example\` to \`apps/web/.env.local\`, fill public-only
+Supabase URL and publishable key. Without valid settings, the account page is
+explicitly disabled; no fake login action exists. **Never commit secrets**.
+The build is expected to succeed without credentials. SQL schema should be
+applied in Supabase staging first and approved membership rows provisioned by
+operators. The PKCE token-hash email template and site/redirect URLs are
+required before sign-in links work. See \`docs/03-IDENTITY-ARCHITECTURE.md\`.
