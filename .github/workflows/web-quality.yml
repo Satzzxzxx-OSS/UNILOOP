@@ -167,3 +167,16 @@ jobs:
           psql -X -d uniloop_sale_deals_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261010020000_sale_transactions.sql
       - name: Verify mutual sale handover and verified reviews
         run: psql -X -d uniloop_sale_deals_ci -v ON_ERROR_STOP=1 -f supabase/tests/08_sale_transactions_rls.sql
+
+      - name: Provision full-chain notification test database
+        run: createdb uniloop_notifications_ci
+      - name: Apply ALL schema migrations in order
+        run: |
+          psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/00_auth_fixture.sql
+          psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/03_storage_fixture.sql
+          for migration in supabase/migrations/*.sql; do
+            echo "Applying $migration"
+            psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f "$migration"
+          done
+      - name: Verify persisted in-app notifications and recipient RLS
+        run: psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/09_notifications_rls.sql
