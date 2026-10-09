@@ -206,12 +206,12 @@ select set_config('request.jwt.claim.sub','aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
 do $$
 declare
   previous_id uuid;
-  conversation_id uuid;
+  thread_uuid uuid;
   counter_id uuid;
 begin
-  select id, conversation_id into previous_id,conversation_id
-    from public.sale_offers where amount_inr = 480;
-  counter_id := public.submit_sale_offer(conversation_id,520,previous_id,
+  select o.id, o.conversation_id into previous_id,thread_uuid
+    from public.sale_offers o where o.amount_inr = 480;
+  counter_id := public.submit_sale_offer(thread_uuid,520,previous_id,
     'aaaaaaaa-2222-4333-8444-aaaaaaaaaaaa');
   if (select status from public.sale_offers where id = previous_id) <> 'countered' then
     raise exception 'Original offer not countered';
