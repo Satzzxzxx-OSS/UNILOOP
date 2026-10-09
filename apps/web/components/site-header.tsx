@@ -16,6 +16,7 @@ export function SiteHeader() {
           <Link href="/explore?mode=buy">Buy</Link>
           <Link href="/explore?mode=rent">Rent</Link>
           <Link href="/#categories">Categories</Link>
+          <Link href="/my/listings">My listings</Link>
           <Link href="/#how-it-works">How it works</Link>
         </nav>
         <div className="header-actions">

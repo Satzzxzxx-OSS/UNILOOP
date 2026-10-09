@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { CategoryGrid } from "@/components/category-grid";
-import { EmptyFeed } from "@/components/empty-feed";
+import { ListingResults } from "@/components/listing-results";
+import { discoverListings } from "@/lib/listings/data";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const result = await discoverListings({ limit: 6 });
   return (
     <>
       <section className="hero-section">
@@ -73,7 +75,7 @@ export default function HomePage() {
             <div><p className="eyebrow">JUST AROUND THE CORNER</p><h2>Fresh finds</h2><p>A place for real products from real people.</p></div>
             <Link className="text-link" href="/explore?mode=buy">Browse marketplace <span aria-hidden="true">↗</span></Link>
           </div>
-          <EmptyFeed mode="buy" />
+          <ListingResults mode="buy" result={result} />
         </div>
       </section>
 
@@ -90,8 +92,8 @@ export default function HomePage() {
 
       <section className="cta-section">
         <div className="container cta-inner">
-          <div><p className="eyebrow">A BETTER SECOND CHAPTER</p><h2>Have something worth sharing?</h2><p>Listing tools are being prepared. See what is coming.</p></div>
-          <Link href="/post" className="button button-accent">About posting <span aria-hidden="true">↗</span></Link>
+          <div><p className="eyebrow">A BETTER SECOND CHAPTER</p><h2>Have something worth sharing?</h2><p>Start with a draft, and review your listing before it goes live.</p></div>
+          <Link href="/post" className="button button-accent">Start a listing <span aria-hidden="true">↗</span></Link>
         </div>
       </section>
     </>

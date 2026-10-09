@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { CategoryGrid } from "@/components/category-grid";
-import { EmptyFeed } from "@/components/empty-feed";
+import { ListingResults } from "@/components/listing-results";
+import { discoverListings } from "@/lib/listings/data";
 import { categories, cleanSearchQuery, exploreHref, parseCategory, parseMarketMode } from "@/lib/catalog";
 
 export const metadata: Metadata = {
@@ -17,6 +18,9 @@ export default async function ExplorePage({ searchParams }: { searchParams: Sear
   const category = parseCategory(params.category);
   const query = cleanSearchQuery(params.q);
   const selectedCategory = categories.find((item) => item.slug === category);
+  const result = mode === "rent"
+    ? { kind: "ready" as const, items: [] }
+    : await discoverListings({ category, search: query });
 
   return (
     <div className="container explore-layout">
@@ -44,8 +48,8 @@ export default async function ExplorePage({ searchParams }: { searchParams: Sear
       </div>
       <CategoryGrid mode={mode} />
       <section className="explore-results" aria-labelledby="results-heading">
-        <div className="result-heading"><h2 id="results-heading">Listings</h2><span className="result-status">No live items yet</span></div>
-        <EmptyFeed mode={mode} search={query} />
+        <div className="result-heading"><h2 id="results-heading">Listings</h2><span className="result-status">{mode === "rent" ? "Rentals in development" : result.kind === "ready" ? `${result.items.length} displayed` : "Access required"}</span></div>
+        <ListingResults mode={mode} result={result} search={query} />
       </section>
     </div>
   );
