@@ -29,7 +29,7 @@ export default async function TransactionDetails({params}:{params:Promise<{id:st
         <div><dt>Seller confirmation</dt><dd>{deal.seller_handed_over_at?"Recorded":"Pending"}</dd></div>
         <div><dt>Buyer confirmation</dt><dd>{deal.buyer_received_at?"Recorded":"Pending"}</dd></div>
       </dl>
-      <p className="interaction-notice">This record reflects participants' confirmations.
+      <p className="interaction-notice">This record reflects participants&apos; confirmations.
         UNILOOP does not verify cash transfers, provide escrow or guarantee item condition.</p>
     </div>
     {enabled&&deal.status==="pending_handover"&&!alreadyConfirmed&&
