@@ -74,6 +74,20 @@ as $$
   );
 $$;
 
+create function private.can_register_listing_photo(photo_path text)
+returns boolean
+language sql stable security definer
+set search_path = ''
+as $
+  select exists (
+    select 1 from public.listings l
+    where l.id = private.photo_listing_id(photo_path)
+      and l.owner_id = (select auth.uid())
+      and private.can_access_campus(l.campus_id)
+      and l.status in ('draft','paused')
+  );
+$;
+
 create function private.photo_object_owned_by_caller(photo_path text)
 returns boolean
 language sql stable security definer
@@ -105,10 +119,12 @@ $$;
 revoke all on function private.photo_listing_id(text) from public,anon,authenticated;
 revoke all on function private.can_view_listing_photo(text) from public,anon,authenticated;
 revoke all on function private.can_upload_listing_photo(text) from public,anon,authenticated;
+revoke all on function private.can_register_listing_photo(text) from public,anon,authenticated;
 revoke all on function private.photo_object_owned_by_caller(text) from public,anon,authenticated;
 revoke all on function private.is_orphan_photo_of_caller(text) from public,anon,authenticated;
 grant execute on function private.can_view_listing_photo(text) to authenticated;
 grant execute on function private.can_upload_listing_photo(text) to authenticated;
+grant execute on function private.can_register_listing_photo(text) to authenticated;
 grant execute on function private.photo_object_owned_by_caller(text) to authenticated;
 grant execute on function private.is_orphan_photo_of_caller(text) to authenticated;
 grant execute on function private.photo_listing_id(text) to authenticated;
@@ -125,7 +141,7 @@ using (private.can_view_listing_photo(storage_path));
 create policy listing_photo_register_after_upload
 on public.listing_photos for insert to authenticated
 with check (
-  private.can_upload_listing_photo(storage_path)
+  private.can_register_listing_photo(storage_path)
   and private.photo_object_owned_by_caller(storage_path)
 );
 
