@@ -19,6 +19,7 @@ export default async function ListingDetails({
   if (!result) notFound();
   const { listing, userId, photos, photoCount } = result;
   const owner = userId === listing.owner_id;
+  const writeControlsEnabled = process.env.ENABLE_MARKETPLACE_WRITES === "true";
   const price = new Intl.NumberFormat("en-IN", {
     style: "currency", currency: "INR", maximumFractionDigits: 0,
   }).format(listing.price_inr);
@@ -45,9 +46,9 @@ export default async function ListingDetails({
         {owner ?
           <>
             <p className="listing-owner-note">You own this listing. Only approved and active listings are discoverable by other accounts.</p>
-            {(listing.status === "draft" || listing.status === "paused") &&
+            {writeControlsEnabled && (listing.status === "draft" || listing.status === "paused") &&
               <ListingPhotoUpload listingId={listing.id} count={photoCount}/>}
-            <ListingStatusForm id={listing.id} current={listing.status} hasPhoto={photoCount > 0}/>
+            {writeControlsEnabled && <ListingStatusForm id={listing.id} current={listing.status} hasPhoto={photoCount > 0}/>}
             <Link className="text-link" href="/my/listings">Manage all my listings →</Link>
           </> :
           <div className="feed-notice listing-contact-notice">
