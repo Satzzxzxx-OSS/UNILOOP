@@ -309,6 +309,14 @@ begin
 end $$;
 
 
+-- Disposable test fixture: provide a known conversation UUID to a third-party
+-- account so that we test RPC authorization, not only SELECT RLS.
+create temporary table ci_guessed_thread_ids (id uuid primary key);
+insert into ci_guessed_thread_ids(id)
+select id from public.sale_conversations
+  where buyer_id = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
+grant select on ci_guessed_thread_ids to authenticated;
+
 -- A member from another conversation must not send in a guessed thread.
 begin;
 set local role authenticated;
@@ -317,8 +325,7 @@ do $$
 declare
   guessed_thread uuid;
 begin
-  select id into guessed_thread from public.sale_conversations
-    where buyer_id = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
+  select id into guessed_thread from ci_guessed_thread_ids;
   begin
     perform public.send_sale_message(guessed_thread,'I should not be here.',
       'eeeeeeee-2222-4333-8444-eeeeeeeeeeee');
