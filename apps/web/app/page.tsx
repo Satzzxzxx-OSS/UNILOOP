@@ -2,9 +2,13 @@ import Link from "next/link";
 import { CategoryGrid } from "@/components/category-grid";
 import { ListingResults } from "@/components/listing-results";
 import { discoverListings } from "@/lib/listings/data";
+import {discoverRentals} from "@/lib/rentals/data";
+import {RentalResults} from "@/components/rental-results";
 
 export default async function HomePage() {
-  const result = await discoverListings({ limit: 6 });
+  const [result, rentals] = await Promise.all([
+    discoverListings({limit:6}),discoverRentals({limit:6}),
+  ]);
   return (
     <>
       <section className="hero-section">
@@ -79,13 +83,23 @@ export default async function HomePage() {
         </div>
       </section>
 
+      <section className="section container">
+        <div className="section-heading">
+          <div><p className="eyebrow">BORROW MORE, OWN LESS</p>
+          <h2>Items available for rent</h2>
+          <p>Real rental listings with clear daily rates.</p></div>
+          <Link className="text-link" href="/explore?mode=rent">Explore rentals →</Link>
+        </div>
+        <RentalResults result={rentals}/>
+      </section>
+
       <section id="how-it-works" className="section container how-section">
         <div className="section-heading">
           <div><p className="eyebrow">THE IDEA IS SIMPLE</p><h2>Make the most of what already exists.</h2></div>
         </div>
         <div className="steps-grid">
           <article className="step-card"><span className="step-number">01 / DISCOVER</span><h3>Explore</h3><p>Look for useful items with clear details, categories and prices.</p></article>
-          <article className="step-card"><span className="step-number">02 / CONNECT</span><h3>Start a conversation</h3><p>Once messaging launches, reach out to arrange a trade or rental request.</p></article>
+          <article className="step-card"><span className="step-number">02 / CONNECT</span><h3>Start a conversation</h3><p>When enabled, send a private message or request rental dates.</p></article>
           <article className="step-card"><span className="step-number">03 / KEEP IT MOVING</span><h3>Pass it along</h3><p>Sell an item, find its next owner or make it available for rent.</p></article>
         </div>
       </section>

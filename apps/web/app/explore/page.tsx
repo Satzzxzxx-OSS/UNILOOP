@@ -3,6 +3,8 @@ import Link from "next/link";
 import { CategoryGrid } from "@/components/category-grid";
 import { ListingResults } from "@/components/listing-results";
 import { discoverListings } from "@/lib/listings/data";
+import { discoverRentals } from "@/lib/rentals/data";
+import { RentalResults } from "@/components/rental-results";
 import { categories, cleanSearchQuery, exploreHref, parseCategory, parseMarketMode } from "@/lib/catalog";
 
 export const metadata: Metadata = {
@@ -18,9 +20,9 @@ export default async function ExplorePage({ searchParams }: { searchParams: Sear
   const category = parseCategory(params.category);
   const query = cleanSearchQuery(params.q);
   const selectedCategory = categories.find((item) => item.slug === category);
-  const result = mode === "rent"
-    ? { kind: "ready" as const, items: [] }
-    : await discoverListings({ category, search: query });
+  const saleResult = mode === "buy" ? await discoverListings({ category, search: query }) : null;
+  const rentalResult = mode === "rent" ? await discoverRentals({ category, search: query }) : null;
+  const shownCount = mode === "rent" ? rentalResult?.items.length ?? 0 : saleResult?.items.length ?? 0;
 
   return (
     <div className="container explore-layout">
@@ -48,8 +50,9 @@ export default async function ExplorePage({ searchParams }: { searchParams: Sear
       </div>
       <CategoryGrid mode={mode} />
       <section className="explore-results" aria-labelledby="results-heading">
-        <div className="result-heading"><h2 id="results-heading">Listings</h2><span className="result-status">{mode === "rent" ? "Rentals in development" : result.kind === "ready" ? `${result.items.length} displayed` : "Access required"}</span></div>
-        <ListingResults mode={mode} result={result} search={query} />
+        <div className="result-heading"><h2 id="results-heading">Listings</h2><span className="result-status">{shownCount + " displayed"}</span></div>
+        {mode === "rent" && rentalResult ? <RentalResults result={rentalResult}/> :
+          saleResult ? <ListingResults mode="buy" result={saleResult} search={query}/> : null}
       </section>
     </div>
   );

@@ -17,6 +17,7 @@ export function SiteHeader() {
           <Link href="/explore?mode=rent">Rent</Link>
           <Link href="/#categories">Categories</Link>
           <Link href="/my/listings">My listings</Link>
+          <Link href="/rentals">Rentals</Link>
           <Link href="/inbox">Inbox</Link>
           <Link href="/saved">Saved</Link>
           <Link href="/#how-it-works">How it works</Link>
@@ -42,6 +43,7 @@ export function SiteHeader() {
         <Link href="/post">Post</Link>
         <Link href="/inbox">Inbox</Link>
         <Link href="/offers">Offers</Link>
+        <Link href="/rentals">Rentals</Link>
         <Link href="/saved">Saved</Link>
         <Link href="/account">Account</Link>
       </nav>

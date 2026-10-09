@@ -28,6 +28,8 @@ export default async function PostPage() {
     <p className="eyebrow">YOUR NEXT LISTING</p>
     <h1>Give something a second life.</h1>
     <p>Create a sale listing draft. Publishing is a separate step so you can review everything first.</p>
+    <div className="rental-crosslink"><strong>Want to lend instead?</strong>
+      <Link href="/rent/post" className="text-link">Create a rental listing →</Link></div>
     <CreateListingForm />
     <Link href="/my/listings" className="text-link">View my listings →</Link>
   </div>;
