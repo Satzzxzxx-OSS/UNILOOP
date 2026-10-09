@@ -16,6 +16,8 @@ on:
       - "apps/web/**"
       - "package.json"
       - "pnpm-workspace.yaml"
+      - "pnpm-lock.yaml"
+      - "supabase/**"
       - ".github/workflows/web-quality.yml"
 
 permissions:
@@ -83,3 +85,14 @@ jobs:
         run: psql -X -v ON_ERROR_STOP=1 -f supabase/migrations/20261009170000_identity_foundation.sql
       - name: Assert row level security
         run: psql -X -v ON_ERROR_STOP=1 -f supabase/tests/01_identity_rls.sql
+
+      - name: Provision fresh database for listing tests
+        run: createdb uniloop_listings_ci
+      - name: Setup Auth fixture in listing test database
+        run: psql -X -d uniloop_listings_ci -v ON_ERROR_STOP=1 -f supabase/tests/00_auth_fixture.sql
+      - name: Apply identity schema to listing test database
+        run: psql -X -d uniloop_listings_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009170000_identity_foundation.sql
+      - name: Apply listing schema
+        run: psql -X -d uniloop_listings_ci -v ON_ERROR_STOP=1 -f supabase/migrations/20261009200000_sale_listings.sql
+      - name: Assert listing access and transitions
+        run: psql -X -d uniloop_listings_ci -v ON_ERROR_STOP=1 -f supabase/tests/02_listings_rls.sql
