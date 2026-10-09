@@ -95,12 +95,28 @@ as $$
   );
 $$;
 
+-- Disallow initiating/contacting users whose account or membership was revoked.
+create function private.sale_counterparty_eligible(other_user uuid, requested_campus uuid)
+returns boolean language sql stable security definer
+set search_path = ''
+as $
+  select exists (
+    select 1 from public.profiles p
+    join public.campus_memberships cm on cm.user_id = p.id
+    where p.id = other_user and p.account_status = 'active'
+      and cm.campus_id = requested_campus and cm.status = 'verified'
+  );
+$;
+
 revoke all on function private.can_read_sale_conversation(uuid)
   from public, anon, authenticated;
 revoke all on function private.sale_participants_blocked(uuid,uuid)
   from public, anon, authenticated;
+revoke all on function private.sale_counterparty_eligible(uuid,uuid)
+  from public, anon, authenticated;
 grant execute on function private.can_read_sale_conversation(uuid) to authenticated;
 grant execute on function private.sale_participants_blocked(uuid,uuid) to authenticated;
+grant execute on function private.sale_counterparty_eligible(uuid,uuid) to authenticated;
 
 alter table public.user_blocks enable row level security;
 alter table public.sale_conversations enable row level security;
@@ -168,6 +184,7 @@ begin
       where k.slug = sale.category_slug and k.enabled
     )
     or private.sale_participants_blocked(caller, sale.owner_id)
+    or not private.sale_counterparty_eligible(sale.owner_id, sale.campus_id)
   then
     raise exception 'Conversation unavailable' using errcode = '42501';
   end if;
@@ -214,7 +231,11 @@ begin
   select * into sale from public.listings where id = thread.listing_id;
   if not private.can_access_campus(sale.campus_id)
     or sale.status = 'removed'
-    or private.sale_participants_blocked(thread.buyer_id, thread.seller_id) then
+    or private.sale_participants_blocked(thread.buyer_id, thread.seller_id)
+    or not private.sale_counterparty_eligible(
+      case when caller = thread.buyer_id then thread.seller_id else thread.buyer_id end,
+      sale.campus_id
+    ) then
     raise exception 'Messaging unavailable' using errcode = '42501';
   end if;
 
@@ -272,6 +293,10 @@ begin
   if not found or sale.status <> 'active'
     or not private.can_access_campus(sale.campus_id)
     or private.sale_participants_blocked(thread.buyer_id, thread.seller_id)
+    or not private.sale_counterparty_eligible(
+      case when caller = thread.buyer_id then thread.seller_id else thread.buyer_id end,
+      sale.campus_id
+    )
     or not exists (
       select 1 from public.categories k
       where k.slug = sale.category_slug and k.enabled
@@ -365,6 +390,7 @@ begin
     if decision = 'accept' and (
       sale.status <> 'active'
       or private.sale_participants_blocked(thread.buyer_id,thread.seller_id)
+      or not private.sale_counterparty_eligible(locked.proposer_id, sale.campus_id)
       or exists (select 1 from public.sale_offers
         where listing_id = sale.id and status = 'accepted')
     ) then
