@@ -1,0 +1,13 @@
+{
+  "name": "uniloop",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@10.18.3",
+  "scripts": {
+    "dev": "pnpm --filter @uniloop/web dev",
+    "build": "pnpm --filter @uniloop/web build",
+    "lint": "pnpm --filter @uniloop/web lint",
+    "typecheck": "pnpm --filter @uniloop/web typecheck",
+    "test": "pnpm --filter @uniloop/web test"
+  }
+}
