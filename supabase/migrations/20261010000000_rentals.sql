@@ -123,7 +123,7 @@ revoke all on public.rental_bookings from public,anon,authenticated;
 revoke all on public.rental_condition_notes from public,anon,authenticated;
 
 grant select on public.rental_listings to authenticated;
-grant insert (owner_id,campus_id,category_slug,title,description,
+grant insert (id,owner_id,campus_id,category_slug,title,description,
   daily_rate_inr,refundable_deposit_inr,min_days,max_days,item_condition)
   on public.rental_listings to authenticated;
 grant update(title,description,category_slug,daily_rate_inr,refundable_deposit_inr,
