@@ -4,6 +4,7 @@ import {Button} from "@/components/spaceui/button";
 import {Input} from "@/components/spaceui/input";
 import {Textarea} from "@/components/spaceui/textarea";
 
+import {Progress} from "@/components/spaceui/progress";
 import Link from "next/link";
 import {useRouter} from "next/navigation";
 import {useActionState,useEffect,useRef,useState,type ChangeEvent} from "react";
@@ -109,6 +110,7 @@ export function ExperienceListingWizard({mode,backendReady}:{
         <span>{i<step?"✓":i+1}</span><strong>{name}</strong>
       </Button>)}
     </nav>
+    <Progress value={step} max={3} aria-label="Listing steps completed" className="ul-wizard-progress"/>
     <div className="ux-wizard-layout">
       <section className="ux-wizard-panel" aria-labelledby="ux-wizard-step-title">
         {step===0&&<>

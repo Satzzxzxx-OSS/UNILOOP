@@ -1,3 +1,4 @@
+import {BouncyAccordion} from "@/components/spaceui/bouncy-accordion";
 import type {Metadata} from "next";
 import Link from "next/link";
 import {ExperienceIcon} from "@/components/experience/experience-header";
@@ -29,10 +30,7 @@ export default function HelpPage(){
    </section>
    <section className="ux-help-faq"><p className="ux-kicker">GOOD QUESTIONS</p>
      <h2>The answers, without the guesswork.</h2>
-     <div className="ux-help-faq-list">{faqs.map(x=><details key={x.question}>
-       <summary>{x.question}<span aria-hidden="true">+</span></summary>
-       <p>{x.answer}</p>
-     </details>)}</div>
+     <BouncyAccordion items={faqs.map(item=>({title:item.question,description:item.answer}))}/>
    </section>
    <div className="ux-help-disclosure"><strong>Service availability</strong>
      <p>Some account and marketplace capabilities are not enabled yet. This help center

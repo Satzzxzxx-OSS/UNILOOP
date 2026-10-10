@@ -1,3 +1,4 @@
+import {ShareItem} from "@/components/experience/share-item";
 import type {Metadata} from "next";
 import Link from "next/link";
 import {randomUUID} from "node:crypto";
@@ -32,6 +33,7 @@ export default async function RentalDetail({params}:{params:Promise<{id:string}>
      <div className="ux-detail-content">
        <p className="ux-kicker">BORROW SMARTER, OWN LESS</p>
        <h1>{item.title}</h1>
+       <ShareItem title={item.title}/>
        <div className="ux-detail-price"><strong>{money(item.daily_rate_inr)}</strong><span>per day</span></div>
        <div className="ux-detail-tags"><span>{category?.label??"Rental item"}</span>
          <span>{item.item_condition.replaceAll("_"," ")}</span><span>{item.status}</span></div>
