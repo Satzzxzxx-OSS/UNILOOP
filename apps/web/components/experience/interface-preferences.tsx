@@ -1,8 +1,8 @@
 "use client";
 
 import {useEffect,useRef,useSyncExternalStore} from "react";
-import {Volume2,VolumeX,WifiOff} from "lucide-react";
-import {Button} from "@/components/spaceui/button";
+import {WifiOff} from "lucide-react";
+import {LiquidSwitch} from "@/components/spaceui/liquid-switch";
 import {Tooltip,TooltipTrigger,TooltipPopup} from "@/components/spaceui/tooltip";
 
 const preferenceKey="uniloop:interface-sounds:v1";
@@ -43,7 +43,7 @@ export function InterfacePreferences(){
     if(!next)void engine.current?.destroy();
   }
   return <>
-    <Tooltip><TooltipTrigger render={<Button variant="ghost" type="button" className="ux-icon-button ul-sound-toggle" data-sound-control aria-label="Interface sounds" aria-pressed={enabled} onClick={toggle}/>}>{enabled?<Volume2 size={17}/>:<VolumeX size={17}/>}</TooltipTrigger><TooltipPopup>{enabled?"Mute interface sounds":"Enable interface sounds"}</TooltipPopup></Tooltip>
+    <span data-sound-control className="ul-sound-control"><Tooltip><TooltipTrigger render={<span/>}><LiquidSwitch className="ul-sound-switch" checked={enabled} onCheckedChange={toggle} aria-label="Interface sounds"/></TooltipTrigger><TooltipPopup>{enabled?"Mute interface sounds":"Enable interface sounds"}</TooltipPopup></Tooltip></span>
     {offline&&<div className="ul-offline-notice" role="status"><WifiOff size={16}/>You’re offline. Reconnect before submitting changes.</div>}
   </>;
 }

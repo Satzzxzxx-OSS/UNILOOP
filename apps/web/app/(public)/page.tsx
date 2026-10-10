@@ -6,6 +6,8 @@ import {Button} from "@/components/spaceui/button";
 import {Card} from "@/components/spaceui/card";
 import {Badge} from "@/components/spaceui/badge";
 import {BouncyAccordion} from "@/components/spaceui/bouncy-accordion";
+import {BlurRevealText} from "@/components/spaceui/blur-reveal-text";
+import {GlassButton} from "@/components/spaceui/glass-button";
 import {LandingArt} from "@/components/experience/landing-art";
 import {CategoryIcon} from "@/components/category-icon";
 import {categories} from "@/lib/catalog";
@@ -18,10 +20,10 @@ export default async function LandingPage(){
  return <div className="ul-landing">
   <section className="ul-landing-hero" aria-labelledby="landing-title">
    <div className="ul-landing-intro"><Badge variant="outline" className="ul-landing-eyebrow"><span/>THE CAMPUS MARKETPLACE</Badge>
-    <h1 id="landing-title">Useful things.<br/><span>New possibilities.</span></h1>
+    <h1 id="landing-title"><BlurRevealText as="span" text="Useful things."/><br/><BlurRevealText as="span" text="New possibilities." delay={0.2}/></h1>
     <p className="ul-landing-lead">Buy what you need. Pass on what you don’t.<br className="ul-desktop-break"/> Borrow for the moments in between.</p>
     <p className="ul-landing-subcopy">Your campus life, a little more connected. One place to discover, list and arrange thoughtful exchanges.</p>
-    <div className="ul-landing-ctas"><Button size="xl" render={<Link href="/signup"/>}>Join the loop <ArrowRight size={18}/></Button><Button variant="outline" size="xl" render={<Link href="#how-it-works"/>}>See how it works <ArrowUpRight size={18}/></Button></div>
+    <div className="ul-landing-ctas"><Button size="xl" render={<Link href="/signup"/>}>Join the loop <ArrowRight size={18}/></Button><GlassButton size="xl" className="ul-glass-action" render={<Link href="#how-it-works"/>}>See how it works <ArrowUpRight size={18}/></GlassButton></div>
     <div className="ul-landing-assurances"><span><Check size={14}/>Buy, sell & rent</span><span><Check size={14}/>Your own workspace</span><span><Check size={14}/>Email-verified account</span></div>
    </div><LandingArt/>
   </section>
