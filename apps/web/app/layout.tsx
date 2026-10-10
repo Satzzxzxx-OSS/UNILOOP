@@ -40,6 +40,8 @@ export default function RootLayout({children}:{children:ReactNode}){
               <Link href="/saved">Saved items</Link>
               <Link href="/inbox">Messages</Link>
               <Link href="/rentals">Rental activity</Link>
+              <Link href="/safety">Exchange safety</Link>
+              <Link href="/help">Help & guidance</Link>
             </nav>
           </div>
           <div className="ux-footer-bottom">
