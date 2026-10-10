@@ -29,7 +29,7 @@ button:disabled { cursor: not-allowed; opacity: .5; }
 }
 .ux-header-list:hover, .ux-search-submit:hover, .ux-last-primary:hover,
 .ux-workspace-action:hover, .ux-wizard-primary:hover, .button-dark:hover, .button-accent:hover {
-  background: var(--surface-raised); color: var(--primary-foreground); box-shadow: 0 4px 24px #c4b5fd16;
+  background: #27272a; color: var(--primary-foreground); box-shadow: 0 4px 24px #00000016;
 }
 .button-outline, .ux-last-secondary, .ux-wizard-secondary { color: var(--foreground); background: var(--surface-subtle); border-color: var(--border); }
 .ux-back-step, .text-link, .refresh-conversation, .block-form button, .notification-read-form button { color: var(--accent); background: transparent; border-color: transparent; }
