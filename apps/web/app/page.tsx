@@ -7,6 +7,7 @@ import {discoverListings} from "@/lib/listings/data";
 import {discoverRentals} from "@/lib/rentals/data";
 import {ExperienceIcon} from "@/components/experience/experience-header";
 import {ExperienceSearch} from "@/components/experience/experience-search";
+import {ExperienceReveal} from "@/components/experience/reveal";
 import {Badge} from "@/components/spaceui/badge";
 
 export const dynamic="force-dynamic";
@@ -18,7 +19,7 @@ export default async function HomePage(){
   return <>
     <section className="ux-hero" aria-labelledby="ux-hero-title">
       <div className="ux-shell ux-hero-grid">
-        <div className="ux-hero-copy">
+        <ExperienceReveal className="ux-hero-copy">
           <p className="ux-eyebrow"><span className="ux-dot"/>A SMARTER WAY TO SHARE WHAT EXISTS</p>
           <h1 id="ux-hero-title">Everything you need. <em>Nothing you don&apos;t.</em></h1>
           <p className="ux-hero-lede">Buy better. Sell effortlessly. Borrow for the moments that matter.
@@ -27,7 +28,7 @@ export default async function HomePage(){
           <div className="ux-hero-assurance"><Badge variant="outline" className="ux-proof-badge">Buy · Sell · Rent · Rent out</Badge>
             <span><ExperienceIcon name="shield" size={18}/> Designed for thoughtful local exchanges</span>
           </div>
-        </div>
+        </ExperienceReveal>
         <div className="ux-hero-art" aria-label="Abstract illustration of useful things moving in a loop" role="img">
           <span className="ux-art-halo ux-art-halo-outer"/><span className="ux-art-halo ux-art-halo-inner"/>
           <div className="ux-art-orbit"/>
@@ -60,7 +61,7 @@ export default async function HomePage(){
           <p>Thoughtful categories for the things you actually use.</p></div>
         <Link href="/explore?mode=buy" className="ux-text-arrow">Explore all <ExperienceIcon name="arrow" size={18}/></Link>
       </div>
-      <div className="ux-category-grid">
+      <ExperienceReveal className="ux-category-grid">
         {categories.map((c,index)=><Link key={c.slug}
           href={exploreHref("buy",c.slug)} className={"ux-category ux-category-"+(index+1)}>
           <span className="ux-category-icon" aria-hidden="true"><CategoryIcon name={c.symbol}/></span>
@@ -69,7 +70,7 @@ export default async function HomePage(){
           </span>
           <span className="ux-category-shape ux-category-shape-first"/><span className="ux-category-shape ux-category-shape-second"/>
         </Link>)}
-      </div>
+      </ExperienceReveal>
     </section>
 
     <section className="ux-section ux-shell ux-dual-section">
