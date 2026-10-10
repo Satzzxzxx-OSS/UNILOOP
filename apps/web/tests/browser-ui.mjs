@@ -84,7 +84,7 @@ try{
   await wizard.getByRole("button",{name:/Continue/}).click();
   await wizard.getByText("Let the item speak.").waitFor();
   await wizard.getByRole("button",{name:/Continue/}).click();
-  await wizard.getByText("Name your price.").waitFor().catch(async()=>{});
+  await wizard.getByRole("heading",{name:"What feels like a fair price?"}).waitFor();
   await wizard.screenshot({path:path.join(output,"sell-wizard-mobile.png"),fullPage:true,animations:"disabled"});
   await wizard.close();
 
