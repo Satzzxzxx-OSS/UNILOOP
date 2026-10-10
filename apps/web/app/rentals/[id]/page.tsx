@@ -27,9 +27,9 @@ export default async function BookingDetails({params}:{
   const confirmedPickup=owner?!!booking.owner_handover_at:!!booking.renter_handover_at;
   const confirmedReturn=owner?!!booking.owner_return_at:!!booking.renter_return_at;
 
-  return <div className="container rental-booking-page">
-    <Link href="/rentals" className="text-link">← All bookings</Link>
-    <p className="eyebrow">PRIVATE RENTAL RECORD</p>
+  return <div className="ux-shell ux-private-detail rental-booking-page">
+    <Link href="/rentals" className="ux-detail-text-link">← Your rentals</Link>
+    <p className="ux-kicker">YOUR RENTAL JOURNEY</p>
     <h1>{item?.title??"Rental booking"}</h1>
     <p className="listing-detail-attributes"><span>{booking.status}</span>
       <span>{owner?"You are lending this item":"You requested this item"}</span></p>

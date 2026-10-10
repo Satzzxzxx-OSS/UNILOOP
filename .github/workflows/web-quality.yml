@@ -56,6 +56,25 @@ jobs:
         run: pnpm build
       - name: Production HTTP smoke without database credentials
         run: node apps/web/tests/http-smoke.mjs
+      - name: Install ephemeral Chromium browser for visual smoke
+        run: |
+          npm install --prefix /tmp/uniloop-playwright --no-audit --no-fund playwright@1.56.1
+          node /tmp/uniloop-playwright/node_modules/playwright/cli.js install --with-deps chromium
+      - name: Launch built Next.js app for browser QA
+        run: |
+          pnpm --filter @uniloop/web exec next start -p 3155 > /tmp/uniloop-browser-server.log 2>&1 &
+          echo $! > /tmp/uniloop-browser-server.pid
+      - name: Verify responsive, navigation and posting flows in Chromium
+        run: node apps/web/tests/browser-ui.mjs
+      - name: Keep UI screenshots for visual review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-v2-browser-captures
+          path: apps/web/test-artifacts/*.png
+          if-no-files-found: ignore
+          retention-days: 7
+
 
   verify-identity-db:
     runs-on: ubuntu-latest

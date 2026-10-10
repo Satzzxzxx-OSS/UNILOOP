@@ -17,9 +17,9 @@ export default async function TransactionDetails({params}:{params:Promise<{id:st
   const alreadyConfirmed=seller?!!deal.seller_handed_over_at:!!deal.buyer_received_at;
   const reviewed=reviews.some(r=>r.reviewer_id===myId);
   const enabled=process.env.ENABLE_SALE_TRANSACTIONS==="true";
-  return <div className="container rental-booking-page">
-    <Link href="/transactions" className="text-link">← All sale handovers</Link>
-    <p className="eyebrow">PRIVATE SALE HANDOVER</p>
+  return <div className="ux-shell ux-private-detail rental-booking-page">
+    <Link href="/transactions" className="ux-detail-text-link">← Your handover records</Link>
+    <p className="ux-kicker">TRUSTED RECORD, NOT VERIFIED PAYMENT</p>
     <h1>{listing?.title??"Item exchange"}</h1>
     <div className="booking-summary">
       <dl>

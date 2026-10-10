@@ -28,11 +28,11 @@ export default async function ConversationPage({ params }: {
   const acceptedOffer = offers.find(o => o.status === "accepted");
   const showOffers = enabled && !iBlockedOther && listing?.status === "active";
 
-  return <div className="container conversation-page">
-    <Link href="/inbox" className="text-link">← All conversations</Link>
+  return <div className="ux-shell ux-chat-page conversation-page">
+    <Link href="/inbox" className="ux-detail-text-link">← Back to conversations</Link>
     <div className="conversation-heading">
       <div>
-        <p className="eyebrow">PRIVATE SALE CONVERSATION</p>
+        <p className="ux-kicker">PRIVATE CONVERSATION · ACTUAL MESSAGES ONLY</p>
         <h1>{listing?.title ?? "Item conversation"}</h1>
         <p className="conversation-intro">
           {listing ? "Asking price: " + money(listing.price_inr) + " · " + listing.status :
