@@ -36,7 +36,7 @@ try{
   await page.getByRole('link',{name:'Create your account',exact:true}).click();
   await page.waitForURL(/\/signup/);
   assert.equal(await page.getByRole('link',{name:'Create account',exact:true}).getAttribute('aria-current'),'page');
-  assert(await page.getByText('Sign-in will be available after the secure account service is connected.').isVisible());
+  assert(await page.getByText(/Sign-in will be available after the secure account service is connected/).isVisible());
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Account overflow at '+width);
   assert.deepEqual(errors,[],'Public JS errors at '+width);await page.close();
  }
@@ -45,7 +45,10 @@ try{
  for(const route of ['/login','/signup','/account?mode=signup']){
   const response=await authRoute.goto(base+route,{waitUntil:'networkidle'});
   assert.equal(response.status(),200,route+' public auth route');
-  assert.equal(await authRoute.getByRole('textbox',{name:'Email address'}).count(),0,'No input without provider');
+  assert.equal(await authRoute.getByRole('textbox',{name:'Email address'}).count(),1,'Email field must remain visible');
+  assert(await authRoute.getByRole('button',{name:/by email|sign-in link/}).isDisabled(),'Unconfigured provider must not submit');
+  assert(await authRoute.getByTestId('uniloop-auth-avatar').last().isVisible(),'Brand avatar should render');
+  assert.equal(await authRoute.locator('.un-auth-v2').evaluate(el=>getComputedStyle(el).backgroundColor),'rgb(9, 9, 13)','Auth v2 dark theme');
   assert.equal(await authRoute.locator('input[type="password"]').count(),0,'No fake password login');
   assert.equal(await authRoute.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,'Auth overflow: '+route);
   await authRoute.screenshot({path:path.join(output,'auth-'+route.split('?')[0].replaceAll('/','-')+'.png'),fullPage:true,animations:'disabled'});
@@ -91,12 +94,12 @@ try{
  await page.context().addCookies([{name:'sb-127-auth-token',value:'base64-'+encode({...session,access_token:token.replace('fixture-only','fixture-invalid')}),url:'http://localhost:3158'}]);
  await page.goto('http://localhost:3158/dashboard',{waitUntil:'networkidle'});assert.equal(new URL(page.url()).pathname,'/account','Configured provider must reject unverified session tokens');
  await page.context().clearCookies();
- await page.goto('http://localhost:3158/signup',{waitUntil:'networkidle'});assert(await page.getByRole('heading',{name:'Create your account.'}).isVisible());
+ await page.goto('http://localhost:3158/signup',{waitUntil:'networkidle'});assert(await page.getByRole('heading',{name:'Join the loop.'}).isVisible());
  await page.goto('http://localhost:3158/account?mode=signup',{waitUntil:'networkidle'});
  await page.getByLabel('Email address').fill('new@example.test');await page.getByRole('button',{name:'Create account by email'}).click();
  await page.getByText(/Check your inbox for a verification link/).waitFor();assert.equal(signupRequest.create_user,true,'Only signup requests enrollment');assert.equal(signupRequest.email,'new@example.test');
  assert.equal(new URL(page.url()).pathname,'/account','Requesting email alone does not authenticate');
- await page.goto('http://localhost:3158/login',{waitUntil:'networkidle'});assert(await page.getByRole('heading',{name:'Sign in to UNILOOP.'}).isVisible());await page.getByLabel('Email address').fill(user.email);await page.getByRole('button',{name:'Email me a sign-in link'}).click();
+ await page.goto('http://localhost:3158/login',{waitUntil:'networkidle'});assert(await page.getByRole('heading',{name:'Welcome back.'}).isVisible());await page.getByLabel('Email address').fill(user.email);await page.getByRole('button',{name:'Email me a sign-in link'}).click();
  await page.getByText(/Check your inbox for a verification link/).waitFor();assert.equal(signinRequest.create_user,false,'Sign-in must not enroll');
  await page.goto('http://localhost:3158/auth/confirm?type=email&token_hash='+'a'.repeat(64),{waitUntil:'networkidle'});
  await page.waitForURL('**/dashboard');assert(await page.getByRole('heading',{name:'Overview',exact:true}).isVisible());
