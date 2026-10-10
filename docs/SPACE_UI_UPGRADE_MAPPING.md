@@ -74,3 +74,7 @@ All 23 existing page sources were inspected. Shared refinements apply to the aut
 - No paid components, external avatar service, hosted asset dependency, device fingerprinting, fake online users, fake totals, fake upload completion or fake backend success.
 - Testing: unit tests, TypeScript, lint, production build, existing HTTP/browser route checks. Extended Chromium tests cover persisted opt-in sound preference, search shortcut/filter/escape/focus restoration, tabs arrow navigation, FAQ single-open behavior and completed-step progress. 320–1440px captures and reduced-motion checks retained.
 - Real authenticated listings/gallery/share can only be exercised against approved account fixtures. Verify those before treating this as launch readiness; this change does not alter backend availability.
+
+### Mobile sidebar follow-up
+
+Mobile and tablet widths up to 900px expose a labeled Menu button. It opens a left-hand Base UI modal drawer with the shared desktop navigation groups, active route markers, search, account, and both listing actions. The drawer has a scrollable middle section, 44px touch targets, safe-area spacing, outside/close/Escape dismissal, focus trapping and restoration, reduced-motion support, and automatic dismissal when resizing to desktop. The bottom dock remains available outside the drawer. Browser checks cover all small viewports, link parity, drawer geometry, reachability, and dismissal.

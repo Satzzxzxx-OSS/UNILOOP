@@ -52,7 +52,29 @@ try{
       const menu=page.getByRole("navigation",{name:"More navigation"});
       assert(await menu.isVisible(),"Mobile menu failed to open at "+width);
       await page.keyboard.press("Escape");
-      assert(!(await menu.count()),"Mobile Escape did not close at "+width);
+      await menu.waitFor({state:"hidden"});
+      assert(await open.evaluate(el=>el===document.activeElement),"Sidebar did not restore menu button focus");
+      await open.click();
+      const drawer=page.getByRole("dialog",{name:"UNILOOP"});
+      await drawer.waitFor({state:"visible"});
+      const bounds=await drawer.boundingBox();
+      assert(bounds.x>=-1&&bounds.width<=width-40,"Mobile drawer must leave an outside dismissal area");
+      assert.equal(await menu.getByRole("link").count(),15,"Sidebar must retain all desktop destinations and account");
+      assert.equal(await menu.getByRole("link",{name:"Overview",exact:true}).getAttribute("aria-current"),"page");
+      const navSizes=await menu.locator(".ul-sidebar-nav a").evaluateAll(links=>links.map(el=>el.getBoundingClientRect().height));
+      assert(navSizes.every(height=>height>=44),"Mobile sidebar links must be touch sized");
+      const scroller=menu;
+      await scroller.evaluate(el=>{el.scrollTop=el.scrollHeight;});
+      assert(await menu.getByRole("link",{name:"Exchange safety"}).isVisible(),"Lower navigation must remain reachable");
+      if(width===390)await page.screenshot({path:path.join(output,"mobile-sidebar-390.png")});
+      await drawer.getByRole("button",{name:"Close navigation"}).click();
+      await drawer.waitFor({state:"hidden"});
+      await open.click();
+      await page.mouse.click(width-8,200);
+      await drawer.waitFor({state:"hidden"});
+      await open.click();
+      await menu.getByRole("link",{name:"Overview",exact:true}).click();
+      await drawer.waitFor({state:"hidden"});
     }else{
       assert(await page.getByRole("navigation",{name:"Main navigation"}).isVisible(),
         "Desktop navigation absent at "+width);
