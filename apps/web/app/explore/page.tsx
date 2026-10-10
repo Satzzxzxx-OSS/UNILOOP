@@ -1,3 +1,6 @@
+import {Button} from "@/components/spaceui/button";
+import {Input} from "@/components/spaceui/input";
+import {CategoryFilterDialog} from "@/components/experience/category-filter-dialog";
 import type {Metadata} from "next";
 import Link from "next/link";
 import {CategoryIcon} from "@/components/category-icon";
@@ -38,11 +41,11 @@ export default async function ExplorePage({searchParams}:{
         <form className="ux-explore-search" action="/explore" role="search">
           <ExperienceIcon name="search" size={20}/>
           <label htmlFor="ux-explore-input" className="ux-visually-hidden">Search the marketplace</label>
-          <input id="ux-explore-input" type="search" name="q" maxLength={100}
+          <Input nativeInput unstyled id="ux-explore-input" type="search" name="q" maxLength={100}
             defaultValue={q} placeholder="Search for something useful..."/>
           <input name="mode" type="hidden" value={mode}/>
           {category&&<input name="category" type="hidden" value={category}/>}
-          <button type="submit">Search <ExperienceIcon name="arrow" size={16}/></button>
+          <Button type="submit">Search <ExperienceIcon name="arrow" size={16}/></Button>
         </form>
       </div>
     </section>
@@ -57,14 +60,11 @@ export default async function ExplorePage({searchParams}:{
         <div className="ux-explore-meta">
           {result.kind==="ready"?<span>{number} visible {number===1?"item":"items"}</span>:
             <span>Browse requires account access</span>}
-          <details className="ux-mobile-filter-toggle">
-            <summary><ExperienceIcon name="grid" size={17}/> Categories</summary>
-            <div className="ux-filter-dropdown">
-              <Link className={!category?"ux-filter-current":""} href={hrefFor(mode,q)}>All categories</Link>
-              {categories.map(c=><Link key={c.slug}
-                href={hrefFor(mode,q,c.slug)} className={c.slug===category?"ux-filter-current":""}>{c.label}</Link>)}
-            </div>
-          </details>
+          <CategoryFilterDialog options={[
+            {label:"All categories",href:hrefFor(mode,q),active:!category},
+            ...categories.map(c=>({label:c.label,href:hrefFor(mode,q,c.slug),active:c.slug===category})),
+          ]}/>
+
         </div>
       </div>
       <div className="ux-explore-columns">

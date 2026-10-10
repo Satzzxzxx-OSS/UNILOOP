@@ -1,0 +1,177 @@
+/* UNILOOP's original dark composition. Premium-inspired effects are authored here,
+   not copied from gated Space UI components. Free primitives live in components/spaceui. */
+body { background: var(--background); }
+::selection { background: var(--accent-border); color: var(--foreground); }
+input, textarea, select { color: var(--foreground); background-color: var(--surface); }
+input::placeholder, textarea::placeholder { color: var(--muted); opacity: .85; }
+select { color-scheme: dark; }
+input[type=checkbox], input[type=radio] { accent-color: var(--accent); }
+input:-webkit-autofill { -webkit-text-fill-color: var(--foreground); box-shadow: 0 0 0 100px var(--surface) inset; }
+button:disabled { cursor: not-allowed; opacity: .5; }
+:focus-visible { outline-color: var(--ring); }
+
+/* Shared squircle surfaces, quiet borders, and a consistent action hierarchy. */
+.ux-header { background: color-mix(in srgb, var(--background) 88%, transparent); border-color: var(--border); }
+.ux-brand { color: var(--foreground); letter-spacing: -1.4px; }
+.ux-brand > span:last-child span, .brand-accent { color: var(--accent); }
+.ux-brand-symbol { background: linear-gradient(145deg, #292238, #17141e); border: 1px solid var(--accent-border); box-shadow: 0 4px 18px #0004; }
+.ux-brand-symbol i:nth-child(2), .brand-ring { border-color: var(--success); }
+.ux-brand-symbol b { background: var(--foreground); }
+.ux-desktop-main { background: var(--surface); border: 1px solid var(--border); padding: 4px; }
+.ux-desktop-main a:hover, .ux-desktop-main .ux-nav-active { background: var(--surface-raised); box-shadow: inset 0 1px 0 #ffffff08; }
+.ux-icon-button { color: var(--muted); }
+.ux-icon-button:hover { color: var(--foreground); background: var(--surface-raised); }
+.ux-header-list, .ux-search-submit, .ux-last-primary, .ux-workspace-action,
+.ux-wizard-primary, .ux-explore-search button, .ux-mobile-search-panel button,
+.button-dark, .button-accent, .ux-final-submit button {
+  background: var(--primary); color: var(--primary-foreground); border: 1px solid #e5dcff24;
+  box-shadow: inset 0 1px 0 #ffffff40, 0 4px 16px #0002;
+}
+.ux-header-list:hover, .ux-search-submit:hover, .ux-last-primary:hover,
+.ux-workspace-action:hover, .ux-wizard-primary:hover, .button-dark:hover, .button-accent:hover {
+  background: #e7dfff; color: var(--primary-foreground); box-shadow: 0 4px 24px #c4b5fd16;
+}
+.button-outline, .ux-last-secondary, .ux-wizard-secondary { color: var(--foreground); background: var(--surface-subtle); border-color: var(--border); }
+.ux-back-step, .text-link, .refresh-conversation, .block-form button, .notification-read-form button { color: var(--accent); background: transparent; border-color: transparent; }
+.ux-menu-sheet, .ux-bottom-dock { background: color-mix(in srgb, var(--surface) 96%, transparent); }
+.ux-menu-sheet a:hover { color: var(--accent); }
+.ux-bottom-dock a[aria-current=page] { background: var(--accent-tint); color: var(--accent); }
+.ux-bottom-dock .ux-dock-post, .ux-bottom-dock .ux-dock-post[aria-current=page] { background: var(--primary); color: var(--primary-foreground); }
+
+/* An original atmospheric hero: neutral dark first, restrained cool light behind it. */
+body:has(.ux-hero) { background: var(--background); }
+.ux-hero { background: radial-gradient(ellipse at 76% 18%, #8170dc17, transparent 52%), radial-gradient(ellipse at 0% 75%, #297d7810, transparent 45%), var(--background); border-bottom: 1px solid var(--border); }
+.ux-hero::before { content: ""; position: absolute; inset: 0; background-image: linear-gradient(#ffffff03 1px, transparent 1px), linear-gradient(90deg, #ffffff03 1px, transparent 1px); background-size: 64px 64px; mask-image: linear-gradient(black, transparent); pointer-events: none; }
+.ux-hero h1 { letter-spacing: -.065em; font-weight: 750; }
+.ux-hero h1 em { color: var(--accent); }
+.ux-eyebrow, .ux-kicker { color: var(--accent); font-weight: 650; }
+.ux-dot { background: var(--success); box-shadow: 0 0 0 4px #7dd3c012, 0 0 12px #7dd3c033; }
+.ux-search-module { background: linear-gradient(145deg, #1b1b20, #111114); border: 1px solid #39333f; box-shadow: 0 24px 64px #0004, inset 0 1px 0 #ffffff08; }
+.ux-search-mode label.ux-mode-selected { color: var(--foreground); background: var(--surface-raised); box-shadow: inset 0 1px 0 #ffffff0a; }
+.ux-search-mode label:hover { background: var(--surface-raised); }
+.ux-search-input-wrap { border-top: 1px solid var(--border); }
+.ux-search-input-wrap input { color: var(--foreground); }
+.ux-search-hints a:hover { color: var(--accent); }
+.ux-hero-art { background: radial-gradient(ellipse at 60% 25%, #45305e55, transparent 65%), radial-gradient(ellipse at 20% 90%, #27575344, transparent 60%), #111116; border: 1px solid #37303f; border-radius: 32px; box-shadow: 0 32px 80px #0006, inset 0 1px 0 #ffffff12; }
+.ux-art-halo, .ux-art-orbit { border-color: #c4b5fd30; }
+.ux-art-halo-outer { border-style: solid; }
+.ux-art-orbit { background: radial-gradient(circle, #c4b5fd18, transparent 65%); }
+.ux-art-arc { border-top-color: #a793d6; border-right-color: #a793d6; }
+.ux-art-core { background: linear-gradient(145deg, #d7ccff, #a394d0); box-shadow: 0 20px 65px #c4b5fd25, inset 0 1px 2px #ffffff90; border-radius: 34px; }
+.ux-art-core span, .ux-art-core small { color: #211a34; }
+.ux-art-notebook { background: linear-gradient(135deg, #575162, #29252f); border: 1px solid #7d7186; box-shadow: 8px 20px 30px #0006, inset -6px 0 0 #211d27; }
+.ux-art-book-spine, .ux-art-book-line { background: #b8a7d1; }
+.ux-art-book-mark { color: #c4b5fd; }
+.ux-art-headset-band { border-color: #60978e; border-bottom-color: transparent; }
+.ux-art-ear { background: linear-gradient(115deg, #35554f, #87b7ab); }
+.ux-art-camera { background: linear-gradient(145deg, #5a5465, #25222d); border: 1px solid #766c82; }
+.ux-art-camera::before { background: #5d5569; }
+.ux-art-lens { border-color: #17141e; background: radial-gradient(circle at 35% 30%, #7c7099, #211a30 65%); box-shadow: 0 0 0 5px #c4b5fd22; }
+.ux-art-camera-dot { background: var(--success); }
+.ux-art-caption { background: #222129e8; border: 1px solid #4b435b; box-shadow: 0 15px 25px #0005; }
+.ux-art-caption b { color: var(--foreground); }
+.ux-art-signature { color: var(--muted); }
+.ux-hero-bottom { background: var(--surface); color: var(--muted); border-top: 1px solid var(--border); }
+
+/* Cards share Space UI's restrained geometry; hover light is our own implementation. */
+.ux-category, .ux-mode-card, .ux-how-card, .ux-last-panel,
+.listing-card, .rental-card, .ux-wizard-panel, .ux-workspace-empty,
+.ux-detail-panel, .moderation-case, .booking-summary, .rental-control-panel {
+  corner-shape: superellipse(1.25); border: 1px solid var(--border);
+}
+.ux-category { background: linear-gradient(145deg, var(--surface-subtle), var(--surface)); border-radius: 20px; }
+.ux-category:hover { border-color: var(--accent-border); background: linear-gradient(145deg, #292336, var(--surface)); box-shadow: 0 12px 32px #0005; transform: translateY(-3px); }
+.ux-category-icon { background: #c4b5fd0d; color: var(--accent); border: 1px solid #c4b5fd18; box-shadow: none; }
+.ux-category-3 .ux-category-icon, .ux-category-7 .ux-category-icon { color: var(--success); background: #7dd3c00d; border-color: #7dd3c018; }
+.ux-category-round { color: var(--muted); border-color: var(--border); }
+.ux-category-shape { background: #c4b5fd15; }
+.ux-mode-buy { background: radial-gradient(ellipse at 90% 0%, #c4b5fd14, transparent 65%), var(--surface); }
+.ux-mode-rent { background: radial-gradient(ellipse at 90% 0%, #7dd3c014, transparent 65%), var(--surface); }
+.ux-mode-art-buy span:nth-child(1) { background: #493853; border: 1px solid #705c80; }
+.ux-mode-art-buy span:nth-child(2) { background: #24202d; border: 1px solid #514565; }
+.ux-mode-art-buy span:nth-child(3) { background: #9a85c4; box-shadow: inset 0 0 0 27px #30263e; }
+.ux-mode-art-rent span:nth-child(1) { background: #294944; border: 1px solid #547b70; }
+.ux-mode-art-rent span:nth-child(2) { background: #182e2c; border: 1px solid #426b62; }
+.ux-mode-art-rent span:nth-child(3) { background: #8ba49b; box-shadow: inset 0 0 0 16px #223832; }
+.ux-feed-section, .ux-how-section { background: var(--background); border-block: 1px solid var(--border); }
+.ux-how-card { background: var(--surface); }
+.ux-last-panel { background: radial-gradient(ellipse at 100% 0%, #c4b5fd1c, transparent 65%), var(--surface); }
+.ux-last-panel::after { border-color: #c4b5fd20; }
+.ux-footer { background: var(--background); border-top: 1px solid var(--border); }
+.ux-footer-bottom { border-top: 0; }
+.ux-footer-rule { margin: 34px 0 0; }
+.ux-explore-hero { background: radial-gradient(ellipse at 100% 0%, #8170dc17, transparent 65%), var(--background); }
+.ux-explore-search { background: var(--surface); border-color: var(--border); }
+.ux-explore-switch { background: var(--surface); border: 1px solid var(--border); }
+.ux-explore-switch a.ux-explore-switch-active { background: var(--surface-raised); color: var(--foreground); border: 1px solid #ffffff0c; box-shadow: 0 2px 8px #0004; }
+.ux-filter-list a.ux-filter-current, .ux-filter-dropdown .ux-filter-current { background: var(--accent-tint); color: var(--accent); }
+.ux-filter-help { background: var(--success-tint); border: 1px solid #29413b; }
+.ux-filter-help strong { color: var(--success); }
+.ux-filter-help p { color: var(--muted); }
+.ux-results-panel .feed-notice, .ux-feed-content .feed-notice { background: var(--surface); border-color: var(--border); }
+
+/* Official inputs are kept native inside a Space UI control wrapper to preserve forms. */
+[data-slot=input-control], [data-slot=textarea-control] { min-width: 0; }
+.ux-field > [data-slot=input-control], .ux-field > [data-slot=textarea-control],
+.form-field > [data-slot=input-control], .form-field > [data-slot=textarea-control] { width: 100%; display: flex; }
+.ux-field input, .ux-field textarea, .form-field input, .form-field textarea,
+.ux-price-field input, .rental-mini-form input, .rental-mini-form textarea,
+.message-form textarea, .offer-form input, .review-form textarea {
+  background: var(--surface); color: var(--foreground); border-color: var(--border); width: 100%;
+}
+.ux-search-input-wrap [data-slot=input-control], .ux-mobile-search-panel [data-slot=input-control], .ux-explore-search [data-slot=input-control] { flex: 1; }
+.ux-price-field [data-slot=input-control] { flex: 1; }
+.ux-price-field [data-slot=input-control] input { border: 0; border-radius: 0; }
+.ux-search-input-wrap [data-slot=input], .ux-explore-search [data-slot=input] { background: transparent; font-size: 14px; }
+.ux-field input:focus-visible, .ux-field textarea:focus-visible, .ux-field select:focus-visible { border-color: var(--ring); box-shadow: 0 0 0 3px #c4b5fd14; outline: none; }
+.ux-wizard-progress-ring { background: var(--accent-tint); border-color: var(--accent-border); color: var(--accent); }
+.ux-wizard-steps button { color: var(--muted); background: transparent; white-space: normal; box-shadow: none; }
+.ux-wizard-steps .ux-step-current { background: var(--accent-tint); color: var(--foreground); border-color: var(--accent-border); }
+.ux-wizard-steps .ux-step-complete { color: var(--success); }
+.ux-wizard-steps .ux-step-current span { background: var(--accent); color: var(--primary-foreground); }
+.ux-wizard-tip-card { background: radial-gradient(ellipse at 100% 0%, #c4b5fd18, transparent 65%), var(--surface); border: 1px solid var(--border); }
+.ux-photo-drop { position: relative; background: radial-gradient(ellipse at 50% 100%, #c4b5fd14, transparent 65%), var(--surface); border-color: var(--accent-border); transition: border-color .2s, background .2s; }
+.ux-photo-drop:hover, .ux-photo-drop:focus-within, .ux-photo-drop.ux-drag-active { border-color: var(--ring); background: var(--accent-tint); }
+.ux-photo-plus { background: var(--accent-tint); color: var(--accent); border: 1px solid var(--accent-border); }
+.ux-photo-preview button { min-width: 28px; height: 28px; padding: 0; background: #09090bd9; color: white; }
+.ux-form-warning, .interaction-feedback, .interaction-action p, .notification-read-form p { color: var(--destructive-foreground); }
+.ux-wizard-disabled { background: var(--surface-subtle); border-color: var(--border); }
+.ux-wizard-disabled button { background: var(--surface-raised); color: var(--muted); }
+.ux-gallery-arrows button { color: var(--foreground); background: #09090bd9; }
+.ux-gallery-thumbs button { padding: 0; background: var(--surface); border-color: var(--border); }
+.ux-gallery-thumbs button[aria-pressed=true] { border-color: var(--accent); }
+.ux-workspace-empty { background: radial-gradient(ellipse at 50% 0%, #c4b5fd0c, transparent 70%), var(--surface); }
+.ux-workspace-empty-art { color: var(--accent); }
+.ux-workspace-empty-circle { border-color: var(--accent-border); }
+.notification-entry.unread { background: var(--accent-tint); border-color: var(--accent-border); }
+.notification-symbol { background: var(--surface-raised); color: var(--accent); }
+
+/* Independently authored expanding search control, available on desktop and mobile. */
+.ux-global-search { display: inline-flex; width: auto; gap: 7px; padding-inline: 11px; border: 1px solid var(--border); background: var(--surface); }
+.ux-global-search span { font-size: 12px; }
+.ux-global-search kbd { padding: 2px 4px; border: 1px solid var(--border); border-radius: 4px; font-size: 10px; color: var(--muted); }
+.ux-mobile-search-panel { display: flex; align-items: center; gap: 10px; padding-block: 12px; animation: ux-search-reveal .2s ease-out; }
+.ux-mobile-search-panel input { border: 1px solid var(--border); border-radius: 12px; padding: 13px; min-height: 44px; height: auto; }
+.ux-mobile-search-panel button { min-height: 44px; padding-inline: 16px; }
+@keyframes ux-search-reveal { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Free Space UI Dialog: accessible mobile category sheet with automatic focus management. */
+.ux-category-dialog-trigger { display: none; }
+[data-slot=dialog-backdrop], [data-slot=dialog-viewport] { z-index: 120; }
+[data-slot=dialog-backdrop] { background: #0009; }
+.ux-category-dialog { border: 1px solid var(--border); background: var(--surface); max-height: min(680px, 85dvh); border-radius: 22px; padding: 24px; box-shadow: 0 30px 80px #0008; }
+.ux-category-dialog [data-slot=dialog-title] { font-size: 23px; margin: 0 0 10px; }
+.ux-category-dialog [data-slot=dialog-description] { margin: 0 0 20px; line-height: 1.6; }
+.ux-category-dialog nav { overflow-y: auto; overscroll-behavior: contain; }
+@media (max-width: 1100px) { .ux-global-search span, .ux-global-search kbd { display: none; } }
+@media (max-width: 680px) {
+  .ux-category-dialog-trigger { display: inline-flex; min-height: 42px; border-color: var(--border); background: var(--surface); color: var(--foreground); }
+  .ux-category-dialog { margin-bottom: env(safe-area-inset-bottom); }
+  .ux-global-search { width: 43px; padding: 0; border-color: transparent; background: transparent; }
+  .ux-art-core { border-radius: 28px; }
+  .ux-wizard-steps button { padding: 8px 5px; font-size: 11px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}

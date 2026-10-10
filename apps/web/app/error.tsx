@@ -1,5 +1,7 @@
 "use client";
 
+import {Button} from "@/components/spaceui/button";
+
 import Link from "next/link";
 import {useEffect} from "react";
 import {ExperienceIcon} from "@/components/experience/experience-header";
@@ -15,9 +17,9 @@ export default function ErrorPage({error,reset}:{error:Error & {digest?:string};
    <h1>Let&apos;s try <em>that again.</em></h1>
    <p>Something interrupted this page. Your action may not have completed.</p>
    <div className="ux-error-actions">
-     <button type="button" onClick={()=>reset()} className="ux-workspace-action">
+     <Button type="button" onClick={()=>reset()} className="ux-workspace-action">
        Try again <ExperienceIcon name="arrow" size={18}/>
-     </button>
+     </Button>
      <Link href="/explore" className="ux-detail-text-link">Explore instead →</Link>
    </div>
  </section>;

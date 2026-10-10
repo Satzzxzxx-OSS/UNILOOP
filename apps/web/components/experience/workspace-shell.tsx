@@ -1,3 +1,4 @@
+import {Card} from "@/components/spaceui/card";
 import Link from "next/link";
 import type {ReactNode} from "react";
 import {ExperienceIcon} from "./experience-header";
@@ -21,7 +22,7 @@ export function WorkspaceEmpty({title,description,action,kind="neutral"}:{
   title:string;description:string;action?:{href:string;label:string};
   kind?:"neutral"|"auth"|"notice";
 }){
-  return <section className={"ux-workspace-empty ux-workspace-empty-"+kind}>
+  return <Card render={<section/>} className={"ux-workspace-empty ux-workspace-empty-"+kind}>
     <div className="ux-workspace-empty-art" aria-hidden="true">
       <span className="ux-workspace-empty-circle"/><span className="ux-workspace-empty-star">✳</span>
     </div>
@@ -29,5 +30,5 @@ export function WorkspaceEmpty({title,description,action,kind="neutral"}:{
     {action&&<Link href={action.href} className="ux-workspace-action">
        {action.label}<ExperienceIcon name="arrow" size={18}/>
     </Link>}
-  </section>;
+  </Card>;
 }

@@ -1,9 +1,11 @@
+import {Separator} from "@/components/spaceui/separator";
 import type {Metadata,Viewport} from "next";
 import type {ReactNode} from "react";
 import Link from "next/link";
 import {ExperienceHeader} from "@/components/experience/experience-header";
 import "./globals.css";
 import "./experience.css";
+import "./space-theme.css";
 
 export const metadata:Metadata={
   title:{default:"UNILOOP — Buy better. Borrow smarter.",template:"%s · UNILOOP"},
@@ -11,10 +13,10 @@ export const metadata:Metadata={
   applicationName:"UNILOOP",
   robots:{index:false,follow:false},
 };
-export const viewport:Viewport={width:"device-width",initialScale:1,themeColor:"#f9f7f1"};
+export const viewport:Viewport={width:"device-width",initialScale:1,themeColor:"#09090b"};
 
 export default function RootLayout({children}:{children:ReactNode}){
-  return <html lang="en">
+  return <html lang="en" className="dark">
     <body>
       <a href="#main-content" className="skip-link">Skip to content</a>
       <ExperienceHeader/>
@@ -44,6 +46,7 @@ export default function RootLayout({children}:{children:ReactNode}){
               <Link href="/help">Help & guidance</Link>
             </nav>
           </div>
+          <Separator className="ux-footer-rule"/>
           <div className="ux-footer-bottom">
             <span>© {new Date().getFullYear()} UNILOOP. Crafted to keep good things moving.</span>
             <span>Browse thoughtfully · Exchange safely · Keep it in the loop</span>
