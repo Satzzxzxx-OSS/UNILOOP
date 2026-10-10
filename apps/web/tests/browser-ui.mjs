@@ -65,7 +65,8 @@ try{
       assert.equal(sidebarWidth,240,"FinCo-style sidebar width");
       await sidebar.locator("summary").click();
       assert(await sidebar.getByRole("navigation",{name:"Account menu"}).isVisible(),"Account menu opens");
-      await sidebar.locator("summary").click();
+      await page.keyboard.press("Escape");
+      assert(!(await sidebar.getByRole("navigation",{name:"Account menu"}).isVisible()),"Escape dismisses account menu");
     }
     await page.getByRole("tab",{name:"For rent",exact:true}).click();
     assert(await page.getByRole("tabpanel").getByRole("heading",{name:"Rental discovery is not connected yet"}).isVisible(),"Rental tab displays the existing rental state");

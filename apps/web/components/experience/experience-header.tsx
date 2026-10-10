@@ -88,6 +88,20 @@ export function ExperienceHeader({identity="Your account",subtitle="Personal mar
   const menuRef=useRef<HTMLElement|null>(null);
   const menuToggleRef=useRef<HTMLButtonElement|null>(null);
   const [searchOpen,setSearchOpen]=useState(false);
+  const accountMenuRef=useRef<HTMLDetailsElement|null>(null);
+  useEffect(()=>{
+    function dismissOutside(event:PointerEvent){
+      const menu=accountMenuRef.current;
+      if(menu?.open&&event.target instanceof Node&&!menu.contains(event.target))menu.open=false;
+    }
+    function dismissEscape(event:KeyboardEvent){
+      const menu=accountMenuRef.current;
+      if(event.key==="Escape"&&menu?.open){menu.open=false;menu.querySelector("summary")?.focus();}
+    }
+    document.addEventListener("pointerdown",dismissOutside);
+    document.addEventListener("keydown",dismissEscape);
+    return ()=>{document.removeEventListener("pointerdown",dismissOutside);document.removeEventListener("keydown",dismissEscape);};
+  },[]);
   useEffect(()=>{
     function onSearchShortcut(event:KeyboardEvent){
       const target=event.target;
@@ -131,7 +145,7 @@ export function ExperienceHeader({identity="Your account",subtitle="Personal mar
       <Suspense fallback={<nav className="ul-sidebar-nav" aria-label="Main navigation"><Link href="/">Overview</Link></nav>}><DesktopNavigation pathname={pathname}/></Suspense>
       <div className="ul-sidebar-bottom">
         <Link href="/post" className="ul-sidebar-create"><ExperienceIcon name="plus" size={17}/>Create listing</Link>
-        <details className="ul-account-menu">
+        <details ref={accountMenuRef} className="ul-account-menu">
           <summary><span className="ul-account-avatar"><ExperienceIcon name="user" size={17}/></span><span><strong>{identity}</strong><small>{subtitle}</small></span><ExperienceIcon name="chevron" size={15}/></summary>
           <nav aria-label="Account menu"><Link href="/account">Account & sign in</Link><Link href="/settings">Account settings</Link><Link href="/help">Help & guidance</Link></nav>
         </details>
