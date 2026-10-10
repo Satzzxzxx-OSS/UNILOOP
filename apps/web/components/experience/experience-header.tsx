@@ -4,6 +4,7 @@ import {Button} from "@/components/spaceui/button";
 import {WorkspaceSearch} from "./workspace-search";
 import {InterfacePreferences} from "./interface-preferences";
 import {TooltipProvider,Tooltip,TooltipTrigger,TooltipPopup} from "@/components/spaceui/tooltip";
+import {SidebarAccountMenu} from "@/components/experience/sidebar-account-menu";
 
 import { Dialog as NavigationDialog } from "@base-ui/react/dialog";
 import Link from "next/link";
@@ -99,7 +100,7 @@ function DesktopNavigation({pathname,onNavigate}:{pathname:string;onNavigate?:()
   </nav>;
 }
 
-export function ExperienceHeader({identity="Your account",subtitle="Personal marketplace"}:{identity?:string;subtitle?:string}){
+export function ExperienceHeader({identity="Your account",subtitle="Personal marketplace",email=""}:{identity?:string;subtitle?:string;email?:string}){
   const pathname=usePathname();
   const [menuOpen,setMenuOpen]=useState(false);
   const menuToggleRef=useRef<HTMLButtonElement|null>(null);
@@ -112,20 +113,7 @@ export function ExperienceHeader({identity="Your account",subtitle="Personal mar
   const [searchOpen,setSearchOpen]=useState(false);
   const searchOrigin=useRef<HTMLElement|null>(null);
   function openSearch(){searchOrigin.current=document.activeElement as HTMLElement;setMenuOpen(false);setSearchOpen(true);}
-  const accountMenuRef=useRef<HTMLDetailsElement|null>(null);
-  useEffect(()=>{
-    function dismissOutside(event:PointerEvent){
-      const menu=accountMenuRef.current;
-      if(menu?.open&&event.target instanceof Node&&!menu.contains(event.target))menu.open=false;
-    }
-    function dismissEscape(event:KeyboardEvent){
-      const menu=accountMenuRef.current;
-      if(event.key==="Escape"&&menu?.open){menu.open=false;menu.querySelector("summary")?.focus();}
-    }
-    document.addEventListener("pointerdown",dismissOutside);
-    document.addEventListener("keydown",dismissEscape);
-    return ()=>{document.removeEventListener("pointerdown",dismissOutside);document.removeEventListener("keydown",dismissEscape);};
-  },[]);
+
   useEffect(()=>{
     function onSearchShortcut(event:KeyboardEvent){
       const target=event.target;
@@ -145,10 +133,7 @@ export function ExperienceHeader({identity="Your account",subtitle="Personal mar
       <Suspense fallback={<nav className="ul-sidebar-nav" aria-label="Main navigation"><Link href="/dashboard">Overview</Link></nav>}><DesktopNavigation pathname={pathname}/></Suspense>
       <div className="ul-sidebar-bottom">
         <Link href="/post" className="ul-sidebar-create"><ExperienceIcon name="plus" size={17}/>Create listing</Link>
-        <details ref={accountMenuRef} className="ul-account-menu">
-          <summary><span className="ul-account-avatar"><ExperienceIcon name="user" size={17}/></span><span><strong>{identity}</strong><small>{subtitle}</small></span><ExperienceIcon name="chevron" size={15}/></summary>
-          <nav aria-label="Account menu"><Link href="/account">Account & sign in</Link><Link href="/settings">Account settings</Link><Link href="/help">Help & guidance</Link></nav>
-        </details>
+        <SidebarAccountMenu name={identity} email={email}/>
       </div>
     </aside>
     <header className="ux-header">
