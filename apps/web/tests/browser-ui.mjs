@@ -57,6 +57,19 @@ try{
       assert(await page.getByRole("navigation",{name:"Main navigation"}).isVisible(),
         "Desktop navigation absent at "+width);
     }
+    assert.deepEqual(await page.locator(".ul-metric-value").allTextContents(),["—","—","—","—"],"Unavailable services must not invent activity counts");
+    if(width>900){
+      const sidebar=page.getByRole("complementary",{name:"Workspace sidebar"});
+      assert(await sidebar.isVisible(),"Persistent workspace sidebar must be visible");
+      const sidebarWidth=await sidebar.evaluate(el=>el.getBoundingClientRect().width);
+      assert.equal(sidebarWidth,240,"FinCo-style sidebar width");
+      await sidebar.locator("summary").click();
+      assert(await sidebar.getByRole("navigation",{name:"Account menu"}).isVisible(),"Account menu opens");
+      await sidebar.locator("summary").click();
+    }
+    await page.getByRole("tab",{name:"For rent",exact:true}).click();
+    assert(await page.getByRole("tabpanel").getByRole("heading",{name:"Rental discovery is not connected yet"}).isVisible(),"Rental tab displays the existing rental state");
+    await page.getByRole("tab",{name:"For sale",exact:true}).click();
     await page.screenshot({path:path.join(output,"home-"+width+".png"),fullPage:true,animations:"disabled"});
     assert.deepEqual(errors,[],"JS page errors at "+width);
     await page.close();

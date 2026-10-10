@@ -7,7 +7,7 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
 
-type Glyph = "search"|"arrow"|"menu"|"close"|"home"|"grid"|"plus"|"heart"|"chat"|"user"|"chevron"|"shield";
+type Glyph = "search"|"arrow"|"menu"|"close"|"home"|"grid"|"plus"|"heart"|"chat"|"user"|"chevron"|"shield"|"bag"|"key"|"package"|"calendar"|"bell"|"settings"|"help"|"receipt";
 export function ExperienceIcon({ name, size = 20 }: {name: Glyph; size?:number}) {
   const common={width:size,height:size,viewBox:"0 0 24 24",fill:"none",stroke:"currentColor",strokeWidth:1.7,strokeLinecap:"round" as const,strokeLinejoin:"round" as const,"aria-hidden":true as const};
   const paths:Record<Glyph,React.ReactNode>={
@@ -22,6 +22,14 @@ export function ExperienceIcon({ name, size = 20 }: {name: Glyph; size?:number})
     chat:<><path d="M20.5 12a8.5 8.5 0 0 1-8.5 8.5 9 9 0 0 1-4-.9L3 21l1.5-5A8.5 8.5 0 1 1 20.5 12Z"/><path d="M8 12h8"/></>,
     user:<><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.6-4 3-6 7-6s6.4 2 7 6"/></>,
     chevron:<><path d="m7 10 5 5 5-5"/></>,
+    bag:<><path d="M5 7h14l1 14H4L5 7Z"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/></>,
+    key:<><circle cx="8" cy="8" r="4"/><path d="m11 11 9 9m-3-3 3-3m-6 0 3-3"/></>,
+    package:<><path d="m12 3 9 5v9l-9 5-9-5V8l9-5Z"/><path d="m3 8 9 5 9-5M12 13v9M7 5.8l9 5"/></>,
+    calendar:<><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 11h18m-13 4h2m4 0h2"/></>,
+    bell:<><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></>,
+    settings:<><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="8" cy="6" r="2" fill="var(--surface)"/><circle cx="16" cy="12" r="2" fill="var(--surface)"/><circle cx="10" cy="18" r="2" fill="var(--surface)"/></>,
+    help:<><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 4 2c-1 .5-1.5 1-1.5 2M12 17h.01"/></>,
+    receipt:<><path d="m5 3 2 1 2-1 3 1 3-1 2 1 2-1v18l-2-1-2 1-3-1-3 1-2-1-2 1V3Z"/><path d="M9 8h6M9 12h6M9 16h4"/></>,
     shield:<><path d="M12 2 4 5v6c0 6 3.4 9.4 8 11 4.6-1.6 8-5 8-11V5z"/><path d="m9 12 2 2 4-4"/></>,
   };
   return <svg {...common}>{paths[name]}</svg>;
@@ -38,22 +46,22 @@ const dockItems=[
 const sidebarGroups=[
   {label:"Marketplace",items:[
     {label:"Overview",href:"/",icon:"home" as Glyph},
-    {label:"Buy",href:"/explore?mode=buy",icon:"grid" as Glyph},
-    {label:"Rent",href:"/explore?mode=rent",icon:"grid" as Glyph},
+    {label:"Buy",href:"/explore?mode=buy",icon:"bag" as Glyph},
+    {label:"Rent",href:"/explore?mode=rent",icon:"key" as Glyph},
     {label:"Saved items",href:"/saved",icon:"heart" as Glyph},
   ]},
   {label:"Your activity",items:[
-    {label:"My listings",href:"/my/listings",icon:"grid" as Glyph},
-    {label:"Rental listings",href:"/rent/my",icon:"grid" as Glyph},
+    {label:"My listings",href:"/my/listings",icon:"package" as Glyph},
+    {label:"Rental listings",href:"/rent/my",icon:"key" as Glyph},
     {label:"Messages",href:"/inbox",icon:"chat" as Glyph},
     {label:"Offers",href:"/offers",icon:"arrow" as Glyph},
-    {label:"Transactions",href:"/transactions",icon:"arrow" as Glyph},
-    {label:"Rental activity",href:"/rentals",icon:"chevron" as Glyph},
+    {label:"Transactions",href:"/transactions",icon:"receipt" as Glyph},
+    {label:"Rental activity",href:"/rentals",icon:"calendar" as Glyph},
   ]},
   {label:"Account",items:[
-    {label:"Notifications",href:"/notifications",icon:"chat" as Glyph},
-    {label:"Settings",href:"/settings",icon:"user" as Glyph},
-    {label:"Help & guidance",href:"/help",icon:"shield" as Glyph},
+    {label:"Notifications",href:"/notifications",icon:"bell" as Glyph},
+    {label:"Settings",href:"/settings",icon:"settings" as Glyph},
+    {label:"Help & guidance",href:"/help",icon:"help" as Glyph},
     {label:"Exchange safety",href:"/safety",icon:"shield" as Glyph},
   ]},
 ];
