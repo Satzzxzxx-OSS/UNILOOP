@@ -11,7 +11,7 @@ export default async function SettingsPage(){
  const result=client?await client.auth.getUser():null;
  const user=result?.data.user;
  if(!client||!user){
-   return <WorkspaceShell eyebrow="PERSONAL & PRIVATE" title="A little more about you."
+   return <WorkspaceShell eyebrow="PERSONAL & PRIVATE" title="Account settings"
      description="Keep your details and notification preferences in one place.">
        <WorkspaceEmpty kind="auth" title="Sign in to see your settings."
          description="Private preferences are only accessible to your own authenticated account."
@@ -24,7 +24,7 @@ export default async function SettingsPage(){
      .eq("user_id",user.id).maybeSingle(),
  ]);
  const enabled=process.env.ENABLE_MARKETPLACE_USER_ACTIONS==="true";
- return <WorkspaceShell eyebrow="PERSONAL & PRIVATE" title="Make it yours."
+ return <WorkspaceShell eyebrow="PERSONAL & PRIVATE" title="Account settings"
    description="Your profile, notification choices and privacy settings.">
    <div className="ux-settings-grid">
      <div>

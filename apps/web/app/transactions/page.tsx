@@ -11,7 +11,7 @@ const money=(n:number)=>new Intl.NumberFormat("en-IN",{
 }).format(n);
 export default async function TransactionsPage(){
  const result=await getSaleDeals();
- return <WorkspaceShell eyebrow="THE EXCHANGE JOURNEY" title="Good things, passed along."
+ return <WorkspaceShell eyebrow="THE EXCHANGE JOURNEY" title="Transactions"
    description="Real two-sided handover records, kept separate from payments and offers."
    action={{href:"/inbox",label:"View conversations"}}>
    {result.kind==="ready"&&result.items.length?

@@ -22,7 +22,7 @@ export function EmptyFeed({
           ? "There are no live items matching your request. Try a different search or browse a category."
           : mode === "rent"
             ? "Rental listings will appear here once the booking system is ready and real items are published."
-            : "Items will appear here once real listings are published. We never fill the feed with made-up products."}
+            : "New listings will appear here as people share items in your marketplace."}
       </p>
       <Link href="/explore" className="text-link">Browse all categories <span aria-hidden="true">→</span></Link>
     </div>

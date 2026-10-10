@@ -27,11 +27,6 @@ export function ExperienceIcon({ name, size = 20 }: {name: Glyph; size?:number})
   return <svg {...common}>{paths[name]}</svg>;
 }
 
-const navItems=[
-  {label:"Discover",href:"/"},
-  {label:"Buy",href:"/explore?mode=buy"},
-  {label:"Rent",href:"/explore?mode=rent"},
-];
 const dockItems=[
   {label:"Home",href:"/",icon:"home" as Glyph},
   {label:"Explore",href:"/explore",icon:"grid" as Glyph},
@@ -40,18 +35,46 @@ const dockItems=[
   {label:"Inbox",href:"/inbox",icon:"chat" as Glyph},
 ];
 
+const sidebarGroups=[
+  {label:"Marketplace",items:[
+    {label:"Overview",href:"/",icon:"home" as Glyph},
+    {label:"Buy",href:"/explore?mode=buy",icon:"grid" as Glyph},
+    {label:"Rent",href:"/explore?mode=rent",icon:"grid" as Glyph},
+    {label:"Saved items",href:"/saved",icon:"heart" as Glyph},
+  ]},
+  {label:"Your activity",items:[
+    {label:"My listings",href:"/my/listings",icon:"grid" as Glyph},
+    {label:"Rental listings",href:"/rent/my",icon:"grid" as Glyph},
+    {label:"Messages",href:"/inbox",icon:"chat" as Glyph},
+    {label:"Offers",href:"/offers",icon:"arrow" as Glyph},
+    {label:"Transactions",href:"/transactions",icon:"arrow" as Glyph},
+    {label:"Rental activity",href:"/rentals",icon:"chevron" as Glyph},
+  ]},
+  {label:"Account",items:[
+    {label:"Notifications",href:"/notifications",icon:"chat" as Glyph},
+    {label:"Settings",href:"/settings",icon:"user" as Glyph},
+    {label:"Help & guidance",href:"/help",icon:"shield" as Glyph},
+    {label:"Exchange safety",href:"/safety",icon:"shield" as Glyph},
+  ]},
+];
 function DesktopNavigation({pathname}:{pathname:string}){
   const params=useSearchParams();
-  const active=pathname==="/"?"/":pathname==="/explore"
-    ?"/explore?mode="+(params.get("mode")==="rent"?"rent":"buy"):null;
-  return <nav className="ux-desktop-main" aria-label="Main navigation">
-    {navItems.map(item=><Link key={item.label} href={item.href}
-      aria-current={active===item.href?"page":undefined}
-      className={active===item.href?"ux-nav-active":""}>{item.label}</Link>)}
+  const active=pathname==="/explore"
+    ?"/explore?mode="+(params.get("mode")==="rent"?"rent":"buy"):pathname;
+  return <nav className="ul-sidebar-nav" aria-label="Main navigation">
+    {sidebarGroups.map(group=><section key={group.label}>
+      <h2>{group.label}</h2>
+      {group.items.map(item=>{
+        const selected=item.href===active||(item.href!=="/"&&!item.href.includes("?")&&active.startsWith(item.href+"/"));
+        return <Link key={item.href} href={item.href} aria-current={selected?"page":undefined}>
+          <ExperienceIcon name={item.icon} size={17}/><span>{item.label}</span>
+        </Link>;
+      })}
+    </section>)}
   </nav>;
 }
 
-export function ExperienceHeader(){
+export function ExperienceHeader({identity="Your account",subtitle="Personal marketplace"}:{identity?:string;subtitle?:string}){
   const pathname=usePathname();
   const [menuOpen,setMenuOpen]=useState(false);
   const menuRef=useRef<HTMLElement|null>(null);
@@ -94,17 +117,25 @@ export function ExperienceHeader(){
     return ()=>{document.removeEventListener("keydown",onKeyDown);document.body.style.overflow=before;};
   },[menuOpen]);
   return <>
+    <aside className="ul-sidebar" aria-label="Workspace sidebar">
+      <Link href="/" className="ul-sidebar-brand" aria-label="UNILOOP overview"><span className="ul-monogram">U</span><strong>UNILOOP</strong><span className="ul-brand-tag">Workspace</span></Link>
+      <Button variant="ghost" className="ul-sidebar-search" type="button" aria-label="Open workspace search" onClick={()=>setSearchOpen(true)}><ExperienceIcon name="search" size={16}/><span>Search marketplace</span><kbd>⌘ K</kbd></Button>
+      <Suspense fallback={<nav className="ul-sidebar-nav" aria-label="Main navigation"><Link href="/">Overview</Link></nav>}><DesktopNavigation pathname={pathname}/></Suspense>
+      <div className="ul-sidebar-bottom">
+        <Link href="/post" className="ul-sidebar-create"><ExperienceIcon name="plus" size={17}/>Create listing</Link>
+        <details className="ul-account-menu">
+          <summary><span className="ul-account-avatar"><ExperienceIcon name="user" size={17}/></span><span><strong>{identity}</strong><small>{subtitle}</small></span><ExperienceIcon name="chevron" size={15}/></summary>
+          <nav aria-label="Account menu"><Link href="/account">Account & sign in</Link><Link href="/settings">Account settings</Link><Link href="/help">Help & guidance</Link></nav>
+        </details>
+      </div>
+    </aside>
     <header className="ux-header">
       <div className="ux-shell ux-header-inner">
         <Link className="ux-brand" href="/" aria-label="UNILOOP home">
           <span className="ux-brand-symbol" aria-hidden="true"><i/><i/><b/></span>
           <span>uni<span>loop</span><sup>™</sup></span>
         </Link>
-        <Suspense fallback={<nav className="ux-desktop-main" aria-label="Main navigation">
-          {navItems.map(item=><Link key={item.label} href={item.href}>{item.label}</Link>)}
-        </nav>}>
-          <DesktopNavigation pathname={pathname}/>
-        </Suspense>
+        <div className="ul-header-context"><span>Workspace</span><span aria-hidden="true">/</span><strong>{pathname==="/"?"Overview":pathname.startsWith("/explore")?"Marketplace":sidebarGroups.flatMap(g=>g.items).find(i=>i.href===pathname)?.label??"Your loop"}</strong></div>
         <div className="ux-header-controls">
           <Button variant="ghost" className="ux-icon-button ux-global-search" type="button"
             aria-label="Open item search" aria-controls="ux-global-search-panel" aria-expanded={searchOpen}
@@ -134,7 +165,7 @@ export function ExperienceHeader(){
             {name:"Discover",href:"/"},{name:"Buy something",href:"/explore?mode=buy"},
             {name:"Rent something",href:"/explore?mode=rent"},
             {name:"Sell an item",href:"/post"},{name:"Rent out an item",href:"/rent/post"},
-            {name:"My listings",href:"/my/listings"},{name:"My rentals",href:"/rentals"},
+            {name:"My listings",href:"/my/listings"},{name:"Rental listings",href:"/rent/my"},{name:"My rentals",href:"/rentals"},{name:"Offers",href:"/offers"},{name:"Saved items",href:"/saved"},{name:"Messages",href:"/inbox"},{name:"Account",href:"/account"},
             {name:"Transactions",href:"/transactions"},{name:"Notifications",href:"/notifications"},{name:"Help center",href:"/help"},
             {name:"Help & safety",href:"/safety"},{name:"Settings",href:"/settings"},
           ].map(item=><Link key={item.href} href={item.href} onClick={()=>setMenuOpen(false)}>

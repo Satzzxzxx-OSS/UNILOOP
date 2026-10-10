@@ -15,7 +15,7 @@ const faqs=[
 export default function HelpPage(){
  return <article className="ux-shell ux-guide-page">
    <header className="ux-guide-hero"><p className="ux-kicker">A LITTLE GUIDANCE GOES A LONG WAY</p>
-     <h1>Here when you need <em>a little clarity.</em></h1>
+     <h1>Help & guidance</h1>
      <p>Answers about discovery, listing, borrowing and staying thoughtful along the way.</p></header>
    <section className="ux-help-topics" aria-label="Helpful places">
      {[

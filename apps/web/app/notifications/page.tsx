@@ -23,7 +23,7 @@ export default async function NotificationsPage(){
    data=(r.data??[]) as Alert[];error=Boolean(r.error);
  }
  const enabled=process.env.ENABLE_MARKETPLACE_USER_ACTIONS==="true";
- return <WorkspaceShell eyebrow="STAY IN THE KNOW" title="A little update for you."
+ return <WorkspaceShell eyebrow="STAY IN THE KNOW" title="Notifications"
    description="Only updates from real conversations and marketplace activity appear here.">
    {user&&enabled&&data.some(a=>!a.read_at)&&
      <div className="ux-notification-controls"><NotificationReadForm id="all"/></div>}
