@@ -4,8 +4,8 @@ import {Button} from "@/components/spaceui/button";
 import {Input} from "@/components/spaceui/input";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useRef, useState } from "react";
 
 type Glyph = "search"|"arrow"|"menu"|"close"|"home"|"grid"|"plus"|"heart"|"chat"|"user"|"chevron"|"shield";
 export function ExperienceIcon({ name, size = 20 }: {name: Glyph; size?:number}) {
@@ -39,6 +39,17 @@ const dockItems=[
   {label:"Saved",href:"/saved",icon:"heart" as Glyph},
   {label:"Inbox",href:"/inbox",icon:"chat" as Glyph},
 ];
+
+function DesktopNavigation({pathname}:{pathname:string}){
+  const params=useSearchParams();
+  const active=pathname==="/"?"/":pathname==="/explore"
+    ?"/explore?mode="+(params.get("mode")==="rent"?"rent":"buy"):null;
+  return <nav className="ux-desktop-main" aria-label="Main navigation">
+    {navItems.map(item=><Link key={item.label} href={item.href}
+      aria-current={active===item.href?"page":undefined}
+      className={active===item.href?"ux-nav-active":""}>{item.label}</Link>)}
+  </nav>;
+}
 
 export function ExperienceHeader(){
   const pathname=usePathname();
@@ -89,12 +100,11 @@ export function ExperienceHeader(){
           <span className="ux-brand-symbol" aria-hidden="true"><i/><i/><b/></span>
           <span>uni<span>loop</span><sup>™</sup></span>
         </Link>
-        <nav className="ux-desktop-main" aria-label="Main navigation">
-          {navItems.map(item=><Link key={item.label} href={item.href}
-            className={pathname==="/"&&item.href==="/"?"ux-nav-active":pathname==="/explore"&&item.href.includes("mode")?"":" "}>
-              {item.label}
-          </Link>)}
-        </nav>
+        <Suspense fallback={<nav className="ux-desktop-main" aria-label="Main navigation">
+          {navItems.map(item=><Link key={item.label} href={item.href}>{item.label}</Link>)}
+        </nav>}>
+          <DesktopNavigation pathname={pathname}/>
+        </Suspense>
         <div className="ux-header-controls">
           <Button variant="ghost" className="ux-icon-button ux-global-search" type="button"
             aria-label="Open item search" aria-controls="ux-global-search-panel" aria-expanded={searchOpen}

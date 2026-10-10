@@ -87,6 +87,23 @@ try{
   );
   await wizard.getByRole("button",{name:/Continue/}).click();
   await wizard.getByText("Let the item speak.").waitFor();
+  await wizard.evaluate(()=>{
+    const data=new DataTransfer();
+    data.items.add(new File(["This is not an image"],"invalid.txt",{type:"text/plain"}));
+    document.querySelector(".ux-photo-drop").dispatchEvent(new DragEvent("drop",{bubbles:true,cancelable:true,dataTransfer:data}));
+  });
+  await wizard.getByRole("alert").filter({hasText:"Use JPEG, PNG or WebP"}).waitFor();
+  await wizard.evaluate(()=>{
+    const bytes=Uint8Array.from(atob("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aBZkAAAAASUVORK5CYII="),c=>c.charCodeAt(0));
+    const data=new DataTransfer();
+    data.items.add(new File([bytes],"dark-preview.png",{type:"image/png"}));
+    document.querySelector(".ux-photo-drop").dispatchEvent(new DragEvent("drop",{bubbles:true,cancelable:true,dataTransfer:data}));
+  });
+  await wizard.locator(".ux-photo-preview img").waitFor();
+  assert.equal(await wizard.locator(".ux-photo-preview img").count(),1,"Valid drop creates one local preview");
+  assert(await wizard.getByText(/Local preview only:/).isVisible(),"Drop must not imply persisted upload");
+  await wizard.getByRole("button",{name:"Remove dark-preview.png"}).click();
+  assert.equal(await wizard.locator(".ux-photo-preview img").count(),0,"Remove clears local preview");
   await wizard.getByRole("button",{name:/Continue/}).click();
   await wizard.getByRole("heading",{name:"What feels like a fair price?"}).waitFor();
   await wizard.evaluate(()=>window.scrollTo(0,0));
@@ -109,7 +126,8 @@ try{
     "/post","/rent/post","/explore?mode=buy","/explore?mode=rent"]){
     const page=await browser.newPage({viewport:{width:390,height:844},reducedMotion:"reduce"});
     const response=await page.goto(base+route,{waitUntil:"networkidle"});
-    assert.equal(response?.status(),200,"Dark route HTTP: "+route);
+    // Moderation intentionally conceals itself from unauthenticated/non-admin accounts.
+    assert.equal(response?.status(),route==="/admin/reports"?404:200,"Dark route HTTP: "+route);
     const theme=await page.evaluate(()=>{
       function luminance(color){
         const rgb=color.match(/[\d.]+/g)?.slice(0,3).map(Number)??[255,255,255];
@@ -142,6 +160,11 @@ try{
   await topSearch.fill("headphones");
   await topSearch.press("Enter");
   await search.waitForURL(/q=headphones/);
+  const selectedNav=search.getByRole("navigation",{name:"Main navigation"});
+  assert.equal(await selectedNav.getByRole("link",{name:"Buy",exact:true}).getAttribute("aria-current"),"page");
+  await selectedNav.getByRole("link",{name:"Rent",exact:true}).click();
+  await search.waitForURL(/mode=rent/);
+  assert.equal(await selectedNav.getByRole("link",{name:"Rent",exact:true}).getAttribute("aria-current"),"page");
   await search.close();
 
   const filters=await browser.newPage({viewport:{width:390,height:844},reducedMotion:"reduce"});
