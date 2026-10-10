@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type Glyph = "search"|"arrow"|"menu"|"close"|"home"|"grid"|"plus"|"heart"|"chat"|"user"|"chevron"|"shield";
 export function ExperienceIcon({ name, size = 20 }: {name: Glyph; size?:number}) {
@@ -40,12 +40,32 @@ const dockItems=[
 export function ExperienceHeader(){
   const pathname=usePathname();
   const [menuOpen,setMenuOpen]=useState(false);
+  const menuRef=useRef<HTMLElement|null>(null);
+  const menuToggleRef=useRef<HTMLButtonElement|null>(null);
   const [searchOpen,setSearchOpen]=useState(false);
   useEffect(()=>{
     if(!menuOpen)return;
-    function onEscape(event:KeyboardEvent){if(event.key==="Escape")setMenuOpen(false);}
-    document.addEventListener("keydown",onEscape);
-    return ()=>document.removeEventListener("keydown",onEscape);
+    const before=document.body.style.overflow;
+    document.body.style.overflow="hidden";
+    const menu=menuRef.current;
+    const links=Array.from(menu?.querySelectorAll<HTMLAnchorElement>('a[href]')??[]);
+    links[0]?.focus();
+    function onKeyDown(event:KeyboardEvent){
+      if(event.key==="Escape"){
+        event.preventDefault();
+        setMenuOpen(false);
+        menuToggleRef.current?.focus();
+      }
+      if(event.key!=="Tab"||!links.length)return;
+      const first=links[0],last=links[links.length-1];
+      if(event.shiftKey&&document.activeElement===first){
+        event.preventDefault();last.focus();
+      }else if(!event.shiftKey&&document.activeElement===last){
+        event.preventDefault();first.focus();
+      }
+    }
+    document.addEventListener("keydown",onKeyDown);
+    return ()=>{document.removeEventListener("keydown",onKeyDown);document.body.style.overflow=before;};
   },[menuOpen]);
   return <>
     <header className="ux-header">
@@ -68,7 +88,7 @@ export function ExperienceHeader(){
           <Link href="/inbox" className="ux-icon-button ux-desktop-control" aria-label="Inbox"><ExperienceIcon name="chat"/></Link>
           <Link href="/account" className="ux-icon-button ux-desktop-control" aria-label="Your account"><ExperienceIcon name="user"/></Link>
           <Link href="/post" className="ux-header-list">List an item <ExperienceIcon name="arrow" size={17}/></Link>
-          <button type="button" className="ux-icon-button ux-menu-toggle"
+          <button ref={menuToggleRef} type="button" className="ux-icon-button ux-menu-toggle"
             aria-label={menuOpen?"Close navigation":"Open navigation"}
             aria-controls="ux-mobile-menu" aria-expanded={menuOpen}
             onClick={()=>setMenuOpen(v=>!v)}><ExperienceIcon name={menuOpen?"close":"menu"}/></button>
@@ -81,8 +101,8 @@ export function ExperienceHeader(){
           maxLength={100} placeholder="What are you looking for?"/>
         <button type="submit">Search <ExperienceIcon name="arrow" size={15}/></button>
       </form>}
-      {menuOpen&&<div className="ux-mobile-backdrop" onClick={()=>setMenuOpen(false)}>
-        <nav id="ux-mobile-menu" className="ux-menu-sheet" aria-label="More navigation"
+      {menuOpen&&<div className="ux-mobile-backdrop" role="presentation" onClick={()=>{setMenuOpen(false);menuToggleRef.current?.focus();}}>
+        <nav ref={menuRef} id="ux-mobile-menu" className="ux-menu-sheet" aria-label="More navigation"
           onClick={event=>event.stopPropagation()}>
           <p className="ux-menu-caption">EXPLORE THE LOOP</p>
           {[
