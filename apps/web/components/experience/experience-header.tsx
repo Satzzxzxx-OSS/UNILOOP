@@ -1,8 +1,11 @@
 "use client";
 
 import {Button} from "@/components/spaceui/button";
-import {Input} from "@/components/spaceui/input";
+import {WorkspaceSearch} from "./workspace-search";
+import {InterfacePreferences} from "./interface-preferences";
+import {TooltipProvider,Tooltip,TooltipTrigger,TooltipPopup} from "@/components/spaceui/tooltip";
 
+import { Dialog as NavigationDialog } from "@base-ui/react/dialog";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
@@ -65,7 +68,7 @@ const sidebarGroups=[
     {label:"Exchange safety",href:"/safety",icon:"shield" as Glyph},
   ]},
 ];
-function DesktopNavigation({pathname}:{pathname:string}){
+function DesktopNavigation({pathname,onNavigate}:{pathname:string;onNavigate?:()=>void}){
   const params=useSearchParams();
   const active=pathname==="/explore"
     ?"/explore?mode="+(params.get("mode")==="rent"?"rent":"buy"):pathname;
@@ -74,7 +77,7 @@ function DesktopNavigation({pathname}:{pathname:string}){
       <h2>{group.label}</h2>
       {group.items.map(item=>{
         const selected=item.href===active||(item.href!=="/"&&!item.href.includes("?")&&active.startsWith(item.href+"/"));
-        return <Link key={item.href} href={item.href} aria-current={selected?"page":undefined}>
+        return <Link key={item.href} href={item.href} onClick={onNavigate} aria-current={selected?"page":undefined}>
           <ExperienceIcon name={item.icon} size={17}/><span>{item.label}</span>
         </Link>;
       })}
@@ -85,9 +88,16 @@ function DesktopNavigation({pathname}:{pathname:string}){
 export function ExperienceHeader({identity="Your account",subtitle="Personal marketplace"}:{identity?:string;subtitle?:string}){
   const pathname=usePathname();
   const [menuOpen,setMenuOpen]=useState(false);
-  const menuRef=useRef<HTMLElement|null>(null);
   const menuToggleRef=useRef<HTMLButtonElement|null>(null);
+  useEffect(()=>{
+    const desktop=window.matchMedia("(min-width:901px)");
+    function closeOnDesktop(){if(desktop.matches)setMenuOpen(false);}
+    desktop.addEventListener("change",closeOnDesktop);
+    return ()=>desktop.removeEventListener("change",closeOnDesktop);
+  },[]);
   const [searchOpen,setSearchOpen]=useState(false);
+  const searchOrigin=useRef<HTMLElement|null>(null);
+  function openSearch(){searchOrigin.current=document.activeElement as HTMLElement;setMenuOpen(false);setSearchOpen(true);}
   const accountMenuRef=useRef<HTMLDetailsElement|null>(null);
   useEffect(()=>{
     function dismissOutside(event:PointerEvent){
@@ -107,41 +117,17 @@ export function ExperienceHeader({identity="Your account",subtitle="Personal mar
       const target=event.target;
       if(target instanceof HTMLElement && (target.isContentEditable || target.closest("input,textarea,select")))return;
       if(event.key==="/" || ((event.metaKey||event.ctrlKey)&&event.key.toLowerCase()==="k")){
-        event.preventDefault();setSearchOpen(true);
+        event.preventDefault();openSearch();
       }
       if(event.key==="Escape")setSearchOpen(false);
     }
     document.addEventListener("keydown",onSearchShortcut);
     return ()=>document.removeEventListener("keydown",onSearchShortcut);
   },[]);
-  useEffect(()=>{
-    if(!menuOpen)return;
-    const before=document.body.style.overflow;
-    document.body.style.overflow="hidden";
-    const menu=menuRef.current;
-    const links=Array.from(menu?.querySelectorAll<HTMLAnchorElement>('a[href]')??[]);
-    links[0]?.focus();
-    function onKeyDown(event:KeyboardEvent){
-      if(event.key==="Escape"){
-        event.preventDefault();
-        setMenuOpen(false);
-        menuToggleRef.current?.focus();
-      }
-      if(event.key!=="Tab"||!links.length)return;
-      const first=links[0],last=links[links.length-1];
-      if(event.shiftKey&&document.activeElement===first){
-        event.preventDefault();last.focus();
-      }else if(!event.shiftKey&&document.activeElement===last){
-        event.preventDefault();first.focus();
-      }
-    }
-    document.addEventListener("keydown",onKeyDown);
-    return ()=>{document.removeEventListener("keydown",onKeyDown);document.body.style.overflow=before;};
-  },[menuOpen]);
-  return <>
+  return <TooltipProvider delay={400}>
     <aside className="ul-sidebar" aria-label="Workspace sidebar">
       <Link href="/" className="ul-sidebar-brand" aria-label="UNILOOP overview"><span className="ul-monogram">U</span><strong>UNILOOP</strong><span className="ul-brand-tag">Workspace</span></Link>
-      <Button variant="ghost" className="ul-sidebar-search" type="button" aria-label="Open workspace search" onClick={()=>setSearchOpen(true)}><ExperienceIcon name="search" size={16}/><span>Search marketplace</span><kbd>⌘ K</kbd></Button>
+      <Button variant="ghost" className="ul-sidebar-search" type="button" aria-label="Open workspace search" onClick={openSearch}><ExperienceIcon name="search" size={16}/><span>Search marketplace</span><kbd>⌘ / Ctrl K</kbd></Button>
       <Suspense fallback={<nav className="ul-sidebar-nav" aria-label="Main navigation"><Link href="/">Overview</Link></nav>}><DesktopNavigation pathname={pathname}/></Suspense>
       <div className="ul-sidebar-bottom">
         <Link href="/post" className="ul-sidebar-create"><ExperienceIcon name="plus" size={17}/>Create listing</Link>
@@ -161,41 +147,41 @@ export function ExperienceHeader({identity="Your account",subtitle="Personal mar
         <div className="ux-header-controls">
           <Button variant="ghost" className="ux-icon-button ux-global-search" type="button"
             aria-label="Open item search" aria-controls="ux-global-search-panel" aria-expanded={searchOpen}
-            onClick={()=>setSearchOpen(v=>!v)}><ExperienceIcon name="search"/><span>Search</span><kbd>/</kbd></Button>
-          <Link href="/saved" className="ux-icon-button ux-desktop-control" aria-label="Saved items"><ExperienceIcon name="heart"/></Link>
-          <Link href="/inbox" className="ux-icon-button ux-desktop-control" aria-label="Inbox"><ExperienceIcon name="chat"/></Link>
-          <Link href="/account" className="ux-icon-button ux-desktop-control" aria-label="Your account"><ExperienceIcon name="user"/></Link>
+            onClick={openSearch}><ExperienceIcon name="search"/><span>Search</span><kbd>/</kbd></Button>
+          <Tooltip><TooltipTrigger render={<Link href="/saved" className="ux-icon-button ux-desktop-control" aria-label="Saved items"/>}><ExperienceIcon name="heart"/></TooltipTrigger><TooltipPopup>Saved items</TooltipPopup></Tooltip>
+          <Tooltip><TooltipTrigger render={<Link href="/inbox" className="ux-icon-button ux-desktop-control" aria-label="Inbox"/>}><ExperienceIcon name="chat"/></TooltipTrigger><TooltipPopup>Your messages</TooltipPopup></Tooltip>
+          <Tooltip><TooltipTrigger render={<Link href="/account" className="ux-icon-button ux-desktop-control" aria-label="Your account"/>}><ExperienceIcon name="user"/></TooltipTrigger><TooltipPopup>Your account</TooltipPopup></Tooltip>
+          <InterfacePreferences/>
           <Link href="/post" className="ux-header-list">List an item <ExperienceIcon name="arrow" size={17}/></Link>
           <Button variant="ghost" ref={menuToggleRef} type="button" className="ux-icon-button ux-menu-toggle"
             aria-label={menuOpen?"Close navigation":"Open navigation"}
             aria-controls="ux-mobile-menu" aria-expanded={menuOpen}
-            onClick={()=>setMenuOpen(v=>!v)}><ExperienceIcon name={menuOpen?"close":"menu"}/></Button>
+            onClick={()=>setMenuOpen(v=>!v)}><ExperienceIcon name={menuOpen?"close":"menu"}/><span>Menu</span></Button>
         </div>
       </div>
-      {searchOpen&&<form id="ux-global-search-panel" className="ux-mobile-search-panel ux-shell" action="/explore" role="search">
-        <label className="ux-visually-hidden" htmlFor="ux-top-search">Search the marketplace</label>
-        <ExperienceIcon name="search" size={19}/>
-        <Input nativeInput unstyled autoFocus id="ux-top-search" type="search" name="q"
-          maxLength={100} onKeyDown={e=>{if(e.key==="Escape"){setSearchOpen(false);document.querySelector<HTMLButtonElement>('[aria-controls="ux-global-search-panel"]')?.focus();}}} placeholder="What are you looking for?"/>
-        <Button type="submit">Search <ExperienceIcon name="arrow" size={15}/></Button>
-      </form>}
-      {menuOpen&&<div className="ux-mobile-backdrop" role="presentation" onClick={()=>{setMenuOpen(false);menuToggleRef.current?.focus();}}>
-        <nav ref={menuRef} id="ux-mobile-menu" className="ux-menu-sheet" aria-label="More navigation"
-          onClick={event=>event.stopPropagation()}>
-          <p className="ux-menu-caption">EXPLORE THE LOOP</p>
-          {[
-            {name:"Discover",href:"/"},{name:"Buy something",href:"/explore?mode=buy"},
-            {name:"Rent something",href:"/explore?mode=rent"},
-            {name:"Sell an item",href:"/post"},{name:"Rent out an item",href:"/rent/post"},
-            {name:"My listings",href:"/my/listings"},{name:"Rental listings",href:"/rent/my"},{name:"My rentals",href:"/rentals"},{name:"Offers",href:"/offers"},{name:"Saved items",href:"/saved"},{name:"Messages",href:"/inbox"},{name:"Account",href:"/account"},
-            {name:"Transactions",href:"/transactions"},{name:"Notifications",href:"/notifications"},{name:"Help center",href:"/help"},
-            {name:"Help & safety",href:"/safety"},{name:"Settings",href:"/settings"},
-          ].map(item=><Link key={item.href} href={item.href} onClick={()=>setMenuOpen(false)}>
-            {item.name}<ExperienceIcon name="arrow" size={16}/>
-          </Link>)}
-        </nav>
-      </div>}
     </header>
+    <NavigationDialog.Root open={menuOpen} onOpenChange={setMenuOpen}>
+      <NavigationDialog.Portal>
+        <NavigationDialog.Backdrop className="ul-mobile-sidebar-backdrop"/>
+        <NavigationDialog.Popup id="ux-mobile-menu" className="ul-mobile-sidebar" finalFocus={menuToggleRef}>
+          <div className="ul-mobile-sidebar-heading">
+            <NavigationDialog.Title className="ul-mobile-sidebar-title"><span className="ul-monogram">U</span>UNILOOP</NavigationDialog.Title>
+            <NavigationDialog.Close aria-label="Close navigation" className="ux-icon-button"><ExperienceIcon name="close"/></NavigationDialog.Close>
+          </div>
+          <NavigationDialog.Description className="ul-mobile-sidebar-description">Your marketplace workspace</NavigationDialog.Description>
+          <Button variant="ghost" className="ul-sidebar-search" type="button" onClick={openSearch}><ExperienceIcon name="search" size={16}/><span>Search marketplace</span></Button>
+          <nav aria-label="More navigation" className="ul-mobile-sidebar-content">
+            <Suspense fallback={<Link href="/" onClick={()=>setMenuOpen(false)}>Overview</Link>}><DesktopNavigation pathname={pathname} onNavigate={()=>setMenuOpen(false)}/></Suspense>
+            <div className="ul-mobile-sidebar-account"><Link href="/account" onClick={()=>setMenuOpen(false)}><ExperienceIcon name="user" size={18}/><span><strong>{identity}</strong><small>{subtitle}</small></span></Link></div>
+          </nav>
+          <div className="ul-mobile-sidebar-actions">
+            <Link href="/post" onClick={()=>setMenuOpen(false)}><ExperienceIcon name="plus" size={18}/>Create listing</Link>
+            <Link href="/rent/post" onClick={()=>setMenuOpen(false)}><ExperienceIcon name="key" size={18}/>Rent out an item</Link>
+          </div>
+        </NavigationDialog.Popup>
+      </NavigationDialog.Portal>
+    </NavigationDialog.Root>
+    <WorkspaceSearch open={searchOpen} onOpenChange={setSearchOpen} onClosed={()=>{if(searchOrigin.current?.isConnected)searchOrigin.current.focus();else menuToggleRef.current?.focus();}}/>
     <nav aria-label="Quick mobile navigation" className="ux-bottom-dock">
       {dockItems.map(item=><Link key={item.label} href={item.href}
         aria-current={item.href==="/"&&pathname==="/"||item.href!=="/"&&pathname.startsWith(item.href)?"page":undefined}
@@ -203,5 +189,5 @@ export function ExperienceHeader({identity="Your account",subtitle="Personal mar
         <ExperienceIcon name={item.icon} size={22}/><span>{item.label}</span>
       </Link>)}
     </nav>
-  </>;
+  </TooltipProvider>;
 }

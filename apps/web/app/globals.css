@@ -2,29 +2,29 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Space UI neutral dark foundation, with UNILOOP's cool accent palette. */
+/* Minimal light palette; existing layout and component behavior are unchanged. */
 :root {
-  color-scheme: dark;
-  --background: #09090b;
-  --foreground: #f4f4f5;
-  --surface: #111114;
-  --surface-subtle: #18181c;
-  --surface-raised: #222227;
-  --muted: #a1a1aa;
-  --border: #2b2b32;
-  --primary: #d7ccff;
-  --primary-foreground: #171124;
-  --secondary: #27272d;
-  --secondary-foreground: #f4f4f5;
-  --accent: #c4b5fd;
-  --accent-foreground: #171124;
-  --accent-tint: #211c30;
-  --accent-border: #51426c;
-  --success: #7dd3c0;
-  --success-tint: #142725;
+  color-scheme: light;
+  --background: #ffffff;
+  --foreground: #18181b;
+  --surface: #ffffff;
+  --surface-subtle: #f4f4f5;
+  --surface-raised: #ededee;
+  --muted: #52525b;
+  --border: #e4e4e7;
+  --primary: #18181b;
+  --primary-foreground: #fafafa;
+  --secondary: #f4f4f5;
+  --secondary-foreground: #18181b;
+  --accent: #27272a;
+  --accent-foreground: #fafafa;
+  --accent-tint: #f4f4f5;
+  --accent-border: #d4d4d8;
+  --success: #047857;
+  --success-tint: #ecfdf5;
   --destructive: #be354b;
-  --destructive-foreground: #fda4af;
-  --ring: #c4b5fd;
+  --destructive-foreground: #9f1239;
+  --ring: #18181b;
   --shadow-color: #000000;
   --radius: .875rem;
 }
@@ -32,6 +32,9 @@
   --color-background:var(--background);
   --color-foreground:var(--foreground);
   --color-card:var(--surface);
+  --color-popover:var(--surface);
+  --color-popover-foreground:var(--foreground);
+  --color-input:var(--surface-raised);
   --color-muted:var(--surface-subtle);
   --color-muted-foreground:var(--muted);
   --color-border:var(--border);

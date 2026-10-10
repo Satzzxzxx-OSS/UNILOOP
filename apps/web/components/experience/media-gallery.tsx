@@ -1,6 +1,8 @@
 "use client";
 
 import {Button} from "@/components/spaceui/button";
+import {Dialog,DialogTrigger,DialogPopup,DialogTitle,DialogDescription} from "@/components/spaceui/dialog";
+import {Maximize2} from "lucide-react";
 
 import Image from "next/image";
 import {useState} from "react";
@@ -31,6 +33,14 @@ export function MediaGallery({urls,title,kind}:{urls:string[];title:string;kind:
         </Button>
       </div>}
       <span className="ux-gallery-kind">{kind==="sale"?"For sale":"For rent"}</span>
+      {urls[visible]&&<Dialog>
+        <DialogTrigger render={<Button type="button" variant="outline" className="ul-gallery-expand" aria-label="View full-size item photo"/>}><Maximize2 size={17}/></DialogTrigger>
+        <DialogPopup className="ul-gallery-lightbox" bottomStickOnMobile={false} onKeyDown={event=>{if(urls.length>1&&(event.key==="ArrowLeft"||event.key==="ArrowRight")){event.preventDefault();setActive(index=>(index+(event.key==="ArrowRight"?1:-1)+urls.length)%urls.length);}}}>
+          <DialogTitle>{title}</DialogTitle><DialogDescription>Image {visible+1} of {urls.length}</DialogDescription>
+          <div className="ul-gallery-full-photo"><Image src={urls[visible]} alt={title+" — full-size image "+(visible+1)} fill sizes="92vw" unoptimized/></div>
+          {urls.length>1&&<div className="ul-lightbox-controls"><Button type="button" variant="outline" onClick={()=>setActive(i=>(i-1+urls.length)%urls.length)} aria-label="Previous full-size photo">← Previous</Button><span aria-live="polite">{visible+1} / {urls.length}</span><Button type="button" variant="outline" onClick={()=>setActive(i=>(i+1)%urls.length)} aria-label="Next full-size photo">Next →</Button></div>}
+        </DialogPopup>
+      </Dialog>}
     </div>
     {urls.length>1&&<div className="ux-gallery-thumbs" aria-label="Choose a photo">
       {urls.map((url,i)=><Button type="button" key={i}
