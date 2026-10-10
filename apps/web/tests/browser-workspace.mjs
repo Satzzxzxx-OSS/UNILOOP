@@ -91,10 +91,16 @@ try{
       assert(await sidebar.isVisible(),"Persistent workspace sidebar must be visible");
       const sidebarWidth=await sidebar.evaluate(el=>el.getBoundingClientRect().width);
       assert.equal(sidebarWidth,240,"FinCo-style sidebar width");
-      await sidebar.locator("summary").click();
-      assert(await sidebar.getByRole("navigation",{name:"Account menu"}).isVisible(),"Account menu opens");
+      const accountTrigger=sidebar.getByRole("button",{name:"Open account menu"});
+      await accountTrigger.click();
+      const accountPopup=page.getByRole("menu",{name:"Account menu"});
+      await accountPopup.waitFor({state:"visible"});
+      assert(await accountPopup.getByRole("menuitem",{name:/Profile & settings/}).isVisible(),"Profile settings link");
+      assert(await accountPopup.getByRole("menuitem",{name:"Sign out"}).isVisible(),"Real sign out action");
+      if(width===1024)await page.screenshot({path:path.join(output,"sidebar-account-spaceui-1024.png"),fullPage:true,animations:"disabled"});
       await page.keyboard.press("Escape");
-      assert(!(await sidebar.getByRole("navigation",{name:"Account menu"}).isVisible()),"Escape dismisses account menu");
+      await accountPopup.waitFor({state:"hidden"});
+      assert(await accountTrigger.evaluate(el=>el===document.activeElement),"Escape restores account trigger focus");
     }
     await page.getByRole("tab",{name:"For rent",exact:true}).click();
     assert(await page.getByRole("tabpanel",{name:"For rent",exact:true}).isVisible(),"Rental tab displays existing rental state");
@@ -104,6 +110,23 @@ try{
     assert.deepEqual(errors,[],"JS page errors at "+width);
     await page.close();
   }
+
+  // Account/profile uses true backend identity, Space UI tabs and safe read-only gates.
+  const profilePage=await newPage({viewport:{width:1024,height:860},reducedMotion:"reduce"});
+  await profilePage.goto(base+"/settings",{waitUntil:"networkidle"});
+  assert(await profilePage.getByRole("heading",{name:"Profile & settings"}).isVisible());
+  assert(await profilePage.getByRole("region",{name:"Your profile overview"}).count()===1,"Profile hero must render");
+  assert(await profilePage.getByRole("tab",{name:"My profile"}).isVisible());
+  assert(await profilePage.getByText(/Editing is temporarily disabled/).isVisible(),"Disabled account write gate remains visible");
+  await profilePage.getByRole("tab",{name:"Notifications"}).click();
+  assert(await profilePage.getByRole("heading",{name:"Stay in the know."}).isVisible(),"Notification section displays");
+  await profilePage.getByRole("tab",{name:"Privacy & safety"}).click();
+  assert(await profilePage.getByText(/Automated account deletion and data export are not yet available/).isVisible(),"No fake data deletion controls");
+  await profilePage.goto(base+"/account",{waitUntil:"networkidle"});
+  assert(await profilePage.getByRole("region",{name:"Your profile overview"}).count()===1,"Same profile surface in account");
+  assert(await profilePage.getByRole("button",{name:"Sign out"}).isVisible(),"Account signout remains");
+  await profilePage.screenshot({path:path.join(output,"account-profile-spaceui-1024.png"),fullPage:true,animations:"disabled"});
+  await profilePage.close();
 
   // Focus-managed search, accessible tabs, bouncy FAQ and opt-in preferences.
   const polish=await newPage({viewport:{width:1440,height:900},reducedMotion:"reduce"});

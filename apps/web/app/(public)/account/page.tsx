@@ -2,6 +2,7 @@ import type {Metadata} from "next";
 import Link from "next/link";
 import {AuthExperience} from "@/components/auth/auth-experience";
 import {AccountSignOut} from "@/components/account-sign-out";
+import {AccountProfileCard} from "@/components/experience/account-profile-card";
 import {verifiedIdentity} from "@/lib/auth/session";
 import {ExperienceIcon} from "@/components/experience/experience-header";
 
@@ -24,12 +25,10 @@ export default async function AccountPage({searchParams}:{
     <p className="ux-kicker">YOUR PERSONAL LOOP</p>
     <h1>Hello{profile?.display_name?", "+profile.display_name:" again"}.</h1>
     <p className="ux-account-signed-intro">All your useful things, in one place.</p>
-    <div className="ux-account-identity">
-      <div className="ux-account-avatar"><ExperienceIcon name="user" size={30}/></div>
-      <div><strong>{user.email??"Email unavailable"}</strong>
-        <span>{approved?"Marketplace access enabled":"Marketplace access not currently enabled"}</span>
-      </div>
-      <div className="ul-account-signed-actions"><Link className="ul-primary-action" href="/dashboard">Open your workspace <ExperienceIcon name="arrow" size={16}/></Link><AccountSignOut/></div>
+    <AccountProfileCard name={profile?.display_name?.trim()||user.email||"Your account"} email={user.email??""} marketplaceEnabled={approved}/>
+    <div className="ul-profile-account-actions">
+     <Link className="ul-primary-action" href="/dashboard">Open your workspace <ExperienceIcon name="arrow" size={16}/></Link>
+     <AccountSignOut/>
     </div>
     <div className="ux-account-links">
       {[
