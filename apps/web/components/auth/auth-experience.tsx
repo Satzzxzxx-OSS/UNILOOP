@@ -54,7 +54,7 @@ export function AuthExperience({intent,configured,error,reason}:AuthExperiencePr
       <Card className="un-v2-auth-card">
        <div className="un-v2-card-top"><span className="un-v2-mail-icon"><Mail size={19}/></span><span className="un-v2-secure-tag"><ShieldCheck size={14}/> PASSWORDLESS</span></div>
        <h2>{signup?"Let's create your account.":"Sign in with your email."}</h2>
-       <p className="un-v2-card-description">We'll send a secure, one-time verification link. No passwords to remember.</p>
+       <p className="un-v2-card-description">We&apos;ll send a secure, one-time verification link. No passwords to remember.</p>
        {error==="link"&&<p className="un-v2-notice un-v2-error" role="alert">This sign-in link is invalid or expired. Request a new link.</p>}
        {reason==="signin"&&<p className="un-v2-notice" role="status">Please sign in or create an account to continue.</p>}
        <EmailSignIn key={intent} intent={intent} configured={configured}/>
