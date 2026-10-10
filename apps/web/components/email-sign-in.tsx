@@ -47,7 +47,7 @@ export function EmailSignIn({intent="signin"}:{intent?:"signin"|"signup"}) {
       }
       setDeliveredEmail(normalized);
       setSent(true);
-      setCooldown(45); // UX throttle only: backend provider limits are still required.
+      setCooldown(60); // UX throttle only: actual provider rate limits must still be enforced.
       setMessage("");
     }catch{
       setMessage("Unable to connect right now. Please try again later.");
