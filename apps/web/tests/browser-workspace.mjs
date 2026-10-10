@@ -152,7 +152,7 @@ try{
   assert.equal(address.searchParams.get("mode"),"rent");
   assert.equal(address.searchParams.get("q"),"camera");
   await modePage.screenshot({path:path.join(output,"explore-mobile.png"),fullPage:true,animations:"disabled"});
-  assert(await modePage.getByRole("heading",{level:1}).isVisible());
+  await modePage.getByRole("heading",{name:"Explore the marketplace"}).waitFor({state:"visible",timeout:15000});
   await modePage.close();
 
   // Multi-step frontend-only wizard must not imply a successful live listing.
