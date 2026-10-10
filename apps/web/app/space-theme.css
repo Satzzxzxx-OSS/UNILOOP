@@ -4,7 +4,7 @@ body { background: var(--background); }
 ::selection { background: var(--accent-border); color: var(--foreground); }
 input, textarea, select { color: var(--foreground); background-color: var(--surface); }
 input::placeholder, textarea::placeholder { color: var(--muted); opacity: .85; }
-select { color-scheme: dark; }
+select { color-scheme: light; }
 input[type=checkbox], input[type=radio] { accent-color: var(--accent); }
 input:-webkit-autofill { -webkit-text-fill-color: var(--foreground); box-shadow: 0 0 0 100px var(--surface) inset; }
 button:disabled { cursor: not-allowed; opacity: .5; }
@@ -24,12 +24,12 @@ button:disabled { cursor: not-allowed; opacity: .5; }
 .ux-header-list, .ux-search-submit, .ux-last-primary, .ux-workspace-action,
 .ux-wizard-primary, .ux-explore-search button, .ux-mobile-search-panel button,
 .button-dark, .button-accent, .ux-final-submit button {
-  background: var(--primary); color: var(--primary-foreground); border: 1px solid #e5dcff24;
+  background: var(--primary); color: var(--primary-foreground); border: 1px solid var(--border);
   box-shadow: inset 0 1px 0 #ffffff40, 0 4px 16px #0002;
 }
 .ux-header-list:hover, .ux-search-submit:hover, .ux-last-primary:hover,
 .ux-workspace-action:hover, .ux-wizard-primary:hover, .button-dark:hover, .button-accent:hover {
-  background: #e7dfff; color: var(--primary-foreground); box-shadow: 0 4px 24px #c4b5fd16;
+  background: var(--surface-raised); color: var(--primary-foreground); box-shadow: 0 4px 24px #c4b5fd16;
 }
 .button-outline, .ux-last-secondary, .ux-wizard-secondary { color: var(--foreground); background: var(--surface-subtle); border-color: var(--border); }
 .ux-back-step, .text-link, .refresh-conversation, .block-form button, .notification-read-form button { color: var(--accent); background: transparent; border-color: transparent; }

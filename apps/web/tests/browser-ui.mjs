@@ -152,14 +152,14 @@ try{
       }
       const body=getComputedStyle(document.body);
       return {dark:document.documentElement.classList.contains("dark"),scheme:body.colorScheme,
-        contrast:(luminance(body.color)+.05)/(luminance(body.backgroundColor)+.05),
+        contrast:(Math.max(luminance(body.color),luminance(body.backgroundColor))+.05)/(Math.min(luminance(body.color),luminance(body.backgroundColor))+.05),
         background:luminance(body.backgroundColor),width:document.documentElement.scrollWidth,
         surfaces:[...document.querySelectorAll(".ux-wizard-panel,.ux-workspace-empty,.post-form,.feed-notice,.ux-header,.ux-footer")]
           .map(el=>luminance(getComputedStyle(el).backgroundColor))};
     });
-    assert(theme.dark&&theme.scheme==="dark","Native controls must use dark scheme: "+route);
-    assert(theme.background<.03&&theme.contrast>=7,"Dark body needs readable text: "+route);
-    assert(theme.surfaces.every(value=>value<.15),"Light panel left behind: "+route);
+    assert(!theme.dark&&theme.scheme==="light","Native controls must use light scheme: "+route);
+    assert(theme.background>.9&&theme.contrast>=7,"Light body needs readable dark text: "+route);
+    assert(theme.surfaces.every(value=>value>.75),"Dark panel left behind: "+route);
     assert(theme.width<=392,"Secondary route overflow: "+route);
     await page.screenshot({path:path.join(output,"dark-"+route.split("?")[0].replaceAll("/","-")+".png"),fullPage:true,animations:"disabled"});
     await page.close();
