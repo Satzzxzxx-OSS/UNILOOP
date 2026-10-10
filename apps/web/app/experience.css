@@ -790,3 +790,68 @@ body:has(.ux-hero) {background:#fffefd}
  .ux-private-detail .rental-control-panel,.ux-private-detail .rental-condition-section{padding:22px;border-radius:19px}
  .ux-report-page .post-form{padding:19px;border-radius:18px}
 }
+
+
+/* Honest help and safety pages: no invented support channel or paid protections. */
+.ux-guide-page{padding-top:90px;padding-bottom:115px}
+.ux-guide-hero{max-width:980px;margin-bottom:50px}
+.ux-guide-hero h1{font-size:clamp(48px,5.4vw,79px);line-height:1.07;letter-spacing:-.075em;margin:20px 0;color:#182b45}
+.ux-guide-hero h1 em,.ux-not-found h1 em{font-style:normal;color:#ae7b39}
+.ux-guide-hero>p:not(.ux-kicker){font-size:17px;line-height:1.85;color:#738196;max-width:720px}
+.ux-guide-banner{display:flex;gap:20px;align-items:flex-start;background:#e9f1e9;border-radius:29px;padding:38px 42px;color:#315f4e;margin-bottom:25px}
+.ux-guide-banner>svg{flex:none}
+.ux-guide-banner h2{font-size:27px;letter-spacing:-.055em;margin:0 0 12px}
+.ux-guide-banner p{font-size:13px;line-height:1.8;color:#557467;margin:0}
+.ux-guide-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:17px}
+.ux-guide-tile{background:#fff;border:1px solid #e5e9eb;border-radius:22px;padding:29px 27px;min-height:248px}
+.ux-guide-tile>span{font-size:12px;color:#a97a40;font-weight:850;letter-spacing:.12em}
+.ux-guide-tile h2{font-size:21px;letter-spacing:-.04em;margin:23px 0 10px;color:#1a3048}
+.ux-guide-tile p{font-size:13px;color:#6e7e92;line-height:1.85;margin:0}
+.ux-guide-footer{margin-top:65px;border-radius:28px;background:#172942;color:#fff;padding:46px;display:flex;align-items:center;justify-content:space-between;gap:30px}
+.ux-guide-footer .ux-kicker{color:#e8ba7d}
+.ux-guide-footer h2{font-size:33px;letter-spacing:-.05em;margin:11px 0}
+.ux-guide-footer p:not(.ux-kicker){font-size:13px;color:#bdc9d6;line-height:1.7}
+.ux-guide-footer .ux-workspace-action{background:#edb55f;color:#1a2d44}
+.ux-help-topics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.ux-help-topic{display:flex;flex-direction:column;gap:10px;padding:30px;border:1px solid #e4e9e9;border-radius:23px;background:#f7f8f6;min-height:260px}
+.ux-help-topic>svg{color:#658f7e;height:35px;width:35px;margin-bottom:20px}
+.ux-help-topic h2{font-size:24px;letter-spacing:-.045em;margin:0;color:#1e364e}
+.ux-help-topic p{font-size:13px;color:#718295;line-height:1.8;margin:0}
+.ux-help-topic>span{display:flex;align-items:center;gap:7px;margin-top:auto;font-size:12px;font-weight:800;color:#305e70}
+.ux-help-faq{padding-top:95px;max-width:920px}
+.ux-help-faq h2{font-size:clamp(34px,3.7vw,51px);line-height:1.1;letter-spacing:-.062em;margin:13px 0 30px}
+.ux-help-faq-list{display:grid;gap:11px}
+.ux-help-faq-list details{border:1px solid #e7eaeb;border-radius:16px;background:#fff}
+.ux-help-faq-list summary{display:flex;gap:15px;align-items:center;justify-content:space-between;min-height:66px;padding:18px 21px;list-style:none;color:#243953;font-weight:800;font-size:15px;cursor:pointer}
+.ux-help-faq-list summary::-webkit-details-marker{display:none}
+.ux-help-faq-list summary span{font-size:25px;font-weight:450;line-height:1;color:#a17c4c}
+.ux-help-faq-list details[open] summary span{transform:rotate(45deg)}
+.ux-help-faq-list details>p{padding:0 21px 23px;color:#67788e;line-height:1.8;font-size:13px;margin:0}
+.ux-help-disclosure{border-left:3px solid #cb9a51;background:#fcf8f0;border-radius:0 13px 13px 0;margin-top:50px;padding:21px 25px;max-width:900px}
+.ux-help-disclosure strong{font-size:14px;color:#785937}
+.ux-help-disclosure p{font-size:12px;color:#8e7d66;line-height:1.8;margin:9px 0 0}
+.ux-not-found{min-height:65vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding-top:75px;padding-bottom:100px;text-align:center}
+.ux-404-mark{position:relative;font-size:clamp(100px,15vw,190px);font-weight:850;line-height:1;color:#e4e7e7;letter-spacing:-.12em}
+.ux-404-mark span{position:absolute;right:0;top:0;font-size:37px;color:#c08e4d}
+.ux-not-found h1{font-size:clamp(35px,4vw,55px);letter-spacing:-.067em;line-height:1.12;max-width:700px;margin:14px 0}
+.ux-not-found>p:not(.ux-kicker){font-size:15px;color:#7a8899;line-height:1.8;max-width:450px}
+.ux-not-found>.ux-workspace-action{margin-top:22px}
+.ux-error-actions{display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;margin-top:22px}
+.ux-error-actions .ux-workspace-action{border:0;cursor:pointer}
+@media(max-width:900px){.ux-guide-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:680px){
+ .ux-guide-page{padding-top:52px;padding-bottom:95px}
+ .ux-guide-hero h1{font-size:44px}
+ .ux-guide-hero>p:not(.ux-kicker){font-size:14px}
+ .ux-guide-banner{padding:26px 22px;border-radius:20px;gap:14px}
+ .ux-guide-banner h2{font-size:22px}
+ .ux-guide-grid,.ux-help-topics{grid-template-columns:1fr;gap:11px}
+ .ux-guide-tile{min-height:0;padding:24px}
+ .ux-guide-footer{display:block;padding:30px 24px}
+ .ux-guide-footer .ux-workspace-action{margin-top:21px}
+ .ux-help-topic{min-height:0;padding:23px}
+ .ux-help-faq{padding-top:60px}
+ .ux-help-faq h2{font-size:34px}
+ .ux-help-faq-list summary{font-size:13px}
+ .ux-not-found{padding-top:55px;min-height:55vh}
+}
