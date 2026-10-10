@@ -91,10 +91,16 @@ try{
       assert(await sidebar.isVisible(),"Persistent workspace sidebar must be visible");
       const sidebarWidth=await sidebar.evaluate(el=>el.getBoundingClientRect().width);
       assert.equal(sidebarWidth,240,"FinCo-style sidebar width");
-      await sidebar.locator("summary").click();
-      assert(await sidebar.getByRole("navigation",{name:"Account menu"}).isVisible(),"Account menu opens");
+      const accountTrigger=sidebar.getByRole("button",{name:"Open account menu"});
+      await accountTrigger.click();
+      const accountPopup=page.getByRole("menu",{name:"Account menu"});
+      assert(await accountPopup.isVisible(),"Space UI account menu opens");
+      assert(await accountPopup.getByRole("menuitem",{name:"My profile"}).isVisible(),"Profile destination is present");
+      assert(await accountPopup.getByRole("menuitem",{name:"Account settings"}).isVisible(),"Settings destination is present");
+      assert(await accountPopup.getByRole("menuitem",{name:"Sign out"}).isVisible(),"Real sign-out action is present");
       await page.keyboard.press("Escape");
-      assert(!(await sidebar.getByRole("navigation",{name:"Account menu"}).isVisible()),"Escape dismisses account menu");
+      await accountPopup.waitFor({state:"hidden"});
+      assert(await accountTrigger.evaluate(el=>el===document.activeElement),"Account menu focus returns to trigger");
     }
     await page.getByRole("tab",{name:"For rent",exact:true}).click();
     assert(await page.getByRole("tabpanel",{name:"For rent",exact:true}).isVisible(),"Rental tab displays existing rental state");
