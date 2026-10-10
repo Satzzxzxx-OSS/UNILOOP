@@ -79,7 +79,7 @@ Layout and CSS are authored specifically for UNILOOP.
   form-first view. Responsive at 320, 360, 390, 430, 768, 1024 and 1440px.
 - Real email request loading/error/success states, generic provider errors to
   reduce account enumeration, disabled double submits, email normalization.
-- Resend with client-side 45-second UX cooldown and change-email action.
+- Resend with client-side 60-second UX cooldown and change-email action.
   **Frontend cooldown is not server-side abuse protection.** Provider quotas,
   SMTP, CAPTCHA, abuse monitoring and request limiting require hosted setup.
 - Accessible native email input, labels, status/error live regions, visible
