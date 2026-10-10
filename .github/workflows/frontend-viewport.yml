@@ -1,0 +1,37 @@
+name: UNILOOP frontend viewport verification
+on:
+  push:
+    branches:
+      - feat/space-ui-frontend-v2
+    paths:
+      - "apps/web/**"
+      - ".github/workflows/frontend-viewport.yml"
+permissions:
+  contents: read
+jobs:
+  chromium-responsive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @uniloop/web build
+      - name: Install isolated headless Chromium tools
+        run: |
+          npm install --prefix /tmp/ux-playwright --no-save playwright@1.56.1
+          /tmp/ux-playwright/node_modules/.bin/playwright install --with-deps chromium
+      - name: Assert viewport containment, mobile navigation and wizard UX
+        env:
+          PLAYWRIGHT_MODULE_PATH: /tmp/ux-playwright/node_modules/playwright/index.mjs
+        run: node apps/web/tests/visual-mobile.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: uniloop-v2-chromium-screens
+          path: /tmp/ux-mobile-screens
+          retention-days: 7
