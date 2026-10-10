@@ -133,11 +133,11 @@ body:has(.ux-hero) { background: var(--background); }
 .ux-photo-drop { position: relative; background: radial-gradient(ellipse at 50% 100%, #c4b5fd14, transparent 65%), var(--surface); border-color: var(--accent-border); transition: border-color .2s, background .2s; }
 .ux-photo-drop:hover, .ux-photo-drop:focus-within, .ux-photo-drop.ux-drag-active { border-color: var(--ring); background: var(--accent-tint); }
 .ux-photo-plus { background: var(--accent-tint); color: var(--accent); border: 1px solid var(--accent-border); }
-.ux-photo-preview button { min-width: 28px; height: 28px; padding: 0; background: #09090bd9; color: white; }
+.ux-photo-preview button { min-width: 28px; height: 28px; padding: 0; background: #ffffffed; color: var(--foreground); }
 .ux-form-warning, .interaction-feedback, .interaction-action p, .notification-read-form p { color: var(--destructive-foreground); }
 .ux-wizard-disabled { background: var(--surface-subtle); border-color: var(--border); }
 .ux-wizard-disabled button { background: var(--surface-raised); color: var(--muted); }
-.ux-gallery-arrows button { color: var(--foreground); background: #09090bd9; }
+.ux-gallery-arrows button { color: var(--foreground); background: #ffffffed; }
 .ux-gallery-thumbs button { padding: 0; background: var(--surface); border-color: var(--border); }
 .ux-gallery-thumbs button[aria-pressed=true] { border-color: var(--accent); }
 .ux-workspace-empty { background: radial-gradient(ellipse at 50% 0%, #c4b5fd0c, transparent 70%), var(--surface); }
