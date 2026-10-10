@@ -1,7 +1,7 @@
 "use client";
 
 import {useEffect,useState,type FormEvent} from "react";
-import {ArrowRight,CheckCircle2,LockKeyhole,Mail,MailCheck,RefreshCw} from "lucide-react";
+import {ArrowRight,LockKeyhole,Mail,MailCheck,RefreshCw} from "lucide-react";
 import {Button} from "@/components/spaceui/button";
 import {Input} from "@/components/spaceui/input";
 import {browserSupabase} from "@/lib/supabase/browser";
