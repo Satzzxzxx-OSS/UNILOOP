@@ -185,3 +185,6 @@ body:has(.ux-hero) { background: var(--background); }
 .ux-field [data-slot=input-control] input { min-height: 50px; }
 .ux-price-field > [data-slot=input-control] { padding-left: 0; font-size: inherit; font-weight: inherit; }
 .ux-workspace-empty > .ux-workspace-action { align-self: center; }
+
+.ux-product-card { corner-shape: superellipse(1.25); background: var(--surface); border: 1px solid var(--border); }
+.ux-product-card:hover { border-color: var(--accent-border); box-shadow: 0 16px 40px #0005; }

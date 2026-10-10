@@ -99,7 +99,7 @@ try{
     await page.close();
   }
   // The dark migration must cover secondary routes and real form controls as well as home.
-  for(const route of ["/account","/settings","/notifications","/my/listings","/my/rentals",
+  for(const route of ["/account","/settings","/notifications","/my/listings","/rent/my",
     "/rentals","/transactions","/offers","/saved","/inbox","/help","/safety","/admin/reports",
     "/post","/rent/post","/explore?mode=buy","/explore?mode=rent"]){
     const page=await browser.newPage({viewport:{width:390,height:844},reducedMotion:"reduce"});
