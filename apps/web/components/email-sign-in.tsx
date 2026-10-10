@@ -6,7 +6,7 @@ import {Input} from "@/components/spaceui/input";
 import { useState, type FormEvent } from "react";
 import { browserSupabase } from "@/lib/supabase/browser";
 
-export function EmailSignIn() {
+export function EmailSignIn({intent="signin"}:{intent?:"signin"|"signup"}) {
   const [email, setEmail] = useState("");
   const [working, setWorking] = useState(false);
   const [message, setMessage] = useState("");
@@ -28,8 +28,8 @@ export function EmailSignIn() {
       const { error } = await supabase.auth.signInWithOtp({
         email: email.trim().toLowerCase(),
         options: {
-          // Default-deny enrollment: the app never auto-creates public accounts.
-          shouldCreateUser: false,
+          // Explicit signup creates identity only; existing campus RLS still gates access.
+          shouldCreateUser: intent === "signup",
           emailRedirectTo: new URL("/auth/confirm", window.location.origin).toString(),
         },
       });
@@ -39,7 +39,7 @@ export function EmailSignIn() {
         setMessage("Unable to send a sign-in email. Please try later.");
       } else {
         setSent(true);
-        setMessage("If this account is enabled, check your inbox for a sign-in link.");
+        setMessage("Check your inbox for a verification link. Marketplace access still depends on your account eligibility.");
       }
     } catch {
       setMessage("Unable to connect right now. Please try again later.");
@@ -64,7 +64,7 @@ export function EmailSignIn() {
         placeholder="you@example.com"
       />
       <Button type="submit" className="button button-dark" disabled={working || sent}>
-        {working ? "Sending…" : sent ? "Email requested" : "Email me a sign-in link"}
+        {working ? "Sending…" : sent ? "Email requested" : intent === "signup" ? "Create account by email" : "Email me a sign-in link"}
       </Button>
       <p className="auth-feedback" role="status" aria-live="polite">{message}</p>
       {sent && (

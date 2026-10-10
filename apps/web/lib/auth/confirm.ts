@@ -9,5 +9,5 @@ export function isValidEmailTokenHash(value: unknown): value is string {
 }
 
 /** No arbitrary next/return URL: prevents open redirects from auth callback. */
-export const AUTH_SUCCESS_PATH = "/account";
+export const AUTH_SUCCESS_PATH = "/dashboard";
 export const AUTH_FAILURE_PATH = "/account?error=link";
