@@ -580,3 +580,54 @@ body:has(.ux-hero) {background:#fffefd}
  .ux-detail-after{padding-top:60px;margin-top:45px}
 }
 @media(max-width:380px){.ux-detail-content h1{font-size:31px}.ux-rental-terms{grid-template-columns:1fr}}
+
+
+/* Unified private workspace experience. Backend-only data, deliberate empty states. */
+.ux-workspace{padding-top:74px;padding-bottom:115px;min-height:calc(100vh - 450px)}
+.ux-workspace-hero{display:flex;align-items:end;justify-content:space-between;gap:32px;margin-bottom:40px}
+.ux-workspace-hero h1{font-size:clamp(39px,4.4vw,64px);letter-spacing:-.07em;line-height:1.08;color:#172841;margin:14px 0}
+.ux-workspace-hero p:not(.ux-kicker){font-size:15px;color:#718096;line-height:1.75;max-width:610px;margin:0}
+.ux-workspace-action{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:47px;background:#1b2f4a;color:#fff;padding:0 20px;border-radius:13px;flex:none;font-size:13px;font-weight:850;box-shadow:0 6px 17px #14284320}
+.ux-workspace-action:hover{background:#344c68;color:#fff}
+.ux-workspace-content{border-top:1px solid #eaedef;padding-top:35px}
+.ux-workspace-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:17px}
+.ux-workspace-empty{border:1px solid #e9e9e6;border-radius:30px;background:linear-gradient(120deg,#fffdfa,#f6f7f6);padding:60px 24px 66px;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;min-height:370px}
+.ux-workspace-empty-auth{background:linear-gradient(120deg,#f5f8f7,#eaf2ee)}
+.ux-workspace-empty-art{position:relative;display:grid;place-items:center;height:120px;width:120px;margin-bottom:16px}
+.ux-workspace-empty-circle{position:absolute;inset:7px;background:linear-gradient(145deg,#e9e9e5,#e2d7c3);border:1px solid #d4d4d0;border-radius:33px;transform:rotate(-15deg)}
+.ux-workspace-empty-star{position:relative;color:#8f805e;font-size:61px;font-weight:400}
+.ux-workspace-empty h2{font-size:clamp(24px,2.6vw,34px);letter-spacing:-.05em;color:#1e324a;margin:14px 0 8px}
+.ux-workspace-empty>p{font-size:14px;color:#748397;line-height:1.75;max-width:445px;margin:0 0 22px}
+.ux-workspace-threads{display:grid;gap:12px;max-width:930px}
+.ux-workspace-thread{display:flex;align-items:center;gap:18px;min-height:103px;border-radius:20px;background:white;padding:18px 22px;border:1px solid #e6eaed;transition:transform .2s,border-color .2s,box-shadow .2s}
+.ux-workspace-thread:hover{transform:translateY(-2px);box-shadow:0 14px 24px #1d30431a;border-color:#cbd8df}
+.ux-workspace-thread-icon{flex:none;display:grid;place-items:center;height:52px;width:52px;background:#e7edf3;color:#315069;border-radius:16px;font-size:23px}
+.ux-workspace-thread-icon.ux-workspace-rupee{background:#f6eddd;color:#a6793e;font-weight:850}
+.ux-workspace-thread>span:nth-child(2){min-width:0;flex:1;display:grid;gap:6px}
+.ux-workspace-thread strong{font-size:15px;overflow-wrap:anywhere}
+.ux-workspace-thread small{font-size:11px;color:#7c8b9c}
+.ux-workspace-thread-arrow{flex:none;display:grid;place-items:center;height:33px;width:33px;background:#f2f5f6;border-radius:50%;color:#516980}
+@media(max-width:1050px){.ux-workspace-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:750px){.ux-workspace-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:680px){
+ .ux-workspace{padding-top:47px;padding-bottom:90px}
+ .ux-workspace-hero{display:block;margin-bottom:29px}
+ .ux-workspace-hero h1{font-size:41px}
+ .ux-workspace-hero p:not(.ux-kicker){font-size:13px}
+ .ux-workspace-hero>.ux-workspace-action{margin-top:22px}
+ .ux-workspace-content{padding-top:23px}
+ .ux-workspace-empty{padding:46px 19px;border-radius:20px;min-height:340px}
+ .ux-workspace-empty-art{height:100px;width:100px}
+ .ux-workspace-empty h2{font-size:26px}
+ .ux-workspace-empty>p{font-size:13px}
+ .ux-workspace-thread{padding:13px;min-height:83px;border-radius:14px;gap:12px}
+ .ux-workspace-thread-icon{height:43px;width:43px;border-radius:12px}
+ .ux-workspace-thread strong{font-size:13px}
+ .ux-workspace-thread-arrow{width:29px;height:29px}
+}
+@media(max-width:380px){
+ .ux-workspace-grid{gap:9px}
+ .ux-workspace-hero h1{font-size:36px}
+ .ux-workspace-thread{gap:9px}
+}
+@media(prefers-reduced-motion:reduce){.ux-workspace-thread{transition:none}.ux-workspace-thread:hover{transform:none}}
