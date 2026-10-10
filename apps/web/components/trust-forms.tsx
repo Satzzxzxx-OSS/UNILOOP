@@ -1,5 +1,9 @@
 "use client";
 
+import {Button} from "@/components/spaceui/button";
+import {Input} from "@/components/spaceui/input";
+import {Textarea} from "@/components/spaceui/textarea";
+
 import { useActionState } from "react";
 import {
   toggleSaved,updateDisplayName,saveNotificationPrefs,sendListingReport,
@@ -12,9 +16,9 @@ export function SavedToggle({listingId,saved}: {listingId:string;saved:boolean})
   return <form action={action} className="mini-form">
     <input type="hidden" name="listing" value={listingId} />
     <input type="hidden" name="target" value={saved?"remove":"add"} />
-    <button className="button button-outline" disabled={pending}>
+    <Button type="submit" className="button button-outline" disabled={pending}>
       {saved?"♥ Remove saved":"♡ Save item"}
-    </button>
+    </Button>
     <p role="status" aria-live="polite">{state.message}</p>
   </form>;
 }
@@ -23,9 +27,9 @@ export function ProfileSettingsForm({name}: {name:string}) {
   const [state,action,pending]=useActionState(updateDisplayName,initialTrustState);
   return <form action={action} className="post-form">
     <div className="form-field"><label htmlFor="settings-name">Display name</label>
-      <input id="settings-name" name="display_name" defaultValue={name}
+      <Input nativeInput unstyled id="settings-name" name="display_name" defaultValue={name}
         maxLength={60} minLength={2} required autoComplete="nickname"/></div>
-    <button className="button button-dark" disabled={pending}>Save profile</button>
+    <Button type="submit" className="button button-dark" disabled={pending}>Save profile</Button>
     <p className="form-helper" role="status" aria-live="polite">{state.message}</p>
   </form>;
 }
@@ -45,7 +49,7 @@ export function PreferenceSettingsForm({messages,offers}:{
       Offer updates
     </label>
     <p className="form-helper">Email delivery is not active yet. These choices are saved for future notifications.</p>
-    <button className="button button-dark" disabled={pending}>Save preferences</button>
+    <Button type="submit" className="button button-dark" disabled={pending}>Save preferences</Button>
     <p className="form-helper" role="status" aria-live="polite">{state.message}</p>
   </form>;
 }
@@ -62,11 +66,11 @@ export function ListingReportForm({listingId}:{listingId:string}) {
         </option>)}
       </select></div>
     <div className="form-field"><label htmlFor="report-details">Explain the issue</label>
-      <textarea id="report-details" name="details" rows={5} minLength={15}
+      <Textarea unstyled id="report-details" name="details" rows={5} minLength={15}
         maxLength={1500} required placeholder="What should our review team know?"/></div>
-    <button className="button button-dark" disabled={pending}>
+    <Button type="submit" className="button button-dark" disabled={pending}>
       {pending?"Submitting…":"Submit report"}
-    </button>
+    </Button>
     <p role="status" aria-live="polite" className="form-helper">{state.message}</p>
   </form>;
 }
@@ -80,7 +84,7 @@ export function ReviewReportForm({id}:{id:string}) {
       <option value="dismiss">Dismiss — insufficient evidence</option>
       <option value="remove_listing">Remove listing</option>
     </select>
-    <button className="button button-dark" disabled={pending}>Record decision</button>
+    <Button type="submit" className="button button-dark" disabled={pending}>Record decision</Button>
     <p role="status" aria-live="polite">{state.message}</p>
   </form>;
 }

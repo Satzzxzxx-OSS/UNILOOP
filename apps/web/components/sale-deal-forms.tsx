@@ -1,4 +1,8 @@
 "use client";
+
+import {Button} from "@/components/spaceui/button";
+import {Textarea} from "@/components/spaceui/textarea";
+
 import {useActionState} from "react";
 import {startSaleDeal,confirmSaleHandover,submitSaleReview} from "@/lib/sales/actions";
 import {initialSaleAction} from "@/lib/sales/validation";
@@ -7,7 +11,7 @@ export function StartDealForm({offerId}:{offerId:string}){
   const [state,action,pending]=useActionState(startSaleDeal,initialSaleAction);
   return <form action={action} className="rental-decision-form">
     <input type="hidden" name="offer" value={offerId}/>
-    <button className="button button-dark" disabled={pending}>Begin handover record</button>
+    <Button type="submit" className="button button-dark" disabled={pending}>Begin handover record</Button>
     <p role="status" aria-live="polite">{state.message}</p>
   </form>;
 }
@@ -15,7 +19,7 @@ export function ConfirmDealForm({id,label}:{id:string;label:string}){
   const [state,action,pending]=useActionState(confirmSaleHandover,initialSaleAction);
   return <form action={action} className="rental-decision-form">
     <input type="hidden" name="transaction" value={id}/>
-    <button className="button button-dark" disabled={pending}>{label}</button>
+    <Button type="submit" className="button button-dark" disabled={pending}>{label}</Button>
     <p role="status" aria-live="polite">{state.message}</p>
   </form>;
 }
@@ -33,9 +37,9 @@ export function SaleReviewForm({id}:{id:string}){
       <option value="1">1 — Very poor</option>
     </select>
     <label htmlFor="sale-review">Your review</label>
-    <textarea id="sale-review" name="review" rows={4} required minLength={15}
+    <Textarea unstyled id="sale-review" name="review" rows={4} required minLength={15}
       maxLength={1000} placeholder="Describe your first-hand exchange experience."/>
-    <button className="button button-dark" disabled={pending}>Save review</button>
+    <Button type="submit" className="button button-dark" disabled={pending}>Save review</Button>
     <p role="status" aria-live="polite">{state.message}</p>
   </form>;
 }

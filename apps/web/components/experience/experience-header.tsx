@@ -1,8 +1,11 @@
 "use client";
 
+import {Button} from "@/components/spaceui/button";
+import {Input} from "@/components/spaceui/input";
+
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useRef, useState } from "react";
 
 type Glyph = "search"|"arrow"|"menu"|"close"|"home"|"grid"|"plus"|"heart"|"chat"|"user"|"chevron"|"shield";
 export function ExperienceIcon({ name, size = 20 }: {name: Glyph; size?:number}) {
@@ -37,12 +40,35 @@ const dockItems=[
   {label:"Inbox",href:"/inbox",icon:"chat" as Glyph},
 ];
 
+function DesktopNavigation({pathname}:{pathname:string}){
+  const params=useSearchParams();
+  const active=pathname==="/"?"/":pathname==="/explore"
+    ?"/explore?mode="+(params.get("mode")==="rent"?"rent":"buy"):null;
+  return <nav className="ux-desktop-main" aria-label="Main navigation">
+    {navItems.map(item=><Link key={item.label} href={item.href}
+      aria-current={active===item.href?"page":undefined}
+      className={active===item.href?"ux-nav-active":""}>{item.label}</Link>)}
+  </nav>;
+}
+
 export function ExperienceHeader(){
   const pathname=usePathname();
   const [menuOpen,setMenuOpen]=useState(false);
   const menuRef=useRef<HTMLElement|null>(null);
   const menuToggleRef=useRef<HTMLButtonElement|null>(null);
   const [searchOpen,setSearchOpen]=useState(false);
+  useEffect(()=>{
+    function onSearchShortcut(event:KeyboardEvent){
+      const target=event.target;
+      if(target instanceof HTMLElement && (target.isContentEditable || target.closest("input,textarea,select")))return;
+      if(event.key==="/" || ((event.metaKey||event.ctrlKey)&&event.key.toLowerCase()==="k")){
+        event.preventDefault();setSearchOpen(true);
+      }
+      if(event.key==="Escape")setSearchOpen(false);
+    }
+    document.addEventListener("keydown",onSearchShortcut);
+    return ()=>document.removeEventListener("keydown",onSearchShortcut);
+  },[]);
   useEffect(()=>{
     if(!menuOpen)return;
     const before=document.body.style.overflow;
@@ -74,32 +100,31 @@ export function ExperienceHeader(){
           <span className="ux-brand-symbol" aria-hidden="true"><i/><i/><b/></span>
           <span>uni<span>loop</span><sup>™</sup></span>
         </Link>
-        <nav className="ux-desktop-main" aria-label="Main navigation">
-          {navItems.map(item=><Link key={item.label} href={item.href}
-            className={pathname==="/"&&item.href==="/"?"ux-nav-active":pathname==="/explore"&&item.href.includes("mode")?"":" "}>
-              {item.label}
-          </Link>)}
-        </nav>
+        <Suspense fallback={<nav className="ux-desktop-main" aria-label="Main navigation">
+          {navItems.map(item=><Link key={item.label} href={item.href}>{item.label}</Link>)}
+        </nav>}>
+          <DesktopNavigation pathname={pathname}/>
+        </Suspense>
         <div className="ux-header-controls">
-          <button className="ux-icon-button ux-mobile-search" type="button"
-            aria-label="Open item search" aria-expanded={searchOpen}
-            onClick={()=>setSearchOpen(v=>!v)}><ExperienceIcon name="search"/></button>
+          <Button variant="ghost" className="ux-icon-button ux-global-search" type="button"
+            aria-label="Open item search" aria-controls="ux-global-search-panel" aria-expanded={searchOpen}
+            onClick={()=>setSearchOpen(v=>!v)}><ExperienceIcon name="search"/><span>Search</span><kbd>/</kbd></Button>
           <Link href="/saved" className="ux-icon-button ux-desktop-control" aria-label="Saved items"><ExperienceIcon name="heart"/></Link>
           <Link href="/inbox" className="ux-icon-button ux-desktop-control" aria-label="Inbox"><ExperienceIcon name="chat"/></Link>
           <Link href="/account" className="ux-icon-button ux-desktop-control" aria-label="Your account"><ExperienceIcon name="user"/></Link>
           <Link href="/post" className="ux-header-list">List an item <ExperienceIcon name="arrow" size={17}/></Link>
-          <button ref={menuToggleRef} type="button" className="ux-icon-button ux-menu-toggle"
+          <Button variant="ghost" ref={menuToggleRef} type="button" className="ux-icon-button ux-menu-toggle"
             aria-label={menuOpen?"Close navigation":"Open navigation"}
             aria-controls="ux-mobile-menu" aria-expanded={menuOpen}
-            onClick={()=>setMenuOpen(v=>!v)}><ExperienceIcon name={menuOpen?"close":"menu"}/></button>
+            onClick={()=>setMenuOpen(v=>!v)}><ExperienceIcon name={menuOpen?"close":"menu"}/></Button>
         </div>
       </div>
-      {searchOpen&&<form className="ux-mobile-search-panel ux-shell" action="/explore" role="search">
+      {searchOpen&&<form id="ux-global-search-panel" className="ux-mobile-search-panel ux-shell" action="/explore" role="search">
         <label className="ux-visually-hidden" htmlFor="ux-top-search">Search the marketplace</label>
         <ExperienceIcon name="search" size={19}/>
-        <input autoFocus id="ux-top-search" type="search" name="q"
-          maxLength={100} placeholder="What are you looking for?"/>
-        <button type="submit">Search <ExperienceIcon name="arrow" size={15}/></button>
+        <Input nativeInput unstyled autoFocus id="ux-top-search" type="search" name="q"
+          maxLength={100} onKeyDown={e=>{if(e.key==="Escape"){setSearchOpen(false);document.querySelector<HTMLButtonElement>('[aria-controls="ux-global-search-panel"]')?.focus();}}} placeholder="What are you looking for?"/>
+        <Button type="submit">Search <ExperienceIcon name="arrow" size={15}/></Button>
       </form>}
       {menuOpen&&<div className="ux-mobile-backdrop" role="presentation" onClick={()=>{setMenuOpen(false);menuToggleRef.current?.focus();}}>
         <nav ref={menuRef} id="ux-mobile-menu" className="ux-menu-sheet" aria-label="More navigation"

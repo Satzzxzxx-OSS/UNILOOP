@@ -1,5 +1,9 @@
 "use client";
 
+import {Button} from "@/components/spaceui/button";
+import {Input} from "@/components/spaceui/input";
+import {Textarea} from "@/components/spaceui/textarea";
+
 import { useActionState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -11,17 +15,17 @@ export function StartSaleConversation({ listingId }: { listingId: string }) {
   const [state, action, pending] = useActionState(openConversation, initialInteractionState);
   return <form action={action} className="interaction-action">
     <input type="hidden" name="listing" value={listingId} />
-    <button className="button button-dark" type="submit" disabled={pending}>
+    <Button className="button button-dark" type="submit" disabled={pending}>
       {pending ? "Opening…" : "Chat with seller"}
-    </button>
+    </Button>
     <p role="status" aria-live="polite">{state.message}</p>
   </form>;
 }
 
 export function ConversationRefresh() {
   const router = useRouter();
-  return <button type="button" className="text-link refresh-conversation"
-    onClick={() => router.refresh()}>Refresh messages ↻</button>;
+  return <Button type="button" className="text-link refresh-conversation"
+    onClick={() => router.refresh()}>Refresh messages ↻</Button>;
 }
 
 export function SendSaleMessage({ conversationId, nonce }: {
@@ -32,11 +36,11 @@ export function SendSaleMessage({ conversationId, nonce }: {
     <input type="hidden" name="conversation" value={conversationId} />
     <input type="hidden" name="nonce" value={nonce} />
     <label htmlFor="compose-body">Your message</label>
-    <textarea id="compose-body" name="body" maxLength={2000} minLength={1}
+    <Textarea unstyled id="compose-body" name="body" maxLength={2000} minLength={1}
       rows={3} placeholder="Ask a question about this item…" required disabled={pending} />
-    <button type="submit" className="button button-dark" disabled={pending}>
+    <Button type="submit" className="button button-dark" disabled={pending}>
       {pending ? "Sending…" : "Send message"}
-    </button>
+    </Button>
     <p role="status" aria-live="polite" className="interaction-feedback">{state.message}</p>
   </form>;
 }
@@ -53,12 +57,12 @@ export function SaleOfferForm({
     <input type="hidden" name="parent_offer" value={parentOfferId ?? ""} />
     <label htmlFor={"offer-price-" + nonce}>{parentOfferId ? "Your counter-offer (₹)" : "Your offer (₹)"}</label>
     <div className="offer-form-row">
-      <input id={"offer-price-" + nonce} type="number" name="amount" min={1}
+      <Input nativeInput unstyled id={"offer-price-" + nonce} type="number" name="amount" min={1}
         max={10000000} step={1} required inputMode="numeric" disabled={pending}
         placeholder="Amount in rupees"/>
-      <button type="submit" className="button button-dark" disabled={pending}>
+      <Button type="submit" className="button button-dark" disabled={pending}>
         {pending ? "Submitting…" : parentOfferId ? "Counter" : "Submit offer"}
-      </button>
+      </Button>
     </div>
     <p role="status" aria-live="polite" className="interaction-feedback">{state.message}</p>
   </form>;
@@ -74,11 +78,11 @@ export function SaleOfferDecision({
     <input type="hidden" name="conversation" value={conversationId} />
     <input type="hidden" name="offer" value={offerId} />
     <input type="hidden" name="decision" value={decision} />
-    <button className={decision === "accept" ? "button button-dark" : "button button-outline"}
+    <Button className={decision === "accept" ? "button button-dark" : "button button-outline"}
       type="submit" disabled={pending}>
       {pending ? "Updating…" : decision === "accept" ? "Accept offer" :
         decision === "reject" ? "Reject" : "Withdraw"}
-    </button>
+    </Button>
     <p role="status" aria-live="polite" className="interaction-feedback">{state.message}</p>
   </form>;
 }
@@ -93,9 +97,9 @@ export function ConversationBlockForm({
     <input type="hidden" name="conversation" value={conversationId} />
     <input type="hidden" name="other" value={otherId} />
     <input type="hidden" name="action" value={blocked ? "unblock" : "block"} />
-    <button type="submit" className="text-link" disabled={pending}>
+    <Button type="submit" className="text-link" disabled={pending}>
       {blocked ? "Unblock user" : "Block user"}
-    </button>
+    </Button>
     <p role="status" aria-live="polite" className="interaction-feedback">{state.message}</p>
   </form>;
 }

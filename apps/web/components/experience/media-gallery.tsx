@@ -1,5 +1,7 @@
 "use client";
 
+import {Button} from "@/components/spaceui/button";
+
 import Image from "next/image";
 import {useState} from "react";
 import {ExperienceIcon} from "./experience-header";
@@ -20,24 +22,24 @@ export function MediaGallery({urls,title,kind}:{urls:string[];title:string;kind:
           <small>Actual seller-uploaded photos appear here.</small>
         </div>}
       {urls.length>1&&<div className="ux-gallery-arrows">
-        <button type="button" aria-label="Previous item photo"
-          onClick={()=>setActive(i=>(i-1+urls.length)%urls.length)}>←</button>
+        <Button type="button" aria-label="Previous item photo"
+          onClick={()=>setActive(i=>(i-1+urls.length)%urls.length)}>←</Button>
         <span aria-live="polite">{visible+1} / {urls.length}</span>
-        <button type="button" aria-label="Next item photo"
+        <Button type="button" aria-label="Next item photo"
           onClick={()=>setActive(i=>(i+1)%urls.length)}>
           <ExperienceIcon name="arrow"/>
-        </button>
+        </Button>
       </div>}
       <span className="ux-gallery-kind">{kind==="sale"?"For sale":"For rent"}</span>
     </div>
     {urls.length>1&&<div className="ux-gallery-thumbs" aria-label="Choose a photo">
-      {urls.map((url,i)=><button type="button" key={i}
+      {urls.map((url,i)=><Button type="button" key={i}
         aria-label={"Show image "+(i+1)} aria-pressed={visible===i}
         className={visible===i?"ux-gallery-thumb-selected":""}
         onClick={()=>setActive(i)}>
         <Image src={url} alt="" width={92} height={75}
           unoptimized className="ux-gallery-thumb-photo"/>
-      </button>)}
+      </Button>)}
     </div>}
   </section>;
 }
