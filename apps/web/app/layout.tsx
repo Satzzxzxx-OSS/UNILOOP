@@ -7,6 +7,7 @@ import "./dashboard.css";
 import "./refinements.css";
 import "./journey.css";
 import "./auth-experience.css";
+import "./auth-v2.css";
 
 export const metadata:Metadata={
   title:{default:"UNILOOP — Buy better. Borrow smarter.",template:"%s · UNILOOP"},
