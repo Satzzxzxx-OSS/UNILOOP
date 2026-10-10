@@ -46,6 +46,9 @@ try{
   const response=await authRoute.goto(base+route,{waitUntil:'networkidle'});
   assert.equal(response.status(),200,route+' public auth route');
   assert.equal(await authRoute.getByRole('textbox',{name:'Email address'}).count(),1,'Email field must remain visible');
+  assert(await authRoute.getByRole('button',{name:/by email|sign-in link/}).isDisabled(),'Unconfigured provider must not submit');
+  assert(await authRoute.getByTestId('uniloop-auth-avatar').first().isVisible(),'Brand avatar should render');
+  assert.equal(await authRoute.locator('.un-auth-v2').evaluate(el=>getComputedStyle(el).backgroundColor),'rgb(9, 9, 13)','Auth v2 dark theme');
   assert.equal(await authRoute.locator('input[type="password"]').count(),0,'No fake password login');
   assert.equal(await authRoute.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,'Auth overflow: '+route);
   await authRoute.screenshot({path:path.join(output,'auth-'+route.split('?')[0].replaceAll('/','-')+'.png'),fullPage:true,animations:'disabled'});
