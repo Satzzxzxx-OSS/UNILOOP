@@ -1,3 +1,4 @@
+import {ExchangeTimeline} from "@/components/experience/exchange-timeline";
 import {ItemStatus} from "@/components/experience/item-status";
 import type {Metadata} from "next";
 import Link from "next/link";
@@ -47,6 +48,12 @@ export default async function BookingDetails({params}:{
         The platform records request and confirmations only; discuss handover safely.
       </p>
     </div>
+    <ExchangeTimeline title="Your booking timeline" steps={[
+      {title:"Request created",description:"Your rental request has been recorded.",done:true},
+      {title:"Booking approved",description:["declined","cancelled"].includes(booking.status)?"Request ended: "+booking.status:"The lender approves the requested dates.",done:booking.status==="cancelled"?undefined:["approved","active","returned"].includes(booking.status)},
+      {title:"Item handed over",description:"Both participants confirm collection.",done:Boolean(booking.owner_handover_at&&booking.renter_handover_at)},
+      {title:"Item returned",description:"Both participants confirm the return.",done:Boolean(booking.owner_return_at&&booking.renter_return_at)},
+    ]}/>
     {enabled&&<section className="rental-control-panel">
       <h2>Booking actions</h2>
       <div className="rental-actions">

@@ -9,6 +9,7 @@ import "./journey.css";
 import "./heading-card-emphasis.css";
 import "./account-profile-spaceui.css";
 import "./auth-split.css";
+import "./selected-spaceui.css";
 
 export const metadata:Metadata={
   title:{default:"UNILOOP — Buy better. Borrow smarter.",template:"%s · UNILOOP"},

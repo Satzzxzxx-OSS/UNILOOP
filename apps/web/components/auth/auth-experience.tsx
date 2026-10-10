@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import {ArrowLeft,ArrowRight,Box,MessagesSquare,KeyRound,Sparkles} from 'lucide-react';
+import {GradientBackground} from '@/components/spaceui/gradient-background';
 import {ProximityGrid} from '@/components/spaceui/proximity-grid';
 import {SignInBlock} from '@/components/spaceui/sign-in-block';
 import {AuthBotAvatar} from '@/components/auth/auth-bot-avatar';
@@ -13,6 +14,7 @@ export function AuthExperience({intent,configured,error}:AuthExperienceProps){
  const signup=intent==='signup';
  return <section className="un-auth-split" aria-label="UNILOOP account access">
   <aside className="un-auth-story" aria-label="Your campus, your community">
+   <GradientBackground className="un-auth-space-gradient" aria-hidden="true"/>
    <ProximityGrid className="un-auth-story-grid" cellSize={64} gap={4} interactive={false} aria-hidden="true"/>
    <div className="un-auth-story-top"><Link href="/" className="un-auth-story-brand"><span>U</span> UNILOOP</Link><span className="un-auth-story-tag"><Sparkles size={13}/> A better way to exchange</span></div>
    <div className="un-auth-story-body">

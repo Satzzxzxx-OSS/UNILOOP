@@ -78,3 +78,6 @@ Branch `feat/heading-card-emphasis` starts after merged PR #11. User requested o
 
 ## 2026-10-10: compact original Space UI auth + temporary frontend preview
 Owner rejected broad Auth V2 and requested the original free Sign In block with the prior grid story panel on desktop AND mobile, a real Space UI avatar, and direct dashboard entry for testing. New branch `feat/spaceui-auth-split-preview` starts from `e539adf`, preserving later account/profile changes. See `docs/SPACE_UI_AUTH_SPLIT.md` for source attribution, acceptance checklist and exact temporary access behavior. Auth V2 styles removed; no custom bot retained. `FRONTEND_PREVIEW=true` opens GET/HEAD workspace UI without creating an identity; real provider/data/write checks stay unchanged. Do not describe this preview as real password authentication or as a production-auth completion.
+
+## Selected component polish — 2026-10-11
+Owner selected Avatar Extended, Thinking Orb, Heat Shade, Squishmoji, Timeline and requested all button placements assessed. Branch feat/spaceui-selected-polish from original main ca534d0 preserves merged auth/profile work. See SPACE_UI_SELECTED_POLISH.md for exact source, placements and PRO exclusion. No backend/data deletion; preview access remains unchanged.

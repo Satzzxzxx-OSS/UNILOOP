@@ -1,0 +1,25 @@
+/* Source treatments: Space UI Button Squircle, Glass Button, Gradient Background.
+   Scope preserves existing monochrome marketplace and all action semantics. */
+.ul-spaceui-tactile{corner-shape:superellipse(1.25);border-radius:12px;transition-property:background-color,border-color,box-shadow,transform}
+.ul-spaceui-tactile:not(:disabled):not([aria-disabled=true]):active{transform:translateY(1px)}
+.ul-spaceui-tactile:focus-visible{outline:2px solid var(--ring,#7663c2);outline-offset:3px}
+.ul-heading-actions .ul-spaceui-tactile{min-height:40px}
+.un-profile-squishmoji{width:100%;height:100%;object-fit:contain;display:block}
+.un-profile-avatar-face{padding:2px;background:#f9f8ff}
+.un-auth-story{isolation:isolate}
+.un-auth-space-gradient{position:absolute;inset:0;z-index:-2;opacity:.24;pointer-events:none}
+.un-auth-story-grid{z-index:-1}
+.ul-thinking-loading{display:flex;align-items:center;gap:12px;padding-block:12px;margin-bottom:16px;font-size:13px;color:var(--muted-foreground,#66666f)}
+.ul-exchange-timeline{padding:24px;margin-block:24px;border:2px solid var(--border,#18181b);border-radius:16px;background:var(--surface,#fff)}
+.ul-exchange-timeline h2{margin:0 0 24px;font-size:18px}
+.ul-exchange-timeline [data-slot=timeline-item]{margin-left:28px}
+.ul-exchange-timeline [data-slot=timeline-header]{flex-wrap:wrap;gap:8px}
+.ul-timeline-state{font-size:10px;border:1px solid var(--border,#d4d4d8);border-radius:99px;padding:3px 8px;color:var(--muted-foreground,#66666f)}
+.ul-exchange-timeline [data-completed] .ul-timeline-state{color:#18181b;background:#f4f4f5}
+@media(max-width:700px){.ul-exchange-timeline{padding:20px 16px}.ul-thinking-loading{gap:4px}.ul-heading-actions{flex-wrap:wrap}}
+@media(prefers-reduced-motion:reduce){.ul-spaceui-tactile{transition:none}.ul-spaceui-tactile:active{transform:none}}
+.ul-landing-space-timeline{display:flex;gap:28px;padding:24px;overflow:visible}
+.ul-landing-space-timeline [data-slot=timeline-item]{padding:24px 0 0;margin-top:24px;border-top:0}
+.ul-landing-space-timeline [data-slot=timeline-title]{font-size:18px;font-weight:700;margin-block:12px 8px}
+.ul-landing-space-timeline [data-slot=timeline-content]{line-height:1.7;font-size:13px;color:var(--muted-foreground)}
+@media(max-width:700px){.ul-landing-space-timeline{flex-direction:column!important;gap:12px}.ul-landing-space-timeline [data-slot=timeline-item]{margin-top:0;padding:16px 0 16px 24px}.ul-landing-space-timeline [data-slot=timeline-indicator]{left:0;top:20px;transform:none}.ul-landing-space-timeline [data-slot=timeline-separator]{left:7px;top:36px;width:2px;height:calc(100% - 20px);transform:none}}

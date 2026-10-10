@@ -1,3 +1,4 @@
+import {ExchangeTimeline} from "@/components/experience/exchange-timeline";
 import {Rating} from "@/components/spaceui/rating";
 import {ItemStatus} from "@/components/experience/item-status";
 import type {Metadata} from "next";
@@ -34,6 +35,12 @@ export default async function TransactionDetails({params}:{params:Promise<{id:st
       <p className="interaction-notice">This record reflects participants&apos; confirmations.
         UNILOOP does not verify cash transfers, provide escrow or guarantee item condition.</p>
     </div>
+    <ExchangeTimeline title="Your exchange timeline" steps={[
+      {title:"Handover record created",description:"The agreed exchange is recorded.",done:true},
+      {title:"Seller confirmation",description:deal.seller_handed_over_at?"The seller recorded item handover.":"Waiting for the seller's confirmation.",done:Boolean(deal.seller_handed_over_at)},
+      {title:"Buyer confirmation",description:deal.buyer_received_at?"The buyer recorded item receipt.":"Waiting for the buyer's confirmation.",done:Boolean(deal.buyer_received_at)},
+      {title:"Exchange completed",description:"Both confirmations are required. This does not verify payment.",done:deal.status==="completed"},
+    ]}/>
     {enabled&&deal.status==="pending_handover"&&!alreadyConfirmed&&
       <section className="rental-control-panel">
         <h2>Confirm what actually happened</h2>
