@@ -44,6 +44,6 @@ export default async function NotificationsPage(){
        <WorkspaceEmpty title="It's quiet here, for now."
          description="Your real message, offer and booking notifications will show up when something happens."
          action={{href:"/explore",label:"Explore the marketplace"}}/>}
-   <p className="ux-activity-footnote">Most recent 50 alerts shown. Email and realtime push aren't active yet.</p>
+   <p className="ux-activity-footnote">Most recent 50 alerts shown. Email and realtime push aren&apos;t active yet.</p>
  </WorkspaceShell>;
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import {useRouter} from "next/navigation";
 import {useActionState,useEffect,useRef,useState,type ChangeEvent} from "react";
 import {categories} from "@/lib/catalog";
 import {createListingDraft} from "@/lib/listings/actions";
@@ -21,6 +22,7 @@ const initialAction={message:""};
 export function ExperienceListingWizard({mode,backendReady}:{
   mode:Type;backendReady:boolean;
 }){
+  const router=useRouter();
   const [step,setStep]=useState(0);
   const [draft,setDraft]=useState<Draft>(initial);
   const [photos,setPhotos]=useState<LocalPhoto[]>([]);
@@ -228,7 +230,7 @@ export function ExperienceListingWizard({mode,backendReady}:{
         {warning&&<p className="ux-form-warning" role="alert">{warning}</p>}
         {step<3&&<div className="ux-form-footer">
           <button type="button" className="ux-wizard-secondary"
-            onClick={()=>{if(step===0)location.href="/";else{setStep(n=>n-1);setWarning("");}}}>
+            onClick={()=>{if(step===0)router.push("/");else{setStep(n=>n-1);setWarning("");}}}>
             {step===0?"Cancel":"Back"}
           </button>
           <button type="button" className="ux-wizard-primary" onClick={handleNext}>
