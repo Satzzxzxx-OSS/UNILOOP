@@ -34,10 +34,13 @@ try{
  await mkdir("/tmp/ux-mobile-screens",{recursive:true});
  const widths=[320,360,390,430,768,1024,1440];
  const routes=["/","/explore?mode=buy","/explore?mode=rent","/post","/rent/post"];
+ const privateRoutes=["/account","/settings","/saved","/inbox","/offers",
+   "/my/listings","/rent/my","/rentals","/transactions","/notifications"];
  for(const width of widths){
   const ctx=await browser.newContext({viewport:{width,height:810},deviceScaleFactor:1});
   const page=await ctx.newPage();
-  for(const route of routes){
+  for(const route of (width===320||width===390||width===1440?
+     routes.concat(privateRoutes):routes)){
    const response=await page.goto(target+route,{waitUntil:"networkidle"});
    assert.equal(response?.status(),200,"route "+route+" at "+width);
    const metrics=await page.evaluate(()=>{
@@ -87,7 +90,7 @@ try{
  assert.equal(await p.getByText("Your frontend preview is ready.").isVisible(),true);
  assert.equal(await p.getByRole("button",{name:/Save draft \(not available yet\)/}).isDisabled(),true);
  await ctx.close();
- console.log("Browser mobile visual smoke passed: 5 routes x 7 widths, modal/dock and Sell wizard.");
+ console.log("Browser visual smoke passed: 5 public routes x 7 widths plus 10 private routes x 3 widths, navigation and Sell wizard.");
 }finally{
  if(browser)await browser.close();
  server.kill("SIGTERM");
