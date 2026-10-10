@@ -1,7 +1,9 @@
 "use client";
 
 import {Button} from "@/components/spaceui/button";
-import {Input} from "@/components/spaceui/input";
+import {WorkspaceSearch} from "./workspace-search";
+import {InterfacePreferences} from "./interface-preferences";
+import {TooltipProvider,Tooltip,TooltipTrigger,TooltipPopup} from "@/components/spaceui/tooltip";
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
@@ -88,6 +90,8 @@ export function ExperienceHeader({identity="Your account",subtitle="Personal mar
   const menuRef=useRef<HTMLElement|null>(null);
   const menuToggleRef=useRef<HTMLButtonElement|null>(null);
   const [searchOpen,setSearchOpen]=useState(false);
+  const searchOrigin=useRef<HTMLElement|null>(null);
+  function openSearch(){searchOrigin.current=document.activeElement as HTMLElement;setMenuOpen(false);setSearchOpen(true);}
   const accountMenuRef=useRef<HTMLDetailsElement|null>(null);
   useEffect(()=>{
     function dismissOutside(event:PointerEvent){
@@ -107,7 +111,7 @@ export function ExperienceHeader({identity="Your account",subtitle="Personal mar
       const target=event.target;
       if(target instanceof HTMLElement && (target.isContentEditable || target.closest("input,textarea,select")))return;
       if(event.key==="/" || ((event.metaKey||event.ctrlKey)&&event.key.toLowerCase()==="k")){
-        event.preventDefault();setSearchOpen(true);
+        event.preventDefault();openSearch();
       }
       if(event.key==="Escape")setSearchOpen(false);
     }
@@ -138,10 +142,10 @@ export function ExperienceHeader({identity="Your account",subtitle="Personal mar
     document.addEventListener("keydown",onKeyDown);
     return ()=>{document.removeEventListener("keydown",onKeyDown);document.body.style.overflow=before;};
   },[menuOpen]);
-  return <>
+  return <TooltipProvider delay={400}>
     <aside className="ul-sidebar" aria-label="Workspace sidebar">
       <Link href="/" className="ul-sidebar-brand" aria-label="UNILOOP overview"><span className="ul-monogram">U</span><strong>UNILOOP</strong><span className="ul-brand-tag">Workspace</span></Link>
-      <Button variant="ghost" className="ul-sidebar-search" type="button" aria-label="Open workspace search" onClick={()=>setSearchOpen(true)}><ExperienceIcon name="search" size={16}/><span>Search marketplace</span><kbd>⌘ K</kbd></Button>
+      <Button variant="ghost" className="ul-sidebar-search" type="button" aria-label="Open workspace search" onClick={openSearch}><ExperienceIcon name="search" size={16}/><span>Search marketplace</span><kbd>⌘ / Ctrl K</kbd></Button>
       <Suspense fallback={<nav className="ul-sidebar-nav" aria-label="Main navigation"><Link href="/">Overview</Link></nav>}><DesktopNavigation pathname={pathname}/></Suspense>
       <div className="ul-sidebar-bottom">
         <Link href="/post" className="ul-sidebar-create"><ExperienceIcon name="plus" size={17}/>Create listing</Link>
@@ -161,10 +165,11 @@ export function ExperienceHeader({identity="Your account",subtitle="Personal mar
         <div className="ux-header-controls">
           <Button variant="ghost" className="ux-icon-button ux-global-search" type="button"
             aria-label="Open item search" aria-controls="ux-global-search-panel" aria-expanded={searchOpen}
-            onClick={()=>setSearchOpen(v=>!v)}><ExperienceIcon name="search"/><span>Search</span><kbd>/</kbd></Button>
-          <Link href="/saved" className="ux-icon-button ux-desktop-control" aria-label="Saved items"><ExperienceIcon name="heart"/></Link>
-          <Link href="/inbox" className="ux-icon-button ux-desktop-control" aria-label="Inbox"><ExperienceIcon name="chat"/></Link>
-          <Link href="/account" className="ux-icon-button ux-desktop-control" aria-label="Your account"><ExperienceIcon name="user"/></Link>
+            onClick={openSearch}><ExperienceIcon name="search"/><span>Search</span><kbd>/</kbd></Button>
+          <Tooltip><TooltipTrigger render={<Link href="/saved" className="ux-icon-button ux-desktop-control" aria-label="Saved items"/>}><ExperienceIcon name="heart"/></TooltipTrigger><TooltipPopup>Saved items</TooltipPopup></Tooltip>
+          <Tooltip><TooltipTrigger render={<Link href="/inbox" className="ux-icon-button ux-desktop-control" aria-label="Inbox"/>}><ExperienceIcon name="chat"/></TooltipTrigger><TooltipPopup>Your messages</TooltipPopup></Tooltip>
+          <Tooltip><TooltipTrigger render={<Link href="/account" className="ux-icon-button ux-desktop-control" aria-label="Your account"/>}><ExperienceIcon name="user"/></TooltipTrigger><TooltipPopup>Your account</TooltipPopup></Tooltip>
+          <InterfacePreferences/>
           <Link href="/post" className="ux-header-list">List an item <ExperienceIcon name="arrow" size={17}/></Link>
           <Button variant="ghost" ref={menuToggleRef} type="button" className="ux-icon-button ux-menu-toggle"
             aria-label={menuOpen?"Close navigation":"Open navigation"}
@@ -172,13 +177,6 @@ export function ExperienceHeader({identity="Your account",subtitle="Personal mar
             onClick={()=>setMenuOpen(v=>!v)}><ExperienceIcon name={menuOpen?"close":"menu"}/></Button>
         </div>
       </div>
-      {searchOpen&&<form id="ux-global-search-panel" className="ux-mobile-search-panel ux-shell" action="/explore" role="search">
-        <label className="ux-visually-hidden" htmlFor="ux-top-search">Search the marketplace</label>
-        <ExperienceIcon name="search" size={19}/>
-        <Input nativeInput unstyled autoFocus id="ux-top-search" type="search" name="q"
-          maxLength={100} onKeyDown={e=>{if(e.key==="Escape"){setSearchOpen(false);document.querySelector<HTMLButtonElement>('[aria-controls="ux-global-search-panel"]')?.focus();}}} placeholder="What are you looking for?"/>
-        <Button type="submit">Search <ExperienceIcon name="arrow" size={15}/></Button>
-      </form>}
       {menuOpen&&<div className="ux-mobile-backdrop" role="presentation" onClick={()=>{setMenuOpen(false);menuToggleRef.current?.focus();}}>
         <nav ref={menuRef} id="ux-mobile-menu" className="ux-menu-sheet" aria-label="More navigation"
           onClick={event=>event.stopPropagation()}>
@@ -196,6 +194,7 @@ export function ExperienceHeader({identity="Your account",subtitle="Personal mar
         </nav>
       </div>}
     </header>
+    <WorkspaceSearch open={searchOpen} onOpenChange={setSearchOpen} onClosed={()=>{if(searchOrigin.current?.isConnected)searchOrigin.current.focus();else menuToggleRef.current?.focus();}}/>
     <nav aria-label="Quick mobile navigation" className="ux-bottom-dock">
       {dockItems.map(item=><Link key={item.label} href={item.href}
         aria-current={item.href==="/"&&pathname==="/"||item.href!=="/"&&pathname.startsWith(item.href)?"page":undefined}
@@ -203,5 +202,5 @@ export function ExperienceHeader({identity="Your account",subtitle="Personal mar
         <ExperienceIcon name={item.icon} size={22}/><span>{item.label}</span>
       </Link>)}
     </nav>
-  </>;
+  </TooltipProvider>;
 }

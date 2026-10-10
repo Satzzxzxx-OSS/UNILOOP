@@ -1,4 +1,4 @@
-// Real Chromium UI smoke tests for UNILOOP dark Space UI frontend.
+// Real Chromium UI smoke tests for UNILOOP minimalist Space UI frontend.
 // Run in GitHub Actions with ephemeral Playwright installed outside app dependencies.
 // No backend keys, mock listings, network access to production or form mutations.
 import assert from "node:assert/strict";
@@ -76,6 +76,42 @@ try{
     assert.deepEqual(errors,[],"JS page errors at "+width);
     await page.close();
   }
+
+  // Focus-managed search, accessible tabs, bouncy FAQ and opt-in preferences.
+  const polish=await browser.newPage({viewport:{width:1440,height:900},reducedMotion:"reduce"});
+  const polishErrors=[];polish.on("pageerror",error=>polishErrors.push(error.message));
+  await polish.goto(base+"/",{waitUntil:"networkidle"});
+  const sounds=polish.getByRole("button",{name:"Interface sounds",exact:true});
+  assert.equal(await sounds.getAttribute("aria-pressed"),"false","Audio must be opt-in");
+  await sounds.click();assert.equal(await sounds.getAttribute("aria-pressed"),"true");
+  await polish.reload({waitUntil:"networkidle"});
+  assert.equal(await polish.getByRole("button",{name:"Interface sounds",exact:true}).getAttribute("aria-pressed"),"true","Preference persists locally");
+  await polish.getByRole("button",{name:"Interface sounds",exact:true}).click();
+  await polish.getByRole("button",{name:"Open workspace search",exact:true}).click();
+  const searchDialog=polish.getByRole("dialog",{name:"Search your workspace"});
+  await searchDialog.waitFor();
+  await searchDialog.getByRole("searchbox").fill("messages");
+  assert.equal(await searchDialog.getByRole("navigation",{name:"Workspace shortcuts"}).getByRole("link").count(),1,"Navigation is filtered by search");
+  await polish.screenshot({path:path.join(output,"workspace-search-desktop.png"),fullPage:false,animations:"disabled"});
+  await polish.keyboard.press("Escape");
+  await searchDialog.waitFor({state:"hidden"});
+  assert.equal(await polish.evaluate(()=>document.activeElement?.getAttribute("aria-label")),"Open workspace search","Search restores trigger focus");
+  await polish.keyboard.press("Control+k");await searchDialog.waitFor();
+  assert.equal(await searchDialog.getByRole("searchbox").inputValue(),"","Closed search resets the query");
+  await polish.keyboard.press("Escape");await searchDialog.waitFor({state:"hidden"});
+  await polish.getByRole("tab",{name:"For sale",exact:true}).focus();
+  await polish.keyboard.press("ArrowRight");
+  assert.equal(await polish.getByRole("tab",{name:"For rent",exact:true}).getAttribute("aria-selected"),"true","Base UI tabs support arrow navigation");
+  await polish.goto(base+"/help",{waitUntil:"networkidle"});
+  const faq=polish.getByRole("button",{name:"Can I save a draft right now?",exact:true});
+  await faq.click();assert.equal(await faq.getAttribute("aria-expanded"),"true");
+  await polish.getByRole("region",{name:"Can I save a draft right now?",exact:true}).waitFor({state:"visible"});
+  assert.equal(await polish.getByRole("button",{name:"What can I do on UNILOOP?",exact:true}).getAttribute("aria-expanded"),"false");
+  await polish.screenshot({path:path.join(output,"help-accordion-desktop.png"),fullPage:true,animations:"disabled"});
+  await polish.goto(base+"/post",{waitUntil:"networkidle"});
+  assert.equal(await polish.getByRole("progressbar",{name:"Listing steps completed"}).getAttribute("aria-valuenow"),"0","Progress represents completed steps, not fake upload progress");
+  assert.deepEqual(polishErrors,[],"New interactions must not introduce browser errors");
+  await polish.close();
 
   // Connected search mode is a real navigation, not decorative toggle.
   const modePage=await browser.newPage({viewport:{width:390,height:844},reducedMotion:"reduce"});
@@ -170,7 +206,8 @@ try{
   const topSearch=search.getByRole("searchbox",{name:"Search the marketplace"});
   await topSearch.fill("headphones");
   await search.keyboard.press("Escape");
-  assert(!(await topSearch.count()),"Escape should close the expanding search");
+  await topSearch.waitFor({state:"hidden"});
+  assert(!(await topSearch.isVisible()),"Escape should close the search dialog");
   await search.getByRole("button",{name:"Open item search"}).click();
   await topSearch.fill("headphones");
   await topSearch.press("Enter");
@@ -196,7 +233,28 @@ try{
   const filtered=new URL(filters.url());
   assert.equal(filtered.searchParams.get("q"),"camera");
   assert.equal(filtered.searchParams.get("mode"),"rent");
+  await filters.getByRole("button",{name:"Open item search",exact:true}).click();
+  const mobileSearch=filters.getByRole("dialog",{name:"Search your workspace"});
+  await mobileSearch.waitFor();
+  const searchWidth=await mobileSearch.evaluate(element=>element.getBoundingClientRect().width);
+  assert(searchWidth<=390,"Mobile search dialog stays within the viewport");
+  await filters.screenshot({path:path.join(output,"workspace-search-mobile.png"),fullPage:false,animations:"disabled"});
+  await mobileSearch.getByRole("button",{name:"Close workspace search",exact:true}).click();
+  await mobileSearch.waitFor({state:"hidden"});
   await filters.close();
+
+  const audio=await browser.newPage({viewport:{width:1024,height:860},reducedMotion:"no-preference"});
+  const audioErrors=[];audio.on("pageerror",error=>audioErrors.push(error.message));
+  await audio.goto(base+"/help",{waitUntil:"networkidle"});
+  await audio.getByRole("button",{name:"Interface sounds",exact:true}).click();
+  await audio.getByRole("button",{name:"Can I save a draft right now?",exact:true}).click();
+  await audio.waitForFunction(()=>localStorage.getItem("spacesound-settings")!==null);
+  const audioSettings=await audio.evaluate(()=>JSON.parse(localStorage.getItem("spacesound-settings")));
+  assert.equal(audioSettings.enabled,true);assert.equal(audioSettings.volume,.16);assert.equal(audioSettings.respectReducedMotion,true);
+  await audio.getByRole("button",{name:"Interface sounds",exact:true}).click();
+  assert.equal(await audio.getByRole("button",{name:"Interface sounds",exact:true}).getAttribute("aria-pressed"),"false");
+  assert.deepEqual(audioErrors,[],"Opted-in lazy audio engine has no browser errors");
+  await audio.close();
   console.log("Chromium frontend navigation and responsive checks: PASSED");
 }finally{
   await browser.close();

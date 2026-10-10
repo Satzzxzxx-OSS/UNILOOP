@@ -32,6 +32,9 @@
   --color-background:var(--background);
   --color-foreground:var(--foreground);
   --color-card:var(--surface);
+  --color-popover:var(--surface);
+  --color-popover-foreground:var(--foreground);
+  --color-input:var(--surface-raised);
   --color-muted:var(--surface-subtle);
   --color-muted-foreground:var(--muted);
   --color-border:var(--border);

@@ -1,3 +1,4 @@
+import {ShareItem} from "@/components/experience/share-item";
 import type {Metadata} from "next";
 import {notFound} from "next/navigation";
 import Link from "next/link";
@@ -41,6 +42,7 @@ export default async function SaleDetail({params}:{params:Promise<{id:string}>})
      <div className="ux-detail-content">
        <p className="ux-kicker">GIVE GOOD THINGS A NEW CHAPTER</p>
        <h1>{listing.title}</h1>
+       <ShareItem title={listing.title}/>
        <div className="ux-detail-price"><strong>{money(listing.price_inr)}</strong>
          <span>One-time asking price</span></div>
        <div className="ux-detail-tags">
