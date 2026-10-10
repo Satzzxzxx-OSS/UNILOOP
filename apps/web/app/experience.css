@@ -713,3 +713,80 @@ body:has(.ux-hero) {background:#fffefd}
 .ux-activity .notification-read-form p{margin:0;max-width:180px;font-size:11px;color:#a45d40}
 .ux-activity .notification-read-form button,.ux-notification-controls button{background:transparent;border:0;font-size:12px;font-weight:850;color:#49718a;text-decoration:underline;cursor:pointer}
 @media(max-width:680px){.ux-activity{padding:14px;min-height:92px;gap:10px;border-radius:15px;flex-wrap:wrap}.ux-activity-symbol{height:41px;width:41px;font-size:20px}.ux-activity-description a strong{font-size:13px}}
+
+
+/* V2 secure detail workspaces: sale messages, bookings, handovers, reporting. */
+.ux-chat-page,.ux-private-detail,.ux-report-page{padding-block:38px 105px;min-width:0}
+.ux-chat-page>.ux-detail-text-link,.ux-private-detail>.ux-detail-text-link,.ux-report-page>.ux-detail-text-link{margin-bottom:30px}
+.ux-chat-page .conversation-heading{display:flex;align-items:end;justify-content:space-between;gap:18px;padding-bottom:30px;border-bottom:1px solid #e9edef;margin:20px 0 28px}
+.ux-chat-page .conversation-heading h1,.ux-private-detail>h1,.ux-report-page>h1{font-size:clamp(36px,4vw,54px);letter-spacing:-.067em;line-height:1.09;color:#192d48;margin:12px 0}
+.ux-chat-page .conversation-intro{font-size:13px;line-height:1.75;color:#718096}
+.ux-chat-page .conversation-layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(295px,.8fr);align-items:start;gap:22px}
+.ux-chat-page .conversation-pane,.ux-chat-page .negotiation-pane{border:1px solid #e6eae9;background:#fff;border-radius:24px;padding:28px;min-width:0;box-shadow:0 12px 30px #172c3e0b}
+.ux-chat-page .conversation-pane h2,.ux-chat-page .negotiation-pane h2{font-size:24px;letter-spacing:-.045em;color:#1c314c;margin:0 0 20px}
+.ux-chat-page .message-history{min-height:270px;max-height:550px;overflow-y:auto;padding:17px 10px;background:#f5f7f7;border-radius:18px;display:flex;flex-direction:column;gap:12px}
+.ux-chat-page .message-bubble{width:fit-content;max-width:min(90%,480px);border-radius:18px;padding:13px 16px;background:#fff;border:1px solid #e5e9ed;word-break:break-word}
+.ux-chat-page .message-bubble.mine{align-self:flex-end;background:#e9f2eb;border-color:#d6e5db}
+.ux-chat-page .message-bubble.theirs{align-self:flex-start}
+.ux-chat-page .message-bubble p{white-space:pre-wrap;overflow-wrap:anywhere;color:#203650;font-size:13px;line-height:1.7;margin:9px 0}
+.ux-chat-page .message-bubble time,.ux-chat-page .message-sender{font-size:10px;color:#8a97a5}
+.ux-chat-page .conversation-empty{color:#8290a0;font-size:13px;line-height:1.8}
+.ux-chat-page .message-compose,.ux-chat-page .offer-compose{display:grid;gap:12px;margin-top:20px}
+.ux-chat-page .message-compose label,.ux-chat-page .offer-compose label{font-size:13px;color:#263a53;font-weight:800}
+.ux-chat-page .message-compose textarea,.ux-chat-page .offer-compose input{width:100%;border:1px solid #d8e0e5;border-radius:12px;background:#fff;resize:vertical;padding:14px;font:inherit;font-size:13px;min-height:51px}
+.ux-chat-page .message-compose .button-dark,.ux-chat-page .offer-compose .button-dark{min-height:47px;border-radius:12px}
+.ux-chat-page .message-compose .button-dark{justify-self:start}
+.ux-chat-page .offer-history{display:grid;gap:12px;margin-bottom:22px}
+.ux-chat-page .offer-card{display:grid;gap:11px;border:1px solid #e8e6dc;border-radius:14px;background:#fefbf4;padding:17px}
+.ux-chat-page .offer-card strong{font-size:24px;color:#1a2e49}
+.ux-chat-page .offer-tag{font-size:11px;color:#9b7b4d}
+.ux-chat-page .conversation-safety{background:#eaf3ef;border:1px solid #d3e7dc;border-radius:17px;padding:20px;margin-top:25px}
+.ux-chat-page .conversation-safety h3{margin:0 0 9px;color:#2f594d;font-size:17px}
+.ux-chat-page .conversation-safety p{font-size:12px;line-height:1.75;color:#59796a}
+.ux-chat-page .interaction-note{font-size:11px;line-height:1.7;color:#8290a0}
+.ux-chat-page .interaction-notice{background:#fff8ee;border:1px solid #f0dfc1;color:#806d55;border-radius:11px;padding:13px;font-size:12px}
+.ux-chat-page .offer-controls{display:grid;gap:10px}
+.ux-chat-page .offer-form-row{display:flex;gap:10px;align-items:center}
+.ux-chat-page .offer-form-row input{min-width:0;flex:1}
+.ux-chat-page .offer-form-row button{flex:none}
+.ux-private-detail>.ux-kicker,.ux-report-page>.ux-kicker{margin-top:13px}
+.ux-private-detail>.listing-detail-attributes{display:flex;flex-wrap:wrap;gap:10px;margin:13px 0 28px}
+.ux-private-detail>.listing-detail-attributes span{font-size:12px;text-transform:capitalize;padding:7px 12px;border-radius:10px;background:#eef3f2;color:#3a675a}
+.ux-private-detail .booking-summary{background:#fff;border:1px solid #e4e9eb;border-radius:26px;box-shadow:0 12px 30px #142a4210;padding:30px;max-width:900px;margin-top:26px}
+.ux-private-detail .booking-summary dl{margin:0;display:grid;gap:0}
+.ux-private-detail .booking-summary dl>div{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:16px 4px;border-bottom:1px solid #eaedef}
+.ux-private-detail .booking-summary dt{font-size:13px;color:#6b7b8e}
+.ux-private-detail .booking-summary dd{margin:0;font-size:14px;font-weight:800;color:#1d354e;text-align:right;overflow-wrap:anywhere}
+.ux-private-detail .interaction-notice{padding:17px;background:#fdf7ec;border-radius:13px;color:#857457;font-size:13px;line-height:1.8;border:1px solid #efdfc6;margin:23px 0 0}
+.ux-private-detail .interaction-note{font-size:12px;color:#758396;line-height:1.8}
+.ux-private-detail .rental-control-panel,.ux-private-detail .rental-condition-section{max-width:900px;margin-top:25px;padding:30px;border:1px solid #e6eaeb;background:#fff;border-radius:24px}
+.ux-private-detail .rental-control-panel h2,.ux-private-detail .rental-condition-section h2{margin:0 0 17px;font-size:23px;letter-spacing:-.035em}
+.ux-private-detail .rental-actions{display:flex;gap:10px;flex-wrap:wrap}
+.ux-private-detail .rental-note-list{display:grid;gap:10px}
+.ux-private-detail .rental-note{padding:15px;border-radius:12px;background:#f6f8f7}
+.ux-private-detail .rental-note strong{font-size:13px}
+.ux-private-detail .rental-note p{font-size:13px;line-height:1.7;color:#728093;white-space:pre-wrap;overflow-wrap:anywhere}
+.ux-private-detail .rental-note time{font-size:10px;color:#8895a1}
+.ux-private-detail .rental-mini-form,.ux-private-detail .rental-decision-form{max-width:650px}
+.ux-report-page{max-width:920px}
+.ux-report-page>p:not(.ux-kicker){color:#67798a;line-height:1.75;font-size:15px;max-width:660px}
+.ux-report-page .post-form{margin:26px 0;border:1px solid #e7e9e9;border-radius:23px;background:#fff;padding:30px;box-shadow:0 15px 28px #172a3e0c}
+.ux-report-page .feed-notice{margin:23px 0;border:1px solid #e4e9e9;border-radius:23px;padding:26px;background:#f5f7f7}
+.ux-report-page .feed-notice h2{font-size:25px;letter-spacing:-.04em}
+.ux-report-page .feed-notice p{font-size:13px;line-height:1.8;color:#7d8897}
+@media(max-width:960px){.ux-chat-page .conversation-layout{grid-template-columns:1fr}.ux-chat-page .negotiation-pane{max-width:none}}
+@media(max-width:680px){
+ .ux-chat-page,.ux-private-detail,.ux-report-page{padding-block:22px 90px}
+ .ux-chat-page .conversation-heading{display:block}
+ .ux-chat-page .conversation-heading h1,.ux-private-detail>h1,.ux-report-page>h1{font-size:35px}
+ .ux-chat-page .conversation-pane,.ux-chat-page .negotiation-pane{padding:20px 16px;border-radius:18px}
+ .ux-chat-page .message-history{min-height:200px;max-height:470px;padding:10px}
+ .ux-chat-page .offer-form-row{flex-wrap:wrap}
+ .ux-chat-page .offer-form-row button{width:100%}
+ .ux-private-detail .booking-summary{padding:20px;border-radius:20px}
+ .ux-private-detail .booking-summary dl>div{align-items:flex-start;gap:12px}
+ .ux-private-detail .booking-summary dt{font-size:11px}
+ .ux-private-detail .booking-summary dd{font-size:12px}
+ .ux-private-detail .rental-control-panel,.ux-private-detail .rental-condition-section{padding:22px;border-radius:19px}
+ .ux-report-page .post-form{padding:19px;border-radius:18px}
+}
