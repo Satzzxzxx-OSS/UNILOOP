@@ -470,3 +470,40 @@ body:has(.ux-hero) {background:#fffefd}
   .ux-wizard-primary{padding:0 16px}
   .ux-post-mode a{padding:0 12px;font-size:12px}
 }
+
+
+/* V2 real product cards: no fake stock images or artificial review counts. */
+.ux-product-card{background:#fff;min-width:0;border:1px solid #e9ecee;border-radius:23px;overflow:hidden;transition:box-shadow .24s,transform .24s,border-color .24s}
+.ux-product-card:hover{transform:translateY(-5px);box-shadow:0 25px 40px #182c4318;border-color:#d7dfe4}
+.ux-product-link{display:block;color:#1b2d45}
+.ux-product-image{position:relative;aspect-ratio:1.25;background:radial-gradient(circle at 30% 20%,#f5f0e6,#e3e9ef 75%);overflow:hidden}
+.ux-product-image-rent{background:radial-gradient(circle at 30% 20%,#edf5ef,#dde8de 75%)}
+.ux-product-cover{display:block;width:100%;height:100%;object-fit:cover;transition:transform .4s ease}
+.ux-product-card:hover .ux-product-cover{transform:scale(1.045)}
+.ux-product-no-photo{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:17px;color:#788999;font-size:11px}
+.ux-product-no-photo svg{height:62px;width:62px;opacity:.55;color:#56708a}
+.ux-product-chip{position:absolute;left:15px;top:15px;z-index:2;border:1px solid #ffffffca!important;border-radius:99px!important;padding:6px 11px!important;height:auto!important;min-width:0!important;background:#fffefaed!important;color:#213650!important;font-size:11px!important;font-weight:800!important}
+.ux-product-view{position:absolute;right:13px;bottom:13px;width:39px;height:39px;display:grid;place-items:center;border-radius:50%;color:#19314b;background:#fffcf5e8;border:1px solid #ffffffad;transition:transform .24s}
+.ux-product-card:hover .ux-product-view{transform:rotate(-40deg)}
+.ux-product-body{padding:21px;display:grid;gap:8px}
+.ux-product-category{margin:0;color:#7c8a9d;text-transform:capitalize;font-size:11px;font-weight:650}
+.ux-product-body h3{margin:0;font-size:17px;line-height:1.35;font-weight:800;letter-spacing:-.027em;min-height:47px;overflow-wrap:anywhere}
+.ux-product-bottom{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding-top:7px;border-top:1px solid #f0f2f3}
+.ux-product-bottom strong{font-size:20px;font-weight:850;letter-spacing:-.05em;color:#172d46}
+.ux-product-bottom small{font-size:12px;letter-spacing:0;font-weight:600;color:#8b97a4}
+.ux-product-status{padding:5px 8px;background:#f4f5f6;border-radius:8px;color:#748398;font-size:10px;text-transform:capitalize}
+.ux-product-sub{color:#8593a2;font-size:11px;margin:0}
+@media(max-width:680px){
+ .ux-product-card{border-radius:16px}
+ .ux-product-chip{left:9px;top:9px;padding:4px 8px!important;font-size:9px!important}
+ .ux-product-view{right:8px;bottom:8px;height:30px;width:30px}
+ .ux-product-body{padding:14px;gap:7px}
+ .ux-product-body h3{font-size:14px;min-height:40px}
+ .ux-product-category{font-size:10px}
+ .ux-product-bottom strong{font-size:17px}
+}
+@media(prefers-reduced-motion:reduce){
+ .ux-product-card,.ux-product-cover,.ux-product-view{transition:none!important}
+ .ux-product-card:hover,.ux-product-card:hover .ux-product-cover,
+ .ux-product-card:hover .ux-product-view{transform:none!important}
+}
