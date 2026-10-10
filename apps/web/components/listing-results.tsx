@@ -16,13 +16,13 @@ export function ListingResults({
       <Link href="/account" className="button button-dark">Go to account</Link></div>;
   if (result.kind === "unconfigured")
     return <div className="feed-notice"><h3>Marketplace is being prepared</h3>
-      <p>Live listings aren&apos;t connected yet. No sample products are shown.</p></div>;
+      <p>Your marketplace will be available once account services are ready.</p></div>;
   if (result.kind === "not_eligible")
     return <div className="feed-notice"><h3>Access is not enabled</h3>
       <p>There are no listings available to this account.</p></div>;
   if (result.kind === "error")
     return <div className="feed-notice" role="alert"><h3>Unable to load listings</h3>
-      <p>Please try again shortly. No cached or invented results are shown.</p></div>;
+      <p>Please try again shortly.</p></div>;
 
   if (!result.items.length) return <EmptyFeed mode={mode} search={search} />;
 

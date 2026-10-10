@@ -1,5 +1,9 @@
 "use client";
 
+import {Button} from "@/components/spaceui/button";
+import {Input} from "@/components/spaceui/input";
+import {Textarea} from "@/components/spaceui/textarea";
+
 import Link from "next/link";
 import {useRouter} from "next/navigation";
 import {useActionState,useEffect,useRef,useState,type ChangeEvent} from "react";
@@ -27,6 +31,7 @@ export function ExperienceListingWizard({mode,backendReady}:{
   const [draft,setDraft]=useState<Draft>(initial);
   const [photos,setPhotos]=useState<LocalPhoto[]>([]);
   const [warning,setWarning]=useState("");
+  const [dragActive,setDragActive]=useState(false);
   const urls=useRef<string[]>([]);
   useEffect(()=>()=>{for(const path of urls.current)URL.revokeObjectURL(path);},[]);
   const actionFn=mode==="sell"?createListingDraft:createRentalDraft;
@@ -63,6 +68,9 @@ export function ExperienceListingWizard({mode,backendReady}:{
   function handlePhotoFiles(event:ChangeEvent<HTMLInputElement>){
     const selected=[...(event.target.files??[])];
     event.target.value="";
+    acceptPhotoFiles(selected);
+  }
+  function acceptPhotoFiles(selected:File[]){
     if(!selected.length)return;
     if(selected.length+photos.length>5){
       setWarning("You can preview up to five photos.");return;
@@ -94,12 +102,12 @@ export function ExperienceListingWizard({mode,backendReady}:{
       </div>
     </div>
     <nav className="ux-wizard-steps" aria-label="Listing form progress">
-      {steps.map((name,i)=><button type="button" key={name} disabled={i>step}
+      {steps.map((name,i)=><Button variant="ghost" type="button" key={name} disabled={i>step}
         onClick={()=>{setStep(i);setWarning("");}}
         aria-current={i===step?"step":undefined}
         className={i===step?"ux-step-current":i<step?"ux-step-complete":""}>
         <span>{i<step?"✓":i+1}</span><strong>{name}</strong>
-      </button>)}
+      </Button>)}
     </nav>
     <div className="ux-wizard-layout">
       <section className="ux-wizard-panel" aria-labelledby="ux-wizard-step-title">
@@ -108,7 +116,7 @@ export function ExperienceListingWizard({mode,backendReady}:{
           <h2 id="ux-wizard-step-title">Tell us about the item.</h2>
           <p className="ux-form-explanation">A specific title, real condition and honest details help people decide.</p>
           <div className="ux-field"><label htmlFor="ux-item-title">What are you listing?</label>
-            <input id="ux-item-title" value={draft.title} maxLength={120}
+            <Input nativeInput unstyled id="ux-item-title" value={draft.title} maxLength={120}
               placeholder="e.g. Scientific calculator in great condition"
               onChange={e=>patch("title",e.target.value)}/>
             <small>{draft.title.length}/120 characters</small></div>
@@ -127,7 +135,7 @@ export function ExperienceListingWizard({mode,backendReady}:{
               </select></div>
           </div>
           <div className="ux-field"><label htmlFor="ux-item-description">A few more details</label>
-            <textarea id="ux-item-description" rows={6} maxLength={5000}
+            <Textarea unstyled id="ux-item-description" rows={6} maxLength={5000}
               value={draft.description} onChange={e=>patch("description",e.target.value)}
               placeholder="What's included? Any marks, missing accessories or important details?"/>
             <small>{draft.description.length}/5000 characters · minimum 20</small>
@@ -137,9 +145,14 @@ export function ExperienceListingWizard({mode,backendReady}:{
           <p className="ux-form-step-kicker">02 — SHOW IT OFF</p>
           <h2 id="ux-wizard-step-title">Let the item speak.</h2>
           <p className="ux-form-explanation">Clear photos build confidence. The first one becomes your cover.</p>
-          <label className="ux-photo-drop" htmlFor="ux-photo-picker">
+          <label className={"ux-photo-drop"+(dragActive?" ux-drag-active":"")} htmlFor="ux-photo-picker"
+            onDragOver={event=>{event.preventDefault();setDragActive(true);}}
+            onDragLeave={event=>{if(!event.currentTarget.contains(event.relatedTarget as Node|null))setDragActive(false);}}
+            onDrop={event=>{event.preventDefault();setDragActive(false);acceptPhotoFiles([...event.dataTransfer.files]);}}>
+
             <span className="ux-photo-plus"><ExperienceIcon name="plus" size={30}/></span>
-            <strong>Add up to 5 photos</strong>
+            <strong>Drop photos here, or choose files</strong>
+            <span>Add up to 5 photos</span>
             <span>JPEG, PNG or WebP · max 5 MB each</span>
             <input id="ux-photo-picker" type="file" accept="image/jpeg,image/png,image/webp"
               multiple onChange={handlePhotoFiles}/>
@@ -149,7 +162,7 @@ export function ExperienceListingWizard({mode,backendReady}:{
               {/* URLs are local object URLs generated only from user-selected images. */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={photo.url} alt={"Selected photo "+(index+1)}/>
-              <button type="button" onClick={()=>removePhoto(photo)} aria-label={"Remove "+photo.name}>×</button>
+              <Button variant="ghost" type="button" onClick={()=>removePhoto(photo)} aria-label={"Remove "+photo.name}>×</Button>
               {index===0&&<span>Cover</span>}
             </div>)}
           </div>
@@ -164,7 +177,7 @@ export function ExperienceListingWizard({mode,backendReady}:{
             "Choose your asking price. Buyers can discuss an offer later when messaging is enabled."}</p>
           <div className="ux-field">
             <label htmlFor="ux-item-price">{rental?"Daily rental price (₹)":"Asking price (₹)"}</label>
-            <div className="ux-price-field"><span>₹</span><input id="ux-item-price"
+            <div className="ux-price-field"><span>₹</span><Input nativeInput unstyled id="ux-item-price"
               type="number" min={1} max={rental?1000000:10000000} step={1}
               inputMode="numeric" value={priceText}
               onChange={e=>patch(rental?"dailyRate":"price",e.target.value)}
@@ -172,15 +185,15 @@ export function ExperienceListingWizard({mode,backendReady}:{
           </div>
           {rental&&<>
             <div className="ux-field"><label htmlFor="ux-rental-deposit">Requested refundable deposit (₹)</label>
-              <div className="ux-price-field"><span>₹</span><input id="ux-rental-deposit"
+              <div className="ux-price-field"><span>₹</span><Input nativeInput unstyled id="ux-rental-deposit"
                 type="number" min={0} max={10000000} step={1} value={draft.deposit}
                 onChange={e=>patch("deposit",e.target.value)}/></div></div>
             <div className="ux-field-row">
               <div className="ux-field"><label htmlFor="ux-rental-min">Minimum rental days</label>
-                <input id="ux-rental-min" type="number" min={1} max={90} value={draft.minDays}
+                <Input nativeInput unstyled id="ux-rental-min" type="number" min={1} max={90} value={draft.minDays}
                   onChange={e=>patch("minDays",e.target.value)}/></div>
               <div className="ux-field"><label htmlFor="ux-rental-max">Maximum rental days</label>
-                <input id="ux-rental-max" type="number" min={1} max={90} value={draft.maxDays}
+                <Input nativeInput unstyled id="ux-rental-max" type="number" min={1} max={90} value={draft.maxDays}
                   onChange={e=>patch("maxDays",e.target.value)}/></div>
             </div>
             <p className="ux-preview-note">No in-app deposit custody, insurance, or verified payments are provided.</p>
@@ -215,29 +228,29 @@ export function ExperienceListingWizard({mode,backendReady}:{
                 <input type="hidden" name="min_days" value={draft.minDays}/>
                 <input type="hidden" name="max_days" value={draft.maxDays}/>
               </>:<input type="hidden" name="price" value={draft.price}/>}
-              <button type="submit" className="ux-wizard-primary" disabled={pending}>
+              <Button type="submit" className="ux-wizard-primary" disabled={pending}>
                 {pending?"Saving…":"Save real draft"} <ExperienceIcon name="arrow" size={18}/>
-              </button>
+              </Button>
               <p role="status" aria-live="polite">{state.message}</p>
             </form>:
             <div className="ux-wizard-disabled">
               <strong>Your frontend preview is ready.</strong>
               <p>Nothing has been submitted, uploaded or saved. Real draft saving stays
                 disabled until approved accounts and backend services are connected.</p>
-              <button type="button" disabled>Save draft (not available yet)</button>
+              <Button type="button" disabled>Save draft (not available yet)</Button>
             </div>}
         </>}
         {warning&&<p className="ux-form-warning" role="alert">{warning}</p>}
         {step<3&&<div className="ux-form-footer">
-          <button type="button" className="ux-wizard-secondary"
+          <Button type="button" className="ux-wizard-secondary"
             onClick={()=>{if(step===0)router.push("/");else{setStep(n=>n-1);setWarning("");}}}>
             {step===0?"Cancel":"Back"}
-          </button>
-          <button type="button" className="ux-wizard-primary" onClick={handleNext}>
+          </Button>
+          <Button type="button" className="ux-wizard-primary" onClick={handleNext}>
             {step===2?"Review listing":"Continue"} <ExperienceIcon name="arrow" size={18}/>
-          </button>
+          </Button>
         </div>}
-        {step===3&&<button type="button" className="ux-back-step" onClick={()=>setStep(2)}>← Back to pricing</button>}
+        {step===3&&<Button type="button" className="ux-back-step" onClick={()=>setStep(2)}>← Back to pricing</Button>}
       </section>
       <aside className="ux-wizard-aside">
         <div className="ux-wizard-tip-card">

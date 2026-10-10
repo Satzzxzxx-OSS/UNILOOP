@@ -25,7 +25,7 @@ export default async function SavedPage(){
       }
     }
   }
-  return <WorkspaceShell eyebrow="THE THINGS YOU LOVE" title="Your saved finds."
+  return <WorkspaceShell eyebrow="THE THINGS YOU LOVE" title="Saved items"
     description="A little collection of the useful things worth coming back to."
     action={{href:"/explore",label:"Keep exploring"}}>
     {context.kind!=="ready"||failure?

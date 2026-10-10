@@ -1,5 +1,7 @@
 "use client";
 
+import {Input} from "@/components/spaceui/input";
+
 import { useState } from "react";
 import Link from "next/link";
 import { ExperienceIcon } from "./experience-header";
@@ -25,7 +27,7 @@ export function ExperienceSearch(){
       <div className="ux-search-input-wrap">
         <ExperienceIcon name="search" size={23}/>
         <label htmlFor="ux-home-search" className="ux-visually-hidden">Search items</label>
-        <input id="ux-home-search" type="search" name="q" maxLength={100}
+        <Input nativeInput unstyled id="ux-home-search" type="search" name="q" maxLength={100}
           placeholder={mode==="buy"?"Search books, devices, essentials...":"What would you like to borrow?"}/>
       </div>
       <Button type="submit" size="xl" className="ux-search-submit">Explore <ExperienceIcon name="arrow" size={19}/></Button>

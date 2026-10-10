@@ -1,5 +1,7 @@
 "use client";
 
+import {Button} from "@/components/spaceui/button";
+
 import { useState } from "react";
 import { browserSupabase } from "@/lib/supabase/browser";
 
@@ -31,9 +33,9 @@ export function AccountSignOut() {
 
   return (
     <div className="account-sign-out">
-      <button type="button" className="button button-dark" onClick={signOut} disabled={working}>
+      <Button type="button" className="button button-dark" onClick={signOut} disabled={working}>
         {working ? "Signing out…" : "Sign out"}
-      </button>
+      </Button>
       <p role="status" aria-live="polite">{message}</p>
     </div>
   );

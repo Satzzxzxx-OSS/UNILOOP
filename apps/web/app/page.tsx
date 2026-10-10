@@ -3,151 +3,39 @@ import {categories,exploreHref} from "@/lib/catalog";
 import {CategoryIcon} from "@/components/category-icon";
 import {ListingResults} from "@/components/listing-results";
 import {RentalResults} from "@/components/rental-results";
-import {discoverListings} from "@/lib/listings/data";
-import {discoverRentals} from "@/lib/rentals/data";
+import {discoverListings,getMyListings} from "@/lib/listings/data";
+import {discoverRentals,getMyRentalListings,getRentalBookings} from "@/lib/rentals/data";
+import {getSaleInbox} from "@/lib/interactions/data";
 import {ExperienceIcon} from "@/components/experience/experience-header";
 import {ExperienceSearch} from "@/components/experience/experience-search";
-import {ExperienceReveal} from "@/components/experience/reveal";
-import {Badge} from "@/components/spaceui/badge";
+import {MarketplacePanel} from "@/components/experience/marketplace-panel";
+import {Card} from "@/components/spaceui/card";
 
 export const dynamic="force-dynamic";
-
+function count(kind:string,length:number,cap:number){return kind==="ready"?(length===cap?"≥ "+length:String(length)):"—";}
 export default async function HomePage(){
-  const [buyResult,rentResult]=await Promise.all([
-    discoverListings({limit:8}),discoverRentals({limit:8}),
+  const [buyResult,rentResult,listings,rentals,inbox,bookings]=await Promise.all([
+    discoverListings({limit:6}),discoverRentals({limit:6}),getMyListings(),getMyRentalListings(),getSaleInbox(),getRentalBookings(),
   ]);
-  return <>
-    <section className="ux-hero" aria-labelledby="ux-hero-title">
-      <div className="ux-shell ux-hero-grid">
-        <ExperienceReveal className="ux-hero-copy">
-          <p className="ux-eyebrow"><span className="ux-dot"/>A SMARTER WAY TO SHARE WHAT EXISTS</p>
-          <h1 id="ux-hero-title">Everything you need. <em>Nothing you don&apos;t.</em></h1>
-          <p className="ux-hero-lede">Buy better. Sell effortlessly. Borrow for the moments that matter.
-            One beautiful place to keep good things moving.</p>
-          <ExperienceSearch/>
-          <div className="ux-hero-assurance"><Badge variant="outline" className="ux-proof-badge">Buy · Sell · Rent · Rent out</Badge>
-            <span><ExperienceIcon name="shield" size={18}/> Designed for thoughtful local exchanges</span>
-          </div>
-        </ExperienceReveal>
-        <div className="ux-hero-art" aria-label="Abstract illustration of useful things moving in a loop" role="img">
-          <span className="ux-art-halo ux-art-halo-outer"/><span className="ux-art-halo ux-art-halo-inner"/>
-          <div className="ux-art-orbit"/>
-          <div className="ux-art-arc ux-art-arc-top"/>
-          <div className="ux-art-arc ux-art-arc-bottom"/>
-          <div className="ux-art-object ux-art-notebook">
-            <span className="ux-art-book-spine"/><span className="ux-art-book-line"/>
-            <span className="ux-art-book-line ux-line-small"/><span className="ux-art-book-mark">01</span>
-          </div>
-          <div className="ux-art-object ux-art-headphones">
-            <span className="ux-art-headset-band"/><span className="ux-art-ear ux-art-ear-left"/>
-            <span className="ux-art-ear ux-art-ear-right"/>
-          </div>
-          <div className="ux-art-object ux-art-camera">
-            <span className="ux-art-lens"/><span className="ux-art-camera-dot"/>
-          </div>
-          <div className="ux-art-core"><span>U</span><small>the loop</small></div>
-          <span className="ux-art-caption ux-art-caption-one"><b>REUSE</b><small>More stories ahead</small></span>
-          <span className="ux-art-caption ux-art-caption-two"><b>DISCOVER</b><small>Find your next thing</small></span>
-          <span className="ux-art-signature">BUY / SELL / RENT / REPEAT</span>
-        </div>
+  const metrics=[
+    {label:"Your listings",value:count(listings.kind,listings.items.length,24),note:listings.kind==="ready"?"Recent listings · up to 24":"Account access required",href:"/my/listings",icon:"grid" as const},
+    {label:"Rental listings",value:count(rentals.kind,rentals.items.length,30),note:rentals.kind==="ready"?"Recent listings · up to 30":"Account access required",href:"/rent/my",icon:"grid" as const},
+    {label:"Conversations",value:count(inbox.kind,inbox.conversations.length,50),note:inbox.kind==="ready"?"Recent conversations · up to 50":"Account access required",href:"/inbox",icon:"chat" as const},
+    {label:"Rental bookings",value:count(bookings.kind,bookings.items.length,50),note:bookings.kind==="ready"?"Recent bookings · up to 50":"Account access required",href:"/rentals",icon:"calendar" as const},
+  ];
+  const recent=[...listings.items.map(item=>({id:item.id,title:item.title,status:item.status,href:"/listing/"+item.id,created:item.created_at,mode:"Sale"})),...rentals.items.map(item=>({id:item.id,title:item.title,status:item.status,href:"/rent/"+item.id,created:item.created_at,mode:"Rental"}))].sort((a,b)=>b.created.localeCompare(a.created)).slice(0,5);
+  return <div className="ul-dashboard ux-shell">
+    <div className="ul-page-heading"><div><p>Workspace</p><h1>Overview</h1><span>Manage your listings, discover items and follow your exchanges.</span></div><div className="ul-heading-actions"><Link className="ul-secondary-action" href="/rent/post">Rent out an item</Link><Link className="ul-primary-action" href="/post"><ExperienceIcon name="plus" size={16}/>Create listing</Link></div></div>
+    <section className="ul-metrics" aria-label="Your activity summary">{metrics.map(metric=><Card render={<Link href={metric.href}/>} className="ul-metric" key={metric.label}><span className="ul-metric-label">{metric.label}<ExperienceIcon name={metric.icon} size={17}/></span><strong className="ul-metric-value">{metric.value}</strong><small>{metric.note}</small></Card>)}</section>
+    {listings.kind!=="ready"&&<div className="ul-access-notice"><span className="ul-status-dot"/><div><strong>{listings.kind==="error"?"Your activity is temporarily unavailable":listings.kind==="not_eligible"?"Marketplace access is pending":"Connect to your personal marketplace"}</strong><p>{listings.kind==="unconfigured"?"Account services are being set up. Your dashboard will show real activity when access is available.":listings.kind==="error"?"Please try again shortly. Your existing items are kept safely in your account.":"Sign in with approved access to see your listings, messages and rental activity."}</p></div><Link href="/account">View account <ExperienceIcon name="arrow" size={16}/></Link></div>}
+    <section className="ul-discover ul-panel" aria-labelledby="ul-discover-title"><div className="ul-panel-heading"><div><h2 id="ul-discover-title">Find your next thing</h2><p>Buy for the everyday. Borrow for the occasion.</p></div></div><ExperienceSearch/><nav className="ul-category-chips" aria-label="Browse marketplace categories">{categories.map(c=><Link href={exploreHref("buy",c.slug)} key={c.slug}><CategoryIcon name={c.symbol}/>{c.label}</Link>)}</nav></section>
+    <div className="ul-dashboard-columns">
+      <MarketplacePanel buy={<ListingResults mode="buy" result={buyResult}/>} rent={<RentalResults result={rentResult}/>}/>
+      <div className="ul-dashboard-aside">
+        <section className="ul-panel" aria-labelledby="ul-recent-title"><div className="ul-panel-heading"><h2 id="ul-recent-title">Your recent listings</h2><Link href="/my/listings">View all <span aria-hidden="true">↗</span></Link></div>{recent.length?<div className="ul-recent-list">{recent.map(item=><Link href={item.href} key={item.mode+item.id}><span className="ul-row-icon"><ExperienceIcon name="grid" size={16}/></span><span><strong>{item.title}</strong><small>{item.mode} · {item.status.replaceAll("_"," ")}</small></span><ExperienceIcon name="arrow" size={14}/></Link>)}</div>:<div className="ul-small-empty"><span className="ul-row-icon"><ExperienceIcon name="grid" size={20}/></span><strong>{listings.kind==="ready"&&rentals.kind==="ready"?"No listings yet":"Your listings belong here"}</strong><p>{listings.kind==="ready"&&rentals.kind==="ready"?"Create a listing to give something useful its next chapter.":"Once your account is ready, your real listings will appear here."}</p><Link href={listings.kind==="ready"?"/post":"/account"}>{listings.kind==="ready"?"Create a listing":"Open your account"}<ExperienceIcon name="arrow" size={15}/></Link></div>}</section>
+        <section className="ul-panel ul-shortcuts" aria-labelledby="ul-shortcuts-title"><div className="ul-panel-heading"><h2 id="ul-shortcuts-title">Quick access</h2></div>{[{title:"Messages & offers",description:"Discuss an item or continue an exchange",href:"/inbox",icon:"chat" as const},{title:"Saved finds",description:"Come back to the things you liked",href:"/saved",icon:"heart" as const},{title:"Rental activity",description:"Requests, handovers and returns",href:"/rentals",icon:"calendar" as const}].map(item=><Link key={item.href} href={item.href}><span className="ul-row-icon"><ExperienceIcon name={item.icon} size={17}/></span><span><strong>{item.title}</strong><small>{item.description}</small></span><ExperienceIcon name="arrow" size={14}/></Link>)}</section>
+        <section className="ul-safety-note"><ExperienceIcon name="shield" size={19}/><div><strong>A safer exchange starts here.</strong><p>Check the item, agree on the details and arrange a safe handover.</p><Link href="/safety">Read the exchange guide <span aria-hidden="true">↗</span></Link></div></section>
       </div>
-      <div className="ux-hero-bottom" aria-hidden="true"><div className="ux-shell"><span>MADE FOR WHAT&apos;S NEXT</span><span>↓ SCROLL TO DISCOVER</span></div></div>
-    </section>
-
-    <section id="categories" className="ux-section ux-shell ux-categories-section">
-      <div className="ux-section-heading">
-        <div><p className="ux-kicker">DISCOVER YOUR THING</p>
-          <h2>Whatever you&apos;re looking for, <em>start here.</em></h2>
-          <p>Thoughtful categories for the things you actually use.</p></div>
-        <Link href="/explore?mode=buy" className="ux-text-arrow">Explore all <ExperienceIcon name="arrow" size={18}/></Link>
-      </div>
-      <ExperienceReveal className="ux-category-grid">
-        {categories.map((c,index)=><Link key={c.slug}
-          href={exploreHref("buy",c.slug)} className={"ux-category ux-category-"+(index+1)}>
-          <span className="ux-category-icon" aria-hidden="true"><CategoryIcon name={c.symbol}/></span>
-          <span className="ux-category-bottom">
-            <strong>{c.label}</strong><span className="ux-category-round" aria-hidden="true"><ExperienceIcon name="arrow" size={19}/></span>
-          </span>
-          <span className="ux-category-shape ux-category-shape-first"/><span className="ux-category-shape ux-category-shape-second"/>
-        </Link>)}
-      </ExperienceReveal>
-    </section>
-
-    <section className="ux-section ux-shell ux-dual-section">
-      <div className="ux-section-heading">
-        <div><p className="ux-kicker">ONE PLACE, MANY POSSIBILITIES</p>
-          <h2>Make it yours. <em>Or just borrow it.</em></h2></div>
-      </div>
-      <div className="ux-dual-grid">
-        <article className="ux-mode-card ux-mode-buy">
-          <p className="ux-mode-number">01 / BUY & SELL</p>
-          <span className="ux-mode-art ux-mode-art-buy" aria-hidden="true"><span/><span/><span/></span>
-          <h3>New to you.<br/>Just right for you.</h3>
-          <p>Find quality pre-loved things, or give yours a brilliant second chapter.</p>
-          <Link href="/explore?mode=buy" className="ux-card-action">Explore to buy <ExperienceIcon name="arrow" size={19}/></Link>
-        </article>
-        <article className="ux-mode-card ux-mode-rent">
-          <p className="ux-mode-number">02 / RENT & LEND</p>
-          <span className="ux-mode-art ux-mode-art-rent" aria-hidden="true"><span/><span/><span/></span>
-          <h3>Need it for now?<br/>Not forever?</h3>
-          <p>Borrow the useful things you need, when you need them. Lend what you already own.</p>
-          <Link href="/explore?mode=rent" className="ux-card-action">Explore to rent <ExperienceIcon name="arrow" size={19}/></Link>
-        </article>
-      </div>
-    </section>
-
-    <section className="ux-section ux-feed-section ux-buy-feed">
-      <div className="ux-shell">
-        <div className="ux-section-heading">
-          <div><p className="ux-kicker">THE LATEST IN THE LOOP</p>
-            <h2>Good finds, <em>new stories.</em></h2>
-            <p>Real listings from real people. No manufactured inventory.</p></div>
-          <Link className="ux-text-arrow" href="/explore?mode=buy">Browse all <ExperienceIcon name="arrow" size={18}/></Link>
-        </div>
-        <div className="ux-feed-content"><ListingResults mode="buy" result={buyResult}/></div>
-      </div>
-    </section>
-
-    <section className="ux-section ux-shell ux-rental-feed">
-      <div className="ux-section-heading">
-        <div><p className="ux-kicker">BORROW SMARTER</p>
-          <h2>More useful days. <em>Less stuff to store.</em></h2>
-          <p>Rent the things you need without adding to your shelves.</p></div>
-        <Link className="ux-text-arrow" href="/explore?mode=rent">Explore rentals <ExperienceIcon name="arrow" size={18}/></Link>
-      </div>
-      <div className="ux-feed-content"><RentalResults result={rentResult}/></div>
-    </section>
-
-    <section id="how-it-works" className="ux-section ux-how-section">
-      <div className="ux-shell">
-        <div className="ux-section-heading">
-          <div><p className="ux-kicker">SIMPLE BY DESIGN</p>
-            <h2>Three steps. <em>Endless possibilities.</em></h2>
-            <p>Find it, connect, and keep the good things moving.</p></div>
-        </div>
-        <div className="ux-how-grid">
-          {[
-            {step:"01",title:"Find your next thing",info:"Explore categories, search for something specific and compare real listings.",symbol:"◎"},
-            {step:"02",title:"Talk things through",info:"Ask questions, discuss an offer or request rental dates when messaging is enabled.",symbol:"↗"},
-            {step:"03",title:"Make the exchange",info:"Arrange a safe handover. Buy, sell or borrow on your terms.",symbol:"↻"},
-          ].map(c=><article key={c.step} className="ux-how-card">
-            <span className="ux-how-step">{c.step}</span><span className="ux-how-symbol" aria-hidden="true">{c.symbol}</span>
-            <h3>{c.title}</h3><p>{c.info}</p>
-          </article>)}
-        </div>
-      </div>
-    </section>
-
-    <section className="ux-section ux-last-section ux-shell">
-      <div className="ux-last-panel">
-        <div><p className="ux-kicker">YOUR NEXT CHAPTER STARTS HERE</p>
-          <h2>Something sitting unused? <em>Give it a new life.</em></h2>
-          <p>When your account is ready, create a listing to sell or lend.</p></div>
-        <div className="ux-last-actions">
-          <Link href="/post" className="ux-last-primary">Sell an item <ExperienceIcon name="arrow" size={18}/></Link>
-          <Link href="/rent/post" className="ux-last-secondary">Rent out an item <ExperienceIcon name="arrow" size={18}/></Link>
-        </div>
-      </div>
-    </section>
-  </>;
+    </div>
+  </div>;
 }

@@ -8,7 +8,7 @@ export const dynamic="force-dynamic";
 export const metadata:Metadata={title:"My rental items",robots:{index:false}};
 export default async function MyRentalsPage(){
  const result=await getMyRentalListings();
- return <WorkspaceShell eyebrow="YOUR LENDING ACTIVITY" title="Things you're lending."
+ return <WorkspaceShell eyebrow="YOUR LENDING ACTIVITY" title="Rental listings"
    description="The useful things you share deserve a thoughtful home."
    action={{href:"/rent/post",label:"Rent out an item"}}>
    {result.kind==="ready"&&result.items.length?

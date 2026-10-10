@@ -39,7 +39,7 @@ export function RentalResults({result}:{result:RentalResult}){
     <h3>{result.kind==="login"?"Your next rental starts with your account":
       result.kind==="not_eligible"?"Marketplace access isn't available for this account":
       "Rental discovery is not connected yet"}</h3>
-    <p>Only verified real listings appear here. No placeholder inventory is shown.</p>
+    <p>Sign in with approved access to browse rentals in your marketplace.</p>
     <Link href="/account" className="text-link">Account →</Link>
   </section>;
   if(!result.items.length)return <section className="feed-notice">

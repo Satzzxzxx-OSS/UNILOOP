@@ -1,5 +1,8 @@
 "use client";
 
+import {Button} from "@/components/spaceui/button";
+import {Input} from "@/components/spaceui/input";
+
 import { useState, type FormEvent } from "react";
 import { browserSupabase } from "@/lib/supabase/browser";
 
@@ -48,7 +51,7 @@ export function EmailSignIn() {
   return (
     <form className="auth-form" onSubmit={submit}>
       <label htmlFor="email-sign-in">Email address</label>
-      <input
+      <Input nativeInput unstyled
         type="email"
         id="email-sign-in"
         name="email"
@@ -60,18 +63,18 @@ export function EmailSignIn() {
         disabled={working || sent}
         placeholder="you@example.com"
       />
-      <button type="submit" className="button button-dark" disabled={working || sent}>
+      <Button type="submit" className="button button-dark" disabled={working || sent}>
         {working ? "Sending…" : sent ? "Email requested" : "Email me a sign-in link"}
-      </button>
+      </Button>
       <p className="auth-feedback" role="status" aria-live="polite">{message}</p>
       {sent && (
-        <button
+        <Button
           type="button"
           className="text-link auth-reset"
           onClick={() => { setSent(false); setMessage(""); }}
         >
           Use a different email
-        </button>
+        </Button>
       )}
     </form>
   );

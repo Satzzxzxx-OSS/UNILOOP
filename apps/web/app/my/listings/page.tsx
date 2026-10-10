@@ -7,7 +7,7 @@ export const dynamic="force-dynamic";
 export const metadata:Metadata={title:"My listings",robots:{index:false}};
 export default async function MyListingsPage(){
  const result=await getMyListings();
- return <WorkspaceShell eyebrow="YOUR MARKETPLACE" title="Things you're sharing."
+ return <WorkspaceShell eyebrow="YOUR MARKETPLACE" title="My listings"
     description="One thoughtful place for your drafts, available items and finished listings."
     action={{href:"/post",label:"List another item"}}>
    {result.kind==="ready"&&result.items.length?

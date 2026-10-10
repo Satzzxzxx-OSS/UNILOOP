@@ -11,7 +11,7 @@ const money=(n:number)=>new Intl.NumberFormat("en-IN",{
 }).format(n);
 export default async function RentalsPage(){
  const result=await getRentalBookings();
- return <WorkspaceShell eyebrow="YOUR RENTAL JOURNEY" title="Borrowed and shared."
+ return <WorkspaceShell eyebrow="YOUR RENTAL JOURNEY" title="Rental activity"
    description="Real requests, confirmed dates, handovers and returns in one place."
    action={{href:"/explore?mode=rent",label:"Explore rentals"}}>
    {result.kind==="ready"&&result.items.length?

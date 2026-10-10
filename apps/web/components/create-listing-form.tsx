@@ -1,5 +1,9 @@
 "use client";
 
+import {Button} from "@/components/spaceui/button";
+import {Input} from "@/components/spaceui/input";
+import {Textarea} from "@/components/spaceui/textarea";
+
 import { useActionState } from "react";
 import { categories } from "@/lib/catalog";
 import { createListingDraft, type ActionState } from "@/lib/listings/actions";
@@ -10,7 +14,7 @@ export function CreateListingForm() {
   const [state, action, pending] = useActionState(createListingDraft, initialState);
   return <form action={action} className="post-form">
     <div className="form-field"><label htmlFor="item-title">Item title</label>
-      <input id="item-title" name="title" required minLength={8} maxLength={120}
+      <Input nativeInput unstyled id="item-title" name="title" required minLength={8} maxLength={120}
         placeholder="e.g. Used calculus textbook, 3rd edition" /></div>
     <div className="form-field"><label htmlFor="item-category">Category</label>
       <select id="item-category" name="category" required defaultValue="">
@@ -23,15 +27,15 @@ export function CreateListingForm() {
         <option value="good">Good</option><option value="fair">Fair</option>
       </select></div>
     <div className="form-field"><label htmlFor="item-price">Asking price (INR)</label>
-      <input id="item-price" name="price" inputMode="numeric"
+      <Input nativeInput unstyled id="item-price" name="price" inputMode="numeric"
         type="number" min={1} max={10000000} step={1} required placeholder="e.g. 700"/></div>
     <div className="form-field"><label htmlFor="item-description">Description</label>
-      <textarea id="item-description" name="description" minLength={20} maxLength={5000}
+      <Textarea unstyled id="item-description" name="description" minLength={20} maxLength={5000}
         rows={6} required placeholder="Describe the item, its condition and what's included." /></div>
     <p className="form-helper">Save as a draft first. Photo uploads and additional protection tools are in progress. Posting never counts as published until you explicitly publish the listing.</p>
-    <button type="submit" className="button button-dark" disabled={pending}>
+    <Button type="submit" className="button button-dark" disabled={pending}>
       {pending ? "Saving…" : "Save draft"}
-    </button>
+    </Button>
     <p className="auth-feedback" role="status" aria-live="polite">{state.message}</p>
   </form>;
 }
