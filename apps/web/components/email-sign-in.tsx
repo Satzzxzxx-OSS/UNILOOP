@@ -8,7 +8,7 @@ import {browserSupabase} from "@/lib/supabase/browser";
 
 /** Both forms use the real Supabase email provider. No simulated success
  * state or password/social provider is presented to the user. */
-export function EmailSignIn({intent="signin"}:{intent?:"signin"|"signup"}) {
+export function EmailSignIn({intent="signin",configured=true}:{intent?:"signin"|"signup";configured?:boolean}) {
   const [email,setEmail]=useState("");
   const [deliveredEmail,setDeliveredEmail]=useState("");
   const [working,setWorking]=useState(false);
@@ -24,6 +24,7 @@ export function EmailSignIn({intent="signin"}:{intent?:"signin"|"signup"}) {
 
   async function requestLink(rawEmail:string) {
     if(working)return;
+    if(!configured){setMessage("Sign-in will be available after the secure account service is connected.");return;}
     const normalized=rawEmail.trim().toLowerCase();
     setWorking(true);
     setMessage("");
@@ -86,7 +87,7 @@ export function EmailSignIn({intent="signin"}:{intent?:"signin"|"signup"}) {
         required disabled={working} placeholder="you@example.com" aria-describedby="un-auth-input-hint"/>
     </div>
     <p id="un-auth-input-hint" className="un-auth-method-hint"><LockKeyhole size={14}/> Secure email link, no password needed.</p>
-    <Button type="submit" className="un-auth-submit" loading={working} disabled={working}>
+    <Button type="submit" className="un-auth-submit" loading={working} disabled={working||!configured}>
       {working?"Sending secure link…":intent==="signup"?"Create account by email":"Email me a sign-in link"}
       {!working&&<ArrowRight size={17} aria-hidden="true"/>}
     </Button>
