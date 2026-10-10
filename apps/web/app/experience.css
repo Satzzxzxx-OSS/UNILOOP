@@ -695,3 +695,21 @@ body:has(.ux-hero) {background:#fffefd}
  .ux-settings-card{padding:23px 19px}
 }
 @media(prefers-reduced-motion:reduce){.ux-account-link{transition:none}.ux-account-link:hover{transform:none}}
+
+
+/* Activity rail: real persisted notifications, never a fabricated unread count. */
+.ux-notification-controls{display:flex;justify-content:flex-end;align-items:center;margin-bottom:20px}
+.ux-activity-list{display:grid;gap:12px;max-width:940px}
+.ux-activity{display:flex;align-items:center;gap:16px;min-height:104px;padding:18px 22px;border:1px solid #e4e9e9;border-radius:19px;background:#fff}
+.ux-activity-new{background:#fffaf0;border-color:#ebd6b2}
+.ux-activity-symbol{display:grid;place-items:center;flex:none;background:#f0f2ee;border-radius:15px;color:#ae7f3a;font-size:26px;width:51px;height:51px}
+.ux-activity-description{display:grid;gap:6px;flex:1;min-width:0}
+.ux-activity-description small{text-transform:uppercase;letter-spacing:.12em;font-weight:850;font-size:10px;color:#a57941}
+.ux-activity-description a strong{font-size:15px;color:#223b56;overflow-wrap:anywhere}
+.ux-activity-description a:hover{text-decoration:underline}
+.ux-activity-description time{font-size:11px;color:#8995a6}
+.ux-activity-footnote{font-size:11px;color:#8a97a6;margin-top:22px}
+.ux-activity .notification-read-form{display:grid;gap:5px}
+.ux-activity .notification-read-form p{margin:0;max-width:180px;font-size:11px;color:#a45d40}
+.ux-activity .notification-read-form button,.ux-notification-controls button{background:transparent;border:0;font-size:12px;font-weight:850;color:#49718a;text-decoration:underline;cursor:pointer}
+@media(max-width:680px){.ux-activity{padding:14px;min-height:92px;gap:10px;border-radius:15px;flex-wrap:wrap}.ux-activity-symbol{height:41px;width:41px;font-size:20px}.ux-activity-description a strong{font-size:13px}}
