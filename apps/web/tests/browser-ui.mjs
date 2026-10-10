@@ -34,7 +34,7 @@ try{
   await page.getByRole('button',{name:'How do I get into my workspace?'}).click();
   assert.equal(await page.getByRole('button',{name:'How do I get into my workspace?'}).getAttribute('aria-expanded'),'true');
   await page.getByRole('link',{name:'Create your account',exact:true}).click();
-  await page.waitForURL(/\/account\?mode=signup/);
+  await page.waitForURL(/\/signup/);
   assert.equal(await page.getByRole('link',{name:'Create account',exact:true}).getAttribute('aria-current'),'page');
   assert(await page.getByText('Sign-in will be available after the secure account service is connected.').isVisible());
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Account overflow at '+width);
