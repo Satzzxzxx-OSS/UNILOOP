@@ -71,6 +71,7 @@ try{
     await page.getByRole("tab",{name:"For rent",exact:true}).click();
     assert(await page.getByRole("tabpanel").getByRole("heading",{name:"Rental discovery is not connected yet"}).isVisible(),"Rental tab displays the existing rental state");
     await page.getByRole("tab",{name:"For sale",exact:true}).click();
+    await page.evaluate(()=>window.scrollTo({top:0,left:0,behavior:"instant"}));
     await page.screenshot({path:path.join(output,"home-"+width+".png"),fullPage:true,animations:"disabled"});
     assert.deepEqual(errors,[],"JS page errors at "+width);
     await page.close();
