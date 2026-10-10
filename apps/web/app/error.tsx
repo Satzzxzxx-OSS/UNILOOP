@@ -11,7 +11,7 @@ export default function ErrorPage({error,reset}:{error:Error & {digest?:string};
  },[error]);
  return <section className="ux-shell ux-not-found" role="alert">
    <span className="ux-404-mark" aria-hidden="true">✳</span>
-   <p className="ux-kicker">THAT DIDN'T LOAD AS EXPECTED</p>
+   <p className="ux-kicker">THAT DIDN&apos;T LOAD AS EXPECTED</p>
    <h1>Let&apos;s try <em>that again.</em></h1>
    <p>Something interrupted this page. Your action may not have completed.</p>
    <div className="ux-error-actions">
