@@ -1,6 +1,6 @@
 import type {Metadata} from "next";
 import Link from "next/link";
-import {EmailSignIn} from "@/components/email-sign-in";
+import {AuthExperience} from "@/components/auth/auth-experience";
 import {AccountSignOut} from "@/components/account-sign-out";
 import {verifiedIdentity} from "@/lib/auth/session";
 import {ExperienceIcon} from "@/components/experience/experience-header";
@@ -13,36 +13,7 @@ export default async function AccountPage({searchParams}:{
  const params=await searchParams;
  const signup=params.mode==="signup";
  const {client,user}=await verifiedIdentity();
- if(!client||!user){
-   return <div className="ux-account-page">
-     <div className="ux-shell ux-account-layout">
-       <div className="ux-account-intro">
-         <span className="ux-account-orb" aria-hidden="true"><span>U</span></span>
-         <p className="ux-kicker">ONE ACCOUNT. ALL THE POSSIBILITIES.</p>
-         <h1>Your account</h1>
-         <p>Find what you need, pass on what you don&apos;t and borrow the rest.
-            A simpler, more thoughtful way to stay in the loop.</p>
-         <div className="ux-account-benefits">
-           <span><ExperienceIcon name="shield" size={19}/> Carefully designed private account access</span>
-           <span><ExperienceIcon name="heart" size={19}/> Your saved items and messages, in one place</span>
-         </div>
-       </div>
-       <section className="ux-account-card">
-         <div className="ux-account-card-icon"><ExperienceIcon name="user" size={26}/></div>
-         <p className="ux-kicker">{signup?"JOIN THE LOOP":"WELCOME BACK"}</p>
-         <h2>{client?(signup?"Your next chapter starts here.":"Continue to your loop."):"We’re getting things ready."}</h2>
-         <p>{client?(signup?"Create your account with an email verification link. Marketplace access depends on your campus eligibility.":"Enter your email to receive a secure sign-in link."):
-           "Sign-in will be available after the secure account service is connected."}</p>
-         {params.error==="link"&&<p className="auth-error" role="alert">This sign-in link is invalid or has expired.</p>}
-         {params.reason==="signin"&&<p className="ul-account-required">Sign in or create an account to enter your workspace.</p>}
-         <nav className="ul-auth-intents" aria-label="Account access"><Link href="/account?mode=signup" aria-current={signup?"page":undefined}>Create account</Link><Link href="/account" aria-current={!signup?"page":undefined}>Sign in</Link></nav>
-         {client?<EmailSignIn key={signup?"signup":"signin"} intent={signup?"signup":"signin"}/>:
-           <Link href="/" className="ux-workspace-action">Learn about UNILOOP <ExperienceIcon name="arrow" size={18}/></Link>}
-         <p className="ux-account-footnote">Never share verification codes or passwords with anyone.</p>
-       </section>
-     </div>
-   </div>;
- }
+ if(!client||!user) return <AuthExperience intent={signup?"signup":"signin"} configured={Boolean(client)} error={params.error} reason={params.reason}/>;
  const [{data:profile},{data:scopes}]=await Promise.all([
   client.from("profiles").select("display_name,account_status").eq("id",user.id).maybeSingle(),
   client.from("campuses").select("id").limit(1),
