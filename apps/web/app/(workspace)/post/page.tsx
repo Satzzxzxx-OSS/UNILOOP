@@ -11,7 +11,7 @@ export default async function PostPage(){
   const ready=context.kind==="ready"&&process.env.ENABLE_MARKETPLACE_WRITES==="true";
   return <div className="ux-post-page">
     <div className="ux-shell">
-      <nav aria-label="Breadcrumb" className="ux-breadcrumb"><Link href="/">Home</Link>
+      <nav aria-label="Breadcrumb" className="ux-breadcrumb"><Link href="/dashboard">Home</Link>
         <span>›</span><Link href="/explore">Marketplace</Link><span>›</span> Sell</nav>
       <div className="ux-post-mode" aria-label="Choose listing type">
         <Link className="ux-post-mode-active" aria-current="page" href="/post">Sell an item</Link>

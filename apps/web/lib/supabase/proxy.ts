@@ -1,10 +1,17 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { isWorkspacePath } from "@/lib/auth/routes";
 import { supabasePublicConfig } from "@/lib/supabase/config";
 
 export async function refreshSupabaseSession(request: NextRequest) {
   const config = supabasePublicConfig();
-  if (!config) return NextResponse.next({ request });
+  function requireSignIn(){
+    const url=new URL("/account?reason=signin",request.url);
+    const denied=NextResponse.redirect(url,307);
+    denied.headers.set("Cache-Control","private, no-store");
+    return denied;
+  }
+  if (!config) return isWorkspacePath(request.nextUrl.pathname)?requireSignIn():NextResponse.next({ request });
 
   let response = NextResponse.next({ request });
   const supabase = createServerClient(config.url, config.publishableKey, {
@@ -24,7 +31,12 @@ export async function refreshSupabaseSession(request: NextRequest) {
   });
 
   // Trust verified claims, never the unvalidated getSession() cookie payload.
-  await supabase.auth.getClaims();
+  const {data,error}=await supabase.auth.getClaims();
+  if(isWorkspacePath(request.nextUrl.pathname)&&(error||!data?.claims?.sub)){
+    const denied=requireSignIn();
+    for(const cookie of response.cookies.getAll())denied.cookies.set(cookie);
+    return denied;
+  }
   response.headers.set("Cache-Control", "private, no-store");
   return response;
 }

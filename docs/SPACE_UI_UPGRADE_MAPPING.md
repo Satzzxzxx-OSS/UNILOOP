@@ -1,3 +1,5 @@
+> Follow-up: PR #5 was merged. The new landing/auth workflow work is tracked in `docs/UNILOOP_FRONTEND_CONTINUITY.md`; `/` is now the public entry and the preserved overview lives at `/dashboard`.
+
 # UNILOOP — Space UI upgrade mapping
 
 Reviewed on 2026-10-10. Branch: `feat/space-ui-polish-v4`. Starts from the light palette in PR #4 and targets main as a complete replacement review. No backend, schema, data access, feature flags, dependencies, lockfile, or account permissions change.

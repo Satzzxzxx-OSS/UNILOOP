@@ -33,7 +33,7 @@ export default async function SaleDetail({params}:{params:Promise<{id:string}>})
  const category=categories.find(c=>c.slug===listing.category_slug);
  return <article className="ux-shell ux-detail-page">
    <nav className="ux-breadcrumb" aria-label="Breadcrumb">
-     <Link href="/">Home</Link><span>›</span>
+     <Link href="/dashboard">Home</Link><span>›</span>
      <Link href="/explore?mode=buy">Buy</Link><span>›</span>
      <Link href={"/explore?mode=buy&category="+listing.category_slug}>{category?.label??"Category"}</Link>
    </nav>

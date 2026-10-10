@@ -24,6 +24,6 @@ test("email confirmation checks hash format and never accepts redirect urls", ()
   assert.equal(isValidEmailTokenHash("../../../etc/passwd"), false);
   assert.equal(isValidEmailTokenHash(""), false);
   assert.equal(isValidEmailTokenHash("x".repeat(500)), false);
-  assert.equal(AUTH_SUCCESS_PATH, "/account");
+  assert.equal(AUTH_SUCCESS_PATH, "/dashboard");
   assert.equal(AUTH_FAILURE_PATH, "/account?error=link");
 });

@@ -39,16 +39,30 @@ export function ExperienceIcon({ name, size = 20 }: {name: Glyph; size?:number})
 }
 
 const dockItems=[
-  {label:"Home",href:"/",icon:"home" as Glyph},
+  {label:"Home",href:"/dashboard",icon:"home" as Glyph},
   {label:"Explore",href:"/explore",icon:"grid" as Glyph},
   {label:"List",href:"/post",icon:"plus" as Glyph},
   {label:"Saved",href:"/saved",icon:"heart" as Glyph},
   {label:"Inbox",href:"/inbox",icon:"chat" as Glyph},
 ];
 
+function workspaceTitle(pathname:string){
+ if(pathname==="/dashboard")return "Overview";
+ if(pathname.startsWith("/explore"))return "Marketplace";
+ if(pathname==="/post")return "Create sale listing";
+ if(pathname==="/rent/post")return "Create rental listing";
+ if(pathname.startsWith("/listing/"))return "Item details";
+ if(pathname.startsWith("/inbox/"))return "Conversation";
+ if(pathname.startsWith("/rentals/"))return "Rental booking";
+ if(pathname.startsWith("/transactions/"))return "Sale exchange";
+ if(pathname.startsWith("/report/"))return "Report details";
+ if(pathname.startsWith("/rent/")&&pathname!=="/rent/my")return "Rental item";
+ return sidebarGroups.flatMap(g=>g.items).find(i=>i.href===pathname)?.label??"Your loop";
+}
+
 const sidebarGroups=[
   {label:"Marketplace",items:[
-    {label:"Overview",href:"/",icon:"home" as Glyph},
+    {label:"Overview",href:"/dashboard",icon:"home" as Glyph},
     {label:"Buy",href:"/explore?mode=buy",icon:"bag" as Glyph},
     {label:"Rent",href:"/explore?mode=rent",icon:"key" as Glyph},
     {label:"Saved items",href:"/saved",icon:"heart" as Glyph},
@@ -76,7 +90,7 @@ function DesktopNavigation({pathname,onNavigate}:{pathname:string;onNavigate?:()
     {sidebarGroups.map(group=><section key={group.label}>
       <h2>{group.label}</h2>
       {group.items.map(item=>{
-        const selected=item.href===active||(item.href!=="/"&&!item.href.includes("?")&&active.startsWith(item.href+"/"));
+        const selected=item.href===active||(item.href!=="/dashboard"&&!item.href.includes("?")&&active.startsWith(item.href+"/"));
         return <Link key={item.href} href={item.href} onClick={onNavigate} aria-current={selected?"page":undefined}>
           <ExperienceIcon name={item.icon} size={17}/><span>{item.label}</span>
         </Link>;
@@ -126,9 +140,9 @@ export function ExperienceHeader({identity="Your account",subtitle="Personal mar
   },[]);
   return <TooltipProvider delay={400}>
     <aside className="ul-sidebar" aria-label="Workspace sidebar">
-      <Link href="/" className="ul-sidebar-brand" aria-label="UNILOOP overview"><span className="ul-monogram">U</span><strong>UNILOOP</strong><span className="ul-brand-tag">Workspace</span></Link>
+      <Link href="/dashboard" className="ul-sidebar-brand" aria-label="UNILOOP overview"><span className="ul-monogram">U</span><strong>UNILOOP</strong><span className="ul-brand-tag">Workspace</span></Link>
       <Button variant="ghost" className="ul-sidebar-search" type="button" aria-label="Open workspace search" onClick={openSearch}><ExperienceIcon name="search" size={16}/><span>Search marketplace</span><kbd>⌘ / Ctrl K</kbd></Button>
-      <Suspense fallback={<nav className="ul-sidebar-nav" aria-label="Main navigation"><Link href="/">Overview</Link></nav>}><DesktopNavigation pathname={pathname}/></Suspense>
+      <Suspense fallback={<nav className="ul-sidebar-nav" aria-label="Main navigation"><Link href="/dashboard">Overview</Link></nav>}><DesktopNavigation pathname={pathname}/></Suspense>
       <div className="ul-sidebar-bottom">
         <Link href="/post" className="ul-sidebar-create"><ExperienceIcon name="plus" size={17}/>Create listing</Link>
         <details ref={accountMenuRef} className="ul-account-menu">
@@ -139,11 +153,11 @@ export function ExperienceHeader({identity="Your account",subtitle="Personal mar
     </aside>
     <header className="ux-header">
       <div className="ux-shell ux-header-inner">
-        <Link className="ux-brand" href="/" aria-label="UNILOOP home">
+        <Link className="ux-brand" href="/dashboard" aria-label="UNILOOP home">
           <span className="ux-brand-symbol" aria-hidden="true"><i/><i/><b/></span>
           <span>uni<span>loop</span><sup>™</sup></span>
         </Link>
-        <div className="ul-header-context"><span>Workspace</span><span aria-hidden="true">/</span><strong>{pathname==="/"?"Overview":pathname.startsWith("/explore")?"Marketplace":sidebarGroups.flatMap(g=>g.items).find(i=>i.href===pathname)?.label??"Your loop"}</strong></div>
+        <div className="ul-header-context"><span>Workspace</span><span aria-hidden="true">/</span><strong>{workspaceTitle(pathname)}</strong></div>
         <div className="ux-header-controls">
           <Button variant="ghost" className="ux-icon-button ux-global-search" type="button"
             aria-label="Open item search" aria-controls="ux-global-search-panel" aria-expanded={searchOpen}
@@ -171,7 +185,7 @@ export function ExperienceHeader({identity="Your account",subtitle="Personal mar
           <NavigationDialog.Description className="ul-mobile-sidebar-description">Your marketplace workspace</NavigationDialog.Description>
           <Button variant="ghost" className="ul-sidebar-search" type="button" onClick={openSearch}><ExperienceIcon name="search" size={16}/><span>Search marketplace</span></Button>
           <nav aria-label="More navigation" className="ul-mobile-sidebar-content">
-            <Suspense fallback={<Link href="/" onClick={()=>setMenuOpen(false)}>Overview</Link>}><DesktopNavigation pathname={pathname} onNavigate={()=>setMenuOpen(false)}/></Suspense>
+            <Suspense fallback={<Link href="/dashboard" onClick={()=>setMenuOpen(false)}>Overview</Link>}><DesktopNavigation pathname={pathname} onNavigate={()=>setMenuOpen(false)}/></Suspense>
             <div className="ul-mobile-sidebar-account"><Link href="/account" onClick={()=>setMenuOpen(false)}><ExperienceIcon name="user" size={18}/><span><strong>{identity}</strong><small>{subtitle}</small></span></Link></div>
           </nav>
           <div className="ul-mobile-sidebar-actions">
@@ -184,7 +198,7 @@ export function ExperienceHeader({identity="Your account",subtitle="Personal mar
     <WorkspaceSearch open={searchOpen} onOpenChange={setSearchOpen} onClosed={()=>{if(searchOrigin.current?.isConnected)searchOrigin.current.focus();else menuToggleRef.current?.focus();}}/>
     <nav aria-label="Quick mobile navigation" className="ux-bottom-dock">
       {dockItems.map(item=><Link key={item.label} href={item.href}
-        aria-current={item.href==="/"&&pathname==="/"||item.href!=="/"&&pathname.startsWith(item.href)?"page":undefined}
+        aria-current={item.href==="/dashboard"&&pathname==="/dashboard"||item.href!=="/dashboard"&&pathname.startsWith(item.href)?"page":undefined}
         className={item.label==="List"?"ux-dock-post":""}>
         <ExperienceIcon name={item.icon} size={22}/><span>{item.label}</span>
       </Link>)}

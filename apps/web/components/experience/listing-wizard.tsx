@@ -4,6 +4,7 @@ import {Button} from "@/components/spaceui/button";
 import {Input} from "@/components/spaceui/input";
 import {Textarea} from "@/components/spaceui/textarea";
 
+import {LuminousBorder} from "@/components/spaceui/luminous-border";
 import {Progress} from "@/components/spaceui/progress";
 import Link from "next/link";
 import {useRouter} from "next/navigation";
@@ -147,7 +148,7 @@ export function ExperienceListingWizard({mode,backendReady}:{
           <p className="ux-form-step-kicker">02 — SHOW IT OFF</p>
           <h2 id="ux-wizard-step-title">Let the item speak.</h2>
           <p className="ux-form-explanation">Clear photos build confidence. The first one becomes your cover.</p>
-          <label className={"ux-photo-drop"+(dragActive?" ux-drag-active":"")} htmlFor="ux-photo-picker"
+          <LuminousBorder colorVariant="ocean" borderRadius={20} staticColors className="ul-photo-border"><label className={"ux-photo-drop"+(dragActive?" ux-drag-active":"")} htmlFor="ux-photo-picker"
             onDragOver={event=>{event.preventDefault();setDragActive(true);}}
             onDragLeave={event=>{if(!event.currentTarget.contains(event.relatedTarget as Node|null))setDragActive(false);}}
             onDrop={event=>{event.preventDefault();setDragActive(false);acceptPhotoFiles([...event.dataTransfer.files]);}}>
@@ -158,7 +159,7 @@ export function ExperienceListingWizard({mode,backendReady}:{
             <span>JPEG, PNG or WebP · max 5 MB each</span>
             <input id="ux-photo-picker" type="file" accept="image/jpeg,image/png,image/webp"
               multiple onChange={handlePhotoFiles}/>
-          </label>
+          </label></LuminousBorder>
           <div className="ux-photo-preview-grid">
             {photos.map((photo,index)=><div className="ux-photo-preview" key={photo.id}>
               {/* URLs are local object URLs generated only from user-selected images. */}
@@ -206,7 +207,10 @@ export function ExperienceListingWizard({mode,backendReady}:{
           <h2 id="ux-wizard-step-title">Looking good. One more check.</h2>
           <p className="ux-form-explanation">Here&apos;s the preview of the information you&apos;ve entered.</p>
           <div className="ux-draft-review">
-            <span className="ux-draft-review-photo">{photos.length?"Selected cover ready":"Photo not selected"}</span>
+            {photos[0]?<>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img className="ul-review-cover" src={photos[0].url} alt="Your selected listing cover preview"/>
+            </>:<span className="ux-draft-review-photo">Photo not selected</span>}
             <p className="ux-kicker">{draft.category?categories.find(c=>c.slug===draft.category)?.label:"Category missing"}</p>
             <h3>{draft.title||"Your item title"}</h3>
             <strong>{priceValue>0?currency.format(priceValue):"Price not set"}{rental?" / day":""}</strong>
@@ -218,6 +222,7 @@ export function ExperienceListingWizard({mode,backendReady}:{
               <div><dt>Photo previews</dt><dd>{photos.length}</dd></div>
             </dl>
           </div>
+          <div className="ul-wizard-next-stage"><strong>What happens next</strong><p>Save your draft, upload the real photos from its detail page, then publish when your account access and listing requirements allow it. Local photo previews are not included in this draft submission.</p></div>
           {backendReady?
             <form action={action} className="ux-final-submit">
               <input type="hidden" name="title" value={draft.title}/>
@@ -245,7 +250,7 @@ export function ExperienceListingWizard({mode,backendReady}:{
         {warning&&<p className="ux-form-warning" role="alert">{warning}</p>}
         {step<3&&<div className="ux-form-footer">
           <Button type="button" className="ux-wizard-secondary"
-            onClick={()=>{if(step===0)router.push("/");else{setStep(n=>n-1);setWarning("");}}}>
+            onClick={()=>{if(step===0)router.push("/dashboard");else{setStep(n=>n-1);setWarning("");}}}>
             {step===0?"Cancel":"Back"}
           </Button>
           <Button type="button" className="ux-wizard-primary" onClick={handleNext}>

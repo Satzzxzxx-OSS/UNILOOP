@@ -25,7 +25,7 @@ export default async function RentalDetail({params}:{params:Promise<{id:string}>
  const category=categories.find(c=>c.slug===item.category_slug);
  return <article className="ux-shell ux-detail-page">
    <nav aria-label="Breadcrumb" className="ux-breadcrumb">
-     <Link href="/">Home</Link><span>›</span><Link href="/explore?mode=rent">Rent</Link>
+     <Link href="/dashboard">Home</Link><span>›</span><Link href="/explore?mode=rent">Rent</Link>
      <span>›</span><span>{category?.label??"Rental"}</span>
    </nav>
    <div className="ux-detail-grid">

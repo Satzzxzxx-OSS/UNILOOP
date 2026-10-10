@@ -11,7 +11,7 @@ const appRoot = fileURLToPath(new URL("../", import.meta.url));
 const nextScript = path.join(appRoot, "node_modules/next/dist/bin/next");
 const port = 3177;
 const base = "http://127.0.0.1:" + port;
-const server = spawn(process.execPath, [nextScript, "start", "-p", String(port)], {
+const server = spawn(process.execPath, [nextScript, "start", "-p", String(port),"-H","127.0.0.1"], {
   cwd: appRoot,
   env: {
     ...process.env,
@@ -43,11 +43,9 @@ try {
   if (!ready) throw new Error("Next server not reachable: " + serverOutput);
 
   const pages = [
-    ["/",200],["/explore?mode=buy",200],["/explore?mode=rent",200],
-    ["/account",200],["/post",200],["/saved",200],["/settings",200],
-    ["/inbox",200],["/offers",200],["/rent/post",200],
-    ["/rentals",200],["/transactions",200],["/notifications",200],
-    ["/admin/reports",404],["/rent/not-a-uuid",404],
+    ["/",200],["/account",200],["/account?mode=signup",200],["/help",200],["/safety",200],
+    ...["/dashboard","/explore?mode=buy","/explore?mode=rent","/post","/saved","/settings","/inbox","/offers","/rent/post","/rentals","/transactions","/notifications","/my/listings","/rent/my","/listing/not-a-uuid","/rent/not-a-uuid"].map(route=>[route,307]),
+    ["/admin/reports",404],
   ];
   for(const [route,expected] of pages){
     const response = await fetch(base + route, {redirect:"manual"});
@@ -55,6 +53,7 @@ try {
     assert.equal(response.headers.get("x-content-type-options"),"nosniff");
     assert.equal(response.headers.get("x-frame-options"),"DENY");
     assert.equal(response.headers.get("referrer-policy"),"no-referrer");
+    if(expected===307){assert.equal(new URL(response.headers.get("location"),base).pathname,"/account");assert.match(response.headers.get("cache-control"),/no-store/);}
     if(expected===200){
       const html = await response.text();
       assert.match(html,/UNILOOP|UNI/,"Expected brand/page chrome at "+route);

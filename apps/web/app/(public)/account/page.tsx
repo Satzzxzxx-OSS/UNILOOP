@@ -2,18 +2,17 @@ import type {Metadata} from "next";
 import Link from "next/link";
 import {EmailSignIn} from "@/components/email-sign-in";
 import {AccountSignOut} from "@/components/account-sign-out";
-import {serverSupabase} from "@/lib/supabase/server";
+import {verifiedIdentity} from "@/lib/auth/session";
 import {ExperienceIcon} from "@/components/experience/experience-header";
 
 export const dynamic="force-dynamic";
 export const metadata:Metadata={title:"Your account",robots:{index:false,follow:false}};
 export default async function AccountPage({searchParams}:{
- searchParams:Promise<{error?:string}>;
+ searchParams:Promise<{error?:string;mode?:string;reason?:string}>;
 }){
  const params=await searchParams;
- const client=await serverSupabase();
- const result=client?await client.auth.getUser():null;
- const user=result?.data.user??null;
+ const signup=params.mode==="signup";
+ const {client,user}=await verifiedIdentity();
  if(!client||!user){
    return <div className="ux-account-page">
      <div className="ux-shell ux-account-layout">
@@ -30,13 +29,15 @@ export default async function AccountPage({searchParams}:{
        </div>
        <section className="ux-account-card">
          <div className="ux-account-card-icon"><ExperienceIcon name="user" size={26}/></div>
-         <p className="ux-kicker">WELCOME BACK</p>
-         <h2>{client?"Continue to your loop.":"We’re getting things ready."}</h2>
-         <p>{client?"Use the email associated with your approved account to receive a sign-in link.":
+         <p className="ux-kicker">{signup?"JOIN THE LOOP":"WELCOME BACK"}</p>
+         <h2>{client?(signup?"Your next chapter starts here.":"Continue to your loop."):"We’re getting things ready."}</h2>
+         <p>{client?(signup?"Create your account with an email verification link. Marketplace access depends on your campus eligibility.":"Enter your email to receive a secure sign-in link."):
            "Sign-in will be available after the secure account service is connected."}</p>
          {params.error==="link"&&<p className="auth-error" role="alert">This sign-in link is invalid or has expired.</p>}
-         {client?<EmailSignIn/>:
-           <Link href="/explore" className="ux-workspace-action">Explore the marketplace <ExperienceIcon name="arrow" size={18}/></Link>}
+         {params.reason==="signin"&&<p className="ul-account-required">Sign in or create an account to enter your workspace.</p>}
+         <nav className="ul-auth-intents" aria-label="Account access"><Link href="/account?mode=signup" aria-current={signup?"page":undefined}>Create account</Link><Link href="/account" aria-current={!signup?"page":undefined}>Sign in</Link></nav>
+         {client?<EmailSignIn key={signup?"signup":"signin"} intent={signup?"signup":"signin"}/>:
+           <Link href="/" className="ux-workspace-action">Learn about UNILOOP <ExperienceIcon name="arrow" size={18}/></Link>}
          <p className="ux-account-footnote">Never share verification codes or passwords with anyone.</p>
        </section>
      </div>
@@ -57,7 +58,7 @@ export default async function AccountPage({searchParams}:{
       <div><strong>{user.email??"Email unavailable"}</strong>
         <span>{approved?"Marketplace access enabled":"Marketplace access not currently enabled"}</span>
       </div>
-      <AccountSignOut/>
+      <div className="ul-account-signed-actions"><Link className="ul-primary-action" href="/dashboard">Open your workspace <ExperienceIcon name="arrow" size={16}/></Link><AccountSignOut/></div>
     </div>
     <div className="ux-account-links">
       {[
