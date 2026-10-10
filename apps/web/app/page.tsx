@@ -7,6 +7,7 @@ import {discoverListings} from "@/lib/listings/data";
 import {discoverRentals} from "@/lib/rentals/data";
 import {ExperienceIcon} from "@/components/experience/experience-header";
 import {ExperienceSearch} from "@/components/experience/experience-search";
+import {Badge} from "@/components/spaceui/badge";
 
 export const dynamic="force-dynamic";
 
@@ -23,7 +24,7 @@ export default async function HomePage(){
           <p className="ux-hero-lede">Buy better. Sell effortlessly. Borrow for the moments that matter.
             One beautiful place to keep good things moving.</p>
           <ExperienceSearch/>
-          <div className="ux-hero-assurance">
+          <div className="ux-hero-assurance"><Badge variant="outline" className="ux-proof-badge">Buy · Sell · Rent · Rent out</Badge>
             <span><ExperienceIcon name="shield" size={18}/> Designed for thoughtful local exchanges</span>
           </div>
         </div>

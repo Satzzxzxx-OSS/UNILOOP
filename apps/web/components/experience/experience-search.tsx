@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ExperienceIcon } from "./experience-header";
+import {Button} from "@/components/spaceui/button";
 
 export function ExperienceSearch(){
   const [mode,setMode]=useState<"buy"|"rent">("buy");
@@ -27,7 +28,7 @@ export function ExperienceSearch(){
         <input id="ux-home-search" type="search" name="q" maxLength={100}
           placeholder={mode==="buy"?"Search books, devices, essentials...":"What would you like to borrow?"}/>
       </div>
-      <button type="submit" className="ux-search-submit">Explore <ExperienceIcon name="arrow" size={19}/></button>
+      <Button type="submit" size="xl" className="ux-search-submit">Explore <ExperienceIcon name="arrow" size={19}/></Button>
     </form>
     <div className="ux-search-hints">
       <span>Quick start</span>
