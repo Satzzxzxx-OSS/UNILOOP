@@ -1,0 +1,27 @@
+/* Requested visual emphasis: headings and existing card surfaces only. */
+body :is(h1, h2, h3, h4, h5, h6, [data-slot="card-title"],
+  .ul-metric-label, .ul-intent-row strong, .category-tile strong, .category-tile > span:nth-child(2),
+  .ul-feed-tabs [role="tab"], .ux-explore-switch a,
+  .ux-post-switch a, .ux-listing-switch a, .ux-wizard-steps strong) {
+  font-weight: 700 !important;
+}
+
+/* Explicit card inventory; never apply borders to arbitrary divs/sections. */
+body :is([data-slot="card"], [data-slot="card-frame"],
+  .category-tile, .listing-card, .ux-product-card, .ul-panel,
+  .ux-account-card, .ux-settings-card, .ux-private-card,
+  .ux-settings-panel, .ux-settings-aside, .ux-report-panel,
+  .ux-guide-panel, .ux-chat-panel, .ux-detail-info, .ux-workspace-thread,
+  .ux-filter-panel, .ux-workspace-empty, .feed-notice, .empty-state,
+  .ul-landing-art,
+  .ux-wizard-panel, .ux-wizard-tip-card, .ux-detail-action-panel,
+  .ux-guide-tile, .ux-guide-card, .ux-how-card, .ux-mode-card,
+  .offer-card, .rental-control-panel, .rental-note,
+  .ul-landing-safety, .ul-landing-final, .ul-landing-steps) {
+  border: 2px solid #171717 !important;
+}
+
+/* Keep existing dark authentication cards legible against their black surface. */
+.un-auth-shell.un-auth-v2 .un-v2-auth-card {
+  border-color: #e4e4e7 !important;
+}
