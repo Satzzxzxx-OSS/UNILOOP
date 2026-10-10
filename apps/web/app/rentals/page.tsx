@@ -1,34 +1,31 @@
 import type {Metadata} from "next";
 import Link from "next/link";
 import {getRentalBookings} from "@/lib/rentals/data";
+import {WorkspaceShell,WorkspaceEmpty} from "@/components/experience/workspace-shell";
+import {ExperienceIcon} from "@/components/experience/experience-header";
 
 export const dynamic="force-dynamic";
-export const metadata:Metadata={title:"My rentals and bookings",robots:{index:false}};
+export const metadata:Metadata={title:"Rental bookings",robots:{index:false}};
 const money=(n:number)=>new Intl.NumberFormat("en-IN",{
  style:"currency",currency:"INR",maximumFractionDigits:0,
 }).format(n);
-
-export default async function RentalsDashboard(){
-  const result=await getRentalBookings();
-  return <div className="container listings-dashboard">
-    <div className="section-heading">
-      <div><p className="eyebrow">RENTAL ACTIVITY</p><h1>Rental bookings</h1>
-        <p>View your own requests and items that others have asked to rent.</p></div>
-      <Link className="button button-dark" href="/explore?mode=rent">Explore rentals</Link>
-    </div>
-    {result.kind!=="ready"?<section className="feed-notice">
-      <h2>Bookings unavailable</h2><p>Sign in with an approved account to view rental activity.</p>
-      <Link href="/account" className="text-link">Account →</Link>
-    </section>:result.items.length?<div className="thread-list">{result.items.map(booking=>
-      <Link key={booking.id} href={"/rentals/"+booking.id} className="thread-link">
-        <span className="thread-indicator" aria-hidden="true">↻</span>
-        <span><strong>{money(booking.rental_total_inr)} estimated rental</strong>
-          <small>{booking.days_count} days · {booking.status}</small></span>
-        <span className="thread-arrow" aria-hidden="true">→</span>
-      </Link>)}</div>:
-      <section className="feed-notice"><h2>No rental bookings yet</h2>
-        <p>Your actual booking requests will show up here after submission.</p>
-        <Link className="text-link" href="/rent/my">My rental items →</Link>
-      </section>}
-  </div>;
+export default async function RentalsPage(){
+ const result=await getRentalBookings();
+ return <WorkspaceShell eyebrow="YOUR RENTAL JOURNEY" title="Borrowed and shared."
+   description="Real requests, confirmed dates, handovers and returns in one place."
+   action={{href:"/explore?mode=rent",label:"Explore rentals"}}>
+   {result.kind==="ready"&&result.items.length?
+     <div className="ux-workspace-threads">{result.items.map(item=>
+       <Link href={"/rentals/"+item.id} key={item.id} className="ux-workspace-thread">
+         <span className="ux-workspace-thread-icon">↻</span>
+         <span><strong>{money(item.rental_total_inr)} rental estimate</strong>
+           <small>{item.days_count} days · {item.status.replaceAll("_"," ")}</small></span>
+         <span className="ux-workspace-thread-arrow"><ExperienceIcon name="arrow" size={18}/></span>
+       </Link>)}</div>:
+     <WorkspaceEmpty kind={result.kind!=="ready"?"auth":"neutral"}
+       title="Your rental story begins here."
+       description="When genuine booking requests are recorded, you can follow them here from approval through return."
+       action={{href:result.kind==="ready"?"/explore?mode=rent":"/account",
+         label:result.kind==="ready"?"Discover rentals":"Go to account"}}/>}
+ </WorkspaceShell>;
 }

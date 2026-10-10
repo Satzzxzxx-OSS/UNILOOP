@@ -1,0 +1,33 @@
+name: Resolve free Space UI dependencies
+on:
+  push:
+    branches:
+      - feat/space-ui-frontend-v2
+    paths:
+      - .github/workflows/spaceui-deps.yml
+permissions:
+  contents: read
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Resolve audited free frontend runtime dependencies
+        run: pnpm --filter @uniloop/web add @base-ui/react class-variance-authority lucide-react motion
+      - name: Export reproducible lockfile and manifest for reviewed commit
+        shell: bash
+        run: |
+          echo SPACEUI_MANIFEST_BEGIN
+          base64 -w 0 apps/web/package.json
+          echo
+          echo SPACEUI_MANIFEST_END
+          echo SPACEUI_LOCK_BEGIN
+          base64 -w 0 pnpm-lock.yaml
+          echo
+          echo SPACEUI_LOCK_END

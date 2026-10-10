@@ -1,36 +1,23 @@
-import type { Metadata } from "next";
+import type {Metadata} from "next";
 import Link from "next/link";
-import { CreateListingForm } from "@/components/create-listing-form";
-import { verifiedMarketplaceContext } from "@/lib/listings/data";
+import {verifiedMarketplaceContext} from "@/lib/listings/data";
+import {ExperienceListingWizard} from "@/components/experience/listing-wizard";
 
-export const metadata: Metadata = { title: "Create a listing", robots: { index: false } };
-export const dynamic = "force-dynamic";
+export const dynamic="force-dynamic";
+export const metadata:Metadata={title:"List an item · Sell",robots:{index:false}};
 
-export default async function PostPage() {
-  const context = await verifiedMarketplaceContext();
-  const enabled = process.env.ENABLE_MARKETPLACE_WRITES === "true";
-
-  if (context.kind !== "ready" || !enabled) {
-    return <div className="container quiet-page">
-      <span className="quiet-mark" aria-hidden="true">＋</span>
-      <p className="eyebrow">SELL AN ITEM</p>
-      <h1>{context.kind === "login" ? "Sign in to list your item." : "Listing creation is not yet available."}</h1>
-      <p>{context.kind === "not_eligible"
-        ? "This account does not currently have permission to publish listings."
-        : "We're preparing verified accounts and safe listing tools. Nothing has been submitted."}</p>
-      <Link href={context.kind === "login" ? "/account" : "/explore"} className="button button-dark">
-        {context.kind === "login" ? "Go to account" : "Explore items"} <span aria-hidden="true">↗</span>
-      </Link>
-    </div>;
-  }
-
-  return <div className="container listing-create-page">
-    <p className="eyebrow">YOUR NEXT LISTING</p>
-    <h1>Give something a second life.</h1>
-    <p>Create a sale listing draft. Publishing is a separate step so you can review everything first.</p>
-    <div className="rental-crosslink"><strong>Want to lend instead?</strong>
-      <Link href="/rent/post" className="text-link">Create a rental listing →</Link></div>
-    <CreateListingForm />
-    <Link href="/my/listings" className="text-link">View my listings →</Link>
+export default async function PostPage(){
+  const context=await verifiedMarketplaceContext();
+  const ready=context.kind==="ready"&&process.env.ENABLE_MARKETPLACE_WRITES==="true";
+  return <div className="ux-post-page">
+    <div className="ux-shell">
+      <nav aria-label="Breadcrumb" className="ux-breadcrumb"><Link href="/">Home</Link>
+        <span>›</span><Link href="/explore">Marketplace</Link><span>›</span> Sell</nav>
+      <div className="ux-post-mode" aria-label="Choose listing type">
+        <Link className="ux-post-mode-active" aria-current="page" href="/post">Sell an item</Link>
+        <Link href="/rent/post">Rent out an item</Link>
+      </div>
+      <ExperienceListingWizard mode="sell" backendReady={ready}/>
+    </div>
   </div>;
 }
