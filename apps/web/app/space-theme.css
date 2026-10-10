@@ -188,3 +188,11 @@ body:has(.ux-hero) { background: var(--background); }
 
 .ux-product-card { corner-shape: superellipse(1.25); background: var(--surface); border: 1px solid var(--border); }
 .ux-product-card:hover { border-color: var(--accent-border); box-shadow: 0 16px 40px #0005; }
+
+@media (max-width: 680px) {
+  .ux-explore-bar { display: grid; grid-template-columns: 1fr auto; gap: 14px; }
+  .ux-explore-switch { justify-self: start; }
+  .ux-explore-meta { display: contents; }
+  .ux-explore-meta > span { grid-column: 1 / -1; grid-row: 2; color: var(--muted); font-size: 12px; }
+  .ux-category-dialog-trigger { grid-column: 2; grid-row: 1; }
+}

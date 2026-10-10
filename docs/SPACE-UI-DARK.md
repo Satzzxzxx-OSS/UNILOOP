@@ -31,7 +31,7 @@ The publicly available Filters, Gradient File Upload and Date Selector examples 
 - Original cool-light hero, squircle cards and border effects preserve the existing home content and marketplace illustration.
 - Original expanding header search works on desktop/mobile, opens with `/` or Ctrl/Cmd+K outside editable controls, dismisses with Escape, and submits to the existing explore route.
 - Photo selection supports drag-and-drop with the same MIME, size and count checks. Photos remain explicitly local previews until the existing real upload flow is used.
-- Dark native controls, visible keyboard focus, selected states and reduced-motion support are shared across the frontend.
+- Dark native controls, visible keyboard focus, selected states and reduced-motion support are shared across the frontend. Reveal content stays visible during SSR and reduced-motion hydration; motion progressively enhances already visible content.
 
 ## Verification
 

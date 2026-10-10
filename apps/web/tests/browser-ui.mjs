@@ -35,7 +35,11 @@ try{
       bodyWidth:document.body.scrollWidth,
       viewportMeta:document.querySelector('meta[name="viewport"]')?.getAttribute("content")??"",
       heroWidth:document.querySelector(".ux-hero")?.getBoundingClientRect().width,
+      heroOpacity:Number(getComputedStyle(document.querySelector(".ux-hero-copy")).opacity),
+      categoryOpacity:Number(getComputedStyle(document.querySelector(".ux-category-grid")).opacity),
     }));
+    assert.equal(metrics.heroOpacity,1,"Home text must remain visible with reduced motion at "+width);
+    assert.equal(metrics.categoryOpacity,1,"Offscreen categories must not start hidden at "+width);
     assert.match(metrics.viewportMeta,/width=device-width/,"Responsive viewport metadata");
     assert(metrics.docWidth<=width+2,"Horizontal overflow at "+width+": "+JSON.stringify(metrics));
     assert(metrics.bodyWidth<=width+2,"Body overflow at "+width+": "+JSON.stringify(metrics));
@@ -85,6 +89,7 @@ try{
   await wizard.getByText("Let the item speak.").waitFor();
   await wizard.getByRole("button",{name:/Continue/}).click();
   await wizard.getByRole("heading",{name:"What feels like a fair price?"}).waitFor();
+  await wizard.evaluate(()=>window.scrollTo(0,0));
   await wizard.screenshot({path:path.join(output,"sell-wizard-mobile.png"),fullPage:true,animations:"disabled"});
   await wizard.close();
 
