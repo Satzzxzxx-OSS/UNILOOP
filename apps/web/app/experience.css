@@ -631,3 +631,67 @@ body:has(.ux-hero) {background:#fffefd}
  .ux-workspace-thread{gap:9px}
 }
 @media(prefers-reduced-motion:reduce){.ux-workspace-thread{transition:none}.ux-workspace-thread:hover{transform:none}}
+
+
+/* Private identity design, without made-up verification status. */
+.ux-account-page{background:radial-gradient(ellipse at 25% 20%,#fff0d6,transparent 45%),#f8f7f2;min-height:calc(100vh - 450px)}
+.ux-account-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,470px);gap:clamp(40px,6vw,120px);align-items:center;padding-block:105px 130px}
+.ux-account-orb{width:96px;height:96px;border-radius:30px;background:linear-gradient(140deg,#1a314d,#101e35);display:grid;place-items:center;margin-bottom:33px;box-shadow:0 23px 43px #15243e36;transform:rotate(-8deg)}
+.ux-account-orb span{font-size:65px;font-weight:900;line-height:1;color:#e7b466;letter-spacing:-.12em}
+.ux-account-intro h1{font-size:clamp(49px,5.2vw,77px);line-height:1.08;letter-spacing:-.076em;color:#192c47;margin:23px 0}
+.ux-account-intro h1 em{font-style:normal;color:#b18343}
+.ux-account-intro>p:not(.ux-kicker){font-size:17px;line-height:1.9;color:#6f7f91;max-width:540px}
+.ux-account-benefits{display:grid;gap:18px;margin-top:35px;font-size:13px;color:#527262}
+.ux-account-benefits span{display:flex;align-items:center;gap:13px}
+.ux-account-benefits svg{flex:none}
+.ux-account-card{background:#fff;border:1px solid #e7e6e2;box-shadow:0 30px 60px #182b4213;padding:40px;border-radius:30px}
+.ux-account-card-icon{display:grid;place-items:center;width:61px;height:61px;background:#eef1f2;color:#29445f;border-radius:18px;margin-bottom:24px}
+.ux-account-card h2{font-size:31px;line-height:1.12;letter-spacing:-.05em;color:#182a45;margin:14px 0}
+.ux-account-card>p:not(.ux-kicker){font-size:13px;line-height:1.75;color:#6e7b8d}
+.ux-account-card .auth-form{width:100%;margin-top:30px}
+.ux-account-card .auth-form label{color:#253853;font-size:13px}
+.ux-account-card .auth-form input{background:#fdfdfc;border:1px solid #d7dfe4;min-height:52px;font-size:14px}
+.ux-account-card .auth-form button.button-dark{min-height:51px;background:#172b45}
+.ux-account-card .ux-workspace-action{margin-top:23px}
+.ux-account-card .ux-account-footnote{border-top:1px solid #eceff0;margin-top:27px;padding-top:17px;color:#8e99a5!important;font-size:11px!important}
+.ux-account-signed{padding-block:75px 120px}
+.ux-account-signed h1{font-size:clamp(42px,5vw,68px);letter-spacing:-.067em;margin:14px 0 8px}
+.ux-account-signed-intro{color:#748398;margin-bottom:30px}
+.ux-account-identity{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:25px;border:1px solid #dbe4e7;border-radius:23px;background:white;max-width:950px}
+.ux-account-avatar{height:67px;width:67px;border-radius:22px;display:grid;place-items:center;background:#dcece6;color:#396b5b}
+.ux-account-identity>div:nth-child(2){min-width:0;flex:1;display:grid;gap:8px}
+.ux-account-identity strong{font-size:15px;overflow-wrap:anywhere}
+.ux-account-identity span{font-size:12px;color:#6c8290}
+.ux-account-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;max-width:950px;margin-top:23px}
+.ux-account-link{display:flex;align-items:center;gap:15px;min-height:111px;padding:22px;border:1px solid #e3e8e9;border-radius:20px;background:#fff;transition:transform .2s}
+.ux-account-link:hover{transform:translateY(-3px)}
+.ux-account-link-icon{display:grid;place-items:center;width:50px;height:50px;flex:none;background:#f0f4f3;border-radius:14px;color:#345a69}
+.ux-account-link>span:nth-child(2){display:grid;gap:6px;flex:1;min-width:0}
+.ux-account-link strong{font-size:15px;color:#18314b}
+.ux-account-link small{font-size:11px;color:#7a899b}
+.ux-account-link>svg{flex:none}
+.ux-settings-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,330px);gap:25px;align-items:start}
+.ux-settings-card{padding:30px 32px;background:#fff;border:1px solid #e8eced;border-radius:23px;margin-bottom:18px}
+.ux-settings-card h2{font-size:27px;letter-spacing:-.05em;margin:14px 0 14px}
+.ux-settings-card>p:not(.ux-kicker){font-size:13px;line-height:1.75;color:#748195}
+.ux-settings-card .post-form{border:0;padding:0;box-shadow:none;margin:24px 0 0;background:none}
+.ux-settings-card .post-form h2{font-size:21px}
+.ux-settings-aside{padding:31px;background:#eaf3ee;border-radius:23px}
+.ux-settings-aside h3{font-size:23px;line-height:1.15;letter-spacing:-.04em;color:#315a4b}
+.ux-settings-aside p{font-size:13px;line-height:1.8;color:#668273}
+.ux-settings-aside a{font-size:12px;font-weight:800;color:#315a4b}
+@media(max-width:900px){.ux-account-layout{grid-template-columns:1fr;gap:30px;padding-block:58px 95px}.ux-account-intro{max-width:630px}.ux-settings-grid{grid-template-columns:1fr}.ux-settings-aside{max-width:none}}
+@media(max-width:680px){
+ .ux-account-layout{padding-block:38px 90px}
+ .ux-account-orb{height:65px;width:65px;border-radius:20px;margin-bottom:18px}
+ .ux-account-orb span{font-size:45px}
+ .ux-account-intro h1{font-size:45px;margin:12px 0}
+ .ux-account-intro>p:not(.ux-kicker){font-size:14px}
+ .ux-account-benefits{margin-top:18px;gap:10px;font-size:11px}
+ .ux-account-card{padding:26px 23px;border-radius:22px}
+ .ux-account-card h2{font-size:26px}
+ .ux-account-signed{padding-block:45px 90px}
+ .ux-account-links{grid-template-columns:1fr}
+ .ux-settings-card{padding:23px 19px}
+}
+@media(prefers-reduced-motion:reduce){.ux-account-link{transition:none}.ux-account-link:hover{transform:none}}
