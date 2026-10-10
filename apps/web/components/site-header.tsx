@@ -4,7 +4,7 @@ export function SiteHeader() {
   return (
     <header className="site-header">
       <div className="container header-inner">
-        <Link href="/" className="brand" aria-label="UNILOOP home">
+        <Link href="/dashboard" className="brand" aria-label="UNILOOP home">
           <span className="brand-icon" aria-hidden="true">
             <span className="brand-ring brand-ring-one" />
             <span className="brand-ring brand-ring-two" />

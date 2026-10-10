@@ -46,9 +46,15 @@ new empty project without checking it first.
 - Session-refresh and account responses are marked private/no-store.
   Verify CDN cache behavior for response Set-Cookie headers during staging.
 - Never deploy a Supabase service-role or secret key to browser/Next public env.
-- Passwordless email currently uses \`shouldCreateUser: false\`; accounts
-  must be provisioned by approved operational process. This prevents public
-  auto-enrollment until signup and eligibility policies are reviewed.
+- Passwordless sign-in uses `shouldCreateUser: false`. The user-requested
+  explicit Create account intent uses `shouldCreateUser: true`, creating only
+  an Auth identity; workspace entry still requires a verified email session.
+  It never grants campus membership;
+  the existing allowlist/RLS still controls marketplace eligibility.
+- Public `/` is the landing page. Verified sessions enter `/dashboard`;
+  workspace routes are gated by Proxy and a verified-user server layout.
+- Auth confirmation has a fixed `/dashboard` success destination and a fixed
+  `/account?error=link` failure destination; query return URLs are not accepted.
 - Supabase's email template must send links in PKCE token-hash form:
   \`{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email\`.
   Set correct Site URL / allowed redirect URLs in Supabase Auth dashboard.
@@ -56,7 +62,7 @@ new empty project without checking it first.
 - Real SMTP, abuse throttling, bot protection, secure email change and
   recovery flows must be configured/tested before launch.
 - The callback only accepts a validated email token_hash and redirects
-  to fixed local account routes. No open redirects from URL parameters.
+  to fixed local dashboard/account routes. No open redirects from URL parameters.
 - Revoking membership is checked against live database state, not stale JWT;
   for urgent account bans also apply Supabase Auth session controls.
 

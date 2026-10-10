@@ -34,7 +34,7 @@ export default async function ExplorePage({searchParams}:{
   return <div className="ux-explore">
     <section className="ux-explore-hero">
       <div className="ux-shell">
-        <nav aria-label="Breadcrumb" className="ux-breadcrumb"><Link href="/">Home</Link><span>›</span> Explore</nav>
+        <nav aria-label="Breadcrumb" className="ux-breadcrumb"><Link href="/dashboard">Home</Link><span>›</span> Explore</nav>
         <p className="ux-kicker">FIND YOUR KIND OF THING</p>
         <h1>Explore the marketplace</h1>
         <p>Find what you need. Explore things worth keeping in the loop.</p>

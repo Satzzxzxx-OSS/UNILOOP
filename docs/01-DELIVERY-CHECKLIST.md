@@ -31,7 +31,7 @@ Never represent planning, a static UI, or unrun tests as launched functionality.
 - [x] Supabase PostgreSQL identity migration with private launch scope.
 - [x] Automated real PostgreSQL migration and RLS allow/deny checks.
 - [x] Client/server cookie SSR wiring, sign-in link and safe auth callback.
-- [x] No public self-enrollment: signInWithOtp shouldCreateUser=false.
+- [x] Explicit email signup creates identity only; sign-in does not enroll and campus RLS still gates access.
 - [x] Pin dependency lockfile and enforce frozen installs.
 - [ ] Hosted Supabase preview project provisioning and migration dry-run.
 - [ ] Configure SMTP, PKCE email link template, approved accounts and redirects.
