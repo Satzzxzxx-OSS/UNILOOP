@@ -6,6 +6,8 @@ import {Menu as MenuPrimitive} from "@base-ui/react/menu";
 import type React from "react";
 import {cn} from "@/lib/spaceui-utils";
 
+type StaticClassName<Props>=Omit<Props,"className">&{className?:string};
+
 export const Menu:typeof MenuPrimitive.Root=MenuPrimitive.Root;
 
 export function MenuTrigger(props:MenuPrimitive.Trigger.Props):React.ReactElement {
@@ -13,7 +15,7 @@ export function MenuTrigger(props:MenuPrimitive.Trigger.Props):React.ReactElemen
 }
 
 export function MenuPopup({className,children,side="top",align="start",sideOffset=12,...props}:
- MenuPrimitive.Popup.Props&{
+ StaticClassName<MenuPrimitive.Popup.Props>&{
   side?:MenuPrimitive.Positioner.Props["side"];
   align?:MenuPrimitive.Positioner.Props["align"];
   sideOffset?:MenuPrimitive.Positioner.Props["sideOffset"];
@@ -27,10 +29,10 @@ export function MenuPopup({className,children,side="top",align="start",sideOffse
  </MenuPrimitive.Portal>;
 }
 
-export function MenuLinkItem({className,...props}:MenuPrimitive.LinkItem.Props):React.ReactElement {
+export function MenuLinkItem({className,...props}:StaticClassName<MenuPrimitive.LinkItem.Props>):React.ReactElement {
  return <MenuPrimitive.LinkItem className={cn("un-profile-menu-item",className)} data-slot="menu-link-item" {...props}/>;
 }
-export function MenuItem({className,...props}:MenuPrimitive.Item.Props):React.ReactElement {
+export function MenuItem({className,...props}:StaticClassName<MenuPrimitive.Item.Props>):React.ReactElement {
  return <MenuPrimitive.Item className={cn("un-profile-menu-item",className)} data-slot="menu-item" {...props}/>;
 }
 export function MenuSeparator(props:MenuPrimitive.Separator.Props):React.ReactElement {
