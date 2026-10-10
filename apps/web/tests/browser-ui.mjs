@@ -34,16 +34,16 @@ try{
       docWidth:document.documentElement.scrollWidth,
       bodyWidth:document.body.scrollWidth,
       viewportMeta:document.querySelector('meta[name="viewport"]')?.getAttribute("content")??"",
-      heroWidth:document.querySelector(".ux-hero")?.getBoundingClientRect().width,
-      heroOpacity:Number(getComputedStyle(document.querySelector(".ux-hero-copy")).opacity),
-      categoryOpacity:Number(getComputedStyle(document.querySelector(".ux-category-grid")).opacity),
+      heroWidth:document.querySelector(".ul-dashboard")?.getBoundingClientRect().width,
+      heroOpacity:Number(getComputedStyle(document.querySelector(".ul-page-heading")).opacity),
+      categoryOpacity:Number(getComputedStyle(document.querySelector(".ul-category-chips")).opacity),
     }));
     assert.equal(metrics.heroOpacity,1,"Home text must remain visible with reduced motion at "+width);
     assert.equal(metrics.categoryOpacity,1,"Offscreen categories must not start hidden at "+width);
     assert.match(metrics.viewportMeta,/width=device-width/,"Responsive viewport metadata");
     assert(metrics.docWidth<=width+2,"Horizontal overflow at "+width+": "+JSON.stringify(metrics));
     assert(metrics.bodyWidth<=width+2,"Body overflow at "+width+": "+JSON.stringify(metrics));
-    assert(metrics.heroWidth!==undefined&&metrics.heroWidth<=width+2,"Hero overflow at "+width);
+    assert(metrics.heroWidth!==undefined&&metrics.heroWidth<=width+2,"Dashboard overflow at "+width);
     if(width<=900){
       assert(await page.getByRole("navigation",{name:"Quick mobile navigation"}).isVisible(),
         "Mobile dock missing at "+width);
@@ -57,6 +57,21 @@ try{
       assert(await page.getByRole("navigation",{name:"Main navigation"}).isVisible(),
         "Desktop navigation absent at "+width);
     }
+    assert.deepEqual(await page.locator(".ul-metric-value").allTextContents(),["—","—","—","—"],"Unavailable services must not invent activity counts");
+    if(width>900){
+      const sidebar=page.getByRole("complementary",{name:"Workspace sidebar"});
+      assert(await sidebar.isVisible(),"Persistent workspace sidebar must be visible");
+      const sidebarWidth=await sidebar.evaluate(el=>el.getBoundingClientRect().width);
+      assert.equal(sidebarWidth,240,"FinCo-style sidebar width");
+      await sidebar.locator("summary").click();
+      assert(await sidebar.getByRole("navigation",{name:"Account menu"}).isVisible(),"Account menu opens");
+      await page.keyboard.press("Escape");
+      assert(!(await sidebar.getByRole("navigation",{name:"Account menu"}).isVisible()),"Escape dismisses account menu");
+    }
+    await page.getByRole("tab",{name:"For rent",exact:true}).click();
+    assert(await page.getByRole("tabpanel").getByRole("heading",{name:"Rental discovery is not connected yet"}).isVisible(),"Rental tab displays the existing rental state");
+    await page.getByRole("tab",{name:"For sale",exact:true}).click();
+    await page.evaluate(()=>window.scrollTo({top:0,left:0,behavior:"instant"}));
     await page.screenshot({path:path.join(output,"home-"+width+".png"),fullPage:true,animations:"disabled"});
     assert.deepEqual(errors,[],"JS page errors at "+width);
     await page.close();

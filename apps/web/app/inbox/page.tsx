@@ -8,7 +8,7 @@ export const dynamic="force-dynamic";
 export const metadata:Metadata={title:"Messages",robots:{index:false}};
 export default async function InboxPage(){
  const result=await getSaleInbox();
- return <WorkspaceShell eyebrow="PRIVATE CONVERSATIONS" title="The conversation starts here."
+ return <WorkspaceShell eyebrow="PRIVATE CONVERSATIONS" title="Messages"
    description="Ask questions, talk through the details and keep exchanges moving."
    action={{href:"/offers",label:"View offers"}}>
    {result.kind==="ready"&&result.conversations.length?

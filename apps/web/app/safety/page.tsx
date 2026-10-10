@@ -14,7 +14,7 @@ const steps=[
 export default function SafetyPage(){
  return <article className="ux-shell ux-guide-page">
    <header className="ux-guide-hero"><p className="ux-kicker">LOOK OUT FOR EACH OTHER</p>
-     <h1>Good finds start with <em>good judgment.</em></h1>
+     <h1>Exchange safety</h1>
      <p>A few practical ways to make buying, selling, lending and renting feel safer for everyone.</p>
    </header>
    <div className="ux-guide-banner">

@@ -20,7 +20,7 @@ export default async function AccountPage({searchParams}:{
        <div className="ux-account-intro">
          <span className="ux-account-orb" aria-hidden="true"><span>U</span></span>
          <p className="ux-kicker">ONE ACCOUNT. ALL THE POSSIBILITIES.</p>
-         <h1>Your next great thing <em>starts here.</em></h1>
+         <h1>Your account</h1>
          <p>Find what you need, pass on what you don&apos;t and borrow the rest.
             A simpler, more thoughtful way to stay in the loop.</p>
          <div className="ux-account-benefits">
