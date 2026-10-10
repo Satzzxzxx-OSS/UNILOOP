@@ -181,3 +181,7 @@ body:has(.ux-hero) { background: var(--background); }
 .ux-detail-action-panel .interaction-action button.button-dark { background: var(--primary); color: var(--primary-foreground); }
 .ux-wizard-steps button.ux-step-current span { background: var(--accent); color: var(--primary-foreground); }
 .ux-gallery-arrows button { padding: 0; min-width: 36px; height: 36px; }
+[data-slot=input-control] input:not([type=hidden]) { height: auto; min-height: 44px; line-height: 1.5; }
+.ux-field [data-slot=input-control] input { min-height: 50px; }
+.ux-price-field > [data-slot=input-control] { padding-left: 0; font-size: inherit; font-weight: inherit; }
+.ux-workspace-empty > .ux-workspace-action { align-self: center; }
