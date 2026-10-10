@@ -1,3 +1,4 @@
+import {ItemStatus} from "@/components/experience/item-status";
 import type {Metadata} from "next";
 import Link from "next/link";
 import {notFound} from "next/navigation";
@@ -31,7 +32,7 @@ export default async function BookingDetails({params}:{
     <Link href="/rentals" className="ux-detail-text-link">← Your rentals</Link>
     <p className="ux-kicker">YOUR RENTAL JOURNEY</p>
     <h1>{item?.title??"Rental booking"}</h1>
-    <p className="listing-detail-attributes"><span>{booking.status}</span>
+    <p className="listing-detail-attributes"><ItemStatus status={booking.status}/>
       <span>{owner?"You are lending this item":"You requested this item"}</span></p>
     <div className="booking-summary">
       <dl>

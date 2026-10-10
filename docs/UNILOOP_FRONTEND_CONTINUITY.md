@@ -65,3 +65,9 @@ Production build, TypeScript, lint and all 23 unit tests passed. HTTP smoke pass
 Live-provider completion remains outside this frontend change: configure actual Supabase public settings, SMTP and the token-hash email template/allowed redirect URLs; enroll eligible campus membership and verify hosted transactions before activating the existing write gates. Signup cannot self-grant membership, staff access or enabled marketplace actions.
 
 Publication: `feat/landing-workflow-polish` targets `main`; the matching draft PR contains the commit/check links. Nothing in this follow-up is merged or deployed automatically.
+
+
+## Catalogue fit follow-up — 2026-10-10
+Branch `feat/spaceui-catalogue-fit` continues on main `d54e033` after merged PR #8. New login/signup URLs and dark auth/avatar work are preserved. Complete catalogue decisions and public source fingerprints are saved in `SPACE_UI_CATALOGUE_AUDIT.md` and `SPACE_UI_CATALOGUE_SOURCE_MANIFEST.json`. Six free additions: Glass Button (secondary landing CTA), Blur Reveal Text (landing h1), Liquid Switch (existing opt-in sound preference), Timeline (existing four listing steps), Status Badge (real sale/rental/exchange state), Rating (existing completed-exchange reviews, read-only stars). Exact/capped dashboard counts and server review submission stay unchanged. No dependencies, marketplace features, backend actions, schema, eligibility or real data changed. Live provider limitations still apply.
+
+Catalogue follow-up validation: clean build/type/lint, 23 unit tests, 24 HTTP routes and production/authenticated-fixture Chromium suites passed; keyboard and drag sound-switch behavior verified. Matching branch PR carries publication/CI status. No real provider launch verification is claimed.

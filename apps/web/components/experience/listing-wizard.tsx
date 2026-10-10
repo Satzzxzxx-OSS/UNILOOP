@@ -5,6 +5,7 @@ import {Input} from "@/components/spaceui/input";
 import {Textarea} from "@/components/spaceui/textarea";
 
 import {LuminousBorder} from "@/components/spaceui/luminous-border";
+import {Timeline,TimelineItem} from "@/components/spaceui/timeline";
 import {Progress} from "@/components/spaceui/progress";
 import Link from "next/link";
 import {useRouter} from "next/navigation";
@@ -104,12 +105,12 @@ export function ExperienceListingWizard({mode,backendReady}:{
       </div>
     </div>
     <nav className="ux-wizard-steps" aria-label="Listing form progress">
-      {steps.map((name,i)=><Button variant="ghost" type="button" key={name} disabled={i>step}
+      <Timeline value={step} orientation="horizontal" className="ul-wizard-timeline">{steps.map((name,i)=><TimelineItem step={i} key={name} className="ul-wizard-timeline-item"><Button variant="ghost" type="button" key={name} disabled={i>step}
         onClick={()=>{setStep(i);setWarning("");}}
         aria-current={i===step?"step":undefined}
         className={i===step?"ux-step-current":i<step?"ux-step-complete":""}>
         <span>{i<step?"✓":i+1}</span><strong>{name}</strong>
-      </Button>)}
+      </Button></TimelineItem>)}</Timeline>
     </nav>
     <Progress value={step} max={3} aria-label="Listing steps completed" className="ul-wizard-progress"/>
     <div className="ux-wizard-layout">

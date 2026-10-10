@@ -1,3 +1,4 @@
+import {ItemStatus} from "@/components/experience/item-status";
 import Link from "next/link";
 import Image from "next/image";
 import {categories} from "@/lib/catalog";
@@ -29,7 +30,7 @@ export function ListingCard({listing}:{listing:Listing}){
         <h3>{listing.title}</h3>
         <div className="ux-product-bottom">
           <strong>{format(listing.price_inr)}</strong>
-          {listing.status!=="active"&&<span className="ux-product-status">{listing.status}</span>}
+          {listing.status!=="active"&&<ItemStatus status={listing.status}/>}
         </div>
       </div>
     </Link>

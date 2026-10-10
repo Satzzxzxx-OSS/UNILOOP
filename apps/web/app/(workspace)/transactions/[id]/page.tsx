@@ -1,3 +1,5 @@
+import {Rating} from "@/components/spaceui/rating";
+import {ItemStatus} from "@/components/experience/item-status";
 import type {Metadata} from "next";
 import Link from "next/link";
 import {notFound} from "next/navigation";
@@ -24,7 +26,7 @@ export default async function TransactionDetails({params}:{params:Promise<{id:st
     <div className="booking-summary">
       <dl>
         <div><dt>Agreed price</dt><dd>{money(deal.agreed_price_inr)}</dd></div>
-        <div><dt>Current state</dt><dd>{deal.status.replaceAll("_"," ")}</dd></div>
+        <div><dt>Current state</dt><dd><ItemStatus status={deal.status}/></dd></div>
         <div><dt>Your role</dt><dd>{seller?"Seller":"Buyer"}</dd></div>
         <div><dt>Seller confirmation</dt><dd>{deal.seller_handed_over_at?"Recorded":"Pending"}</dd></div>
         <div><dt>Buyer confirmation</dt><dd>{deal.buyer_received_at?"Recorded":"Pending"}</dd></div>
@@ -45,7 +47,7 @@ export default async function TransactionDetails({params}:{params:Promise<{id:st
         <h2>Exchange reviews</h2>
         {reviews.length?<div className="rental-note-list">{reviews.map(review=>
           <article key={review.id} className="rental-note">
-            <strong>{review.rating}/5 · {review.reviewer_id===myId?"You":"Other participant"}</strong>
+            <strong>{review.reviewer_id===myId?"You":"Other participant"}</strong><Rating role="img" rating={review.rating} className="ul-review-rating" aria-label={"Rated "+review.rating+" out of 5"}/>
             <p>{review.review_body}</p>
           </article>)}</div>:<p className="interaction-note">No reviews yet.</p>}
         {enabled&&!reviewed&&<SaleReviewForm id={deal.id}/>}
