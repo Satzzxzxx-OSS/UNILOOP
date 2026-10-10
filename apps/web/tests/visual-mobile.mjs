@@ -35,7 +35,7 @@ try{
  const widths=[320,360,390,430,768,1024,1440];
  const routes=["/","/explore?mode=buy","/explore?mode=rent","/post","/rent/post"];
  const privateRoutes=["/account","/settings","/saved","/inbox","/offers",
-   "/my/listings","/rent/my","/rentals","/transactions","/notifications"];
+   "/my/listings","/rent/my","/rentals","/transactions","/notifications","/help","/safety"];
  for(const width of widths){
   const ctx=await browser.newContext({viewport:{width,height:810},deviceScaleFactor:1});
   const page=await ctx.newPage();
@@ -90,7 +90,7 @@ try{
  assert.equal(await p.getByText("Your frontend preview is ready.").isVisible(),true);
  assert.equal(await p.getByRole("button",{name:/Save draft \(not available yet\)/}).isDisabled(),true);
  await ctx.close();
- console.log("Browser visual smoke passed: 5 public routes x 7 widths plus 10 private routes x 3 widths, navigation and Sell wizard.");
+ console.log("Browser visual smoke passed: 5 public routes x 7 widths plus 12 additional routes x 3 widths, navigation and Sell wizard.");
 }finally{
  if(browser)await browser.close();
  server.kill("SIGTERM");

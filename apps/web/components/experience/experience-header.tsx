@@ -110,8 +110,8 @@ export function ExperienceHeader(){
             {name:"Rent something",href:"/explore?mode=rent"},
             {name:"Sell an item",href:"/post"},{name:"Rent out an item",href:"/rent/post"},
             {name:"My listings",href:"/my/listings"},{name:"My rentals",href:"/rentals"},
-            {name:"Transactions",href:"/transactions"},{name:"Notifications",href:"/notifications"},
-            {name:"Help & safety",href:"/#how-it-works"},{name:"Settings",href:"/settings"},
+            {name:"Transactions",href:"/transactions"},{name:"Notifications",href:"/notifications"},{name:"Help center",href:"/help"},
+            {name:"Help & safety",href:"/safety"},{name:"Settings",href:"/settings"},
           ].map(item=><Link key={item.href} href={item.href} onClick={()=>setMenuOpen(false)}>
             {item.name}<ExperienceIcon name="arrow" size={16}/>
           </Link>)}
