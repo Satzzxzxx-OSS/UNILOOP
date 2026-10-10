@@ -1,5 +1,5 @@
 // Production public/gate checks plus existing workspace QA against a disposable local
-// provider fixture. Fixture only lives in this test process; no app auth bypass exists.
+// provider fixture. Preview navigation never invents an authenticated identity.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -35,34 +35,42 @@ try{
   assert.equal(await page.getByRole('button',{name:'How do I get into my workspace?'}).getAttribute('aria-expanded'),'true');
   await page.getByRole('link',{name:'Create your account',exact:true}).click();
   await page.waitForURL(/\/signup/);
-  assert.equal(await page.getByRole('link',{name:'Create account',exact:true}).getAttribute('aria-current'),'page');
-  assert(await page.getByText(/Sign-in will be available after the secure account service is connected/).isVisible());
+  assert.equal(await page.locator('.un-auth-mode').getByRole('link',{name:'Create account',exact:true}).getAttribute('aria-current'),'page');
+  assert(await page.getByText(/Frontend preview · continue without verification/).isVisible());
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Account overflow at '+width);
   assert.deepEqual(errors,[],'Public JS errors at '+width);await page.close();
  }
- // Dedicated auth pages must be usable without a provider, never show fake login.
+ // Compact auth block, full story on desktop and mobile, no credential submission.
  const authRoute=await browser.newPage({viewport:{width:360,height:780},reducedMotion:'reduce'});
- for(const route of ['/login','/signup','/account?mode=signup']){
-  const response=await authRoute.goto(base+route,{waitUntil:'networkidle'});
-  assert.equal(response.status(),200,route+' public auth route');
-  assert.equal(await authRoute.getByRole('textbox',{name:'Email address'}).count(),1,'Email field must remain visible');
-  assert(await authRoute.getByRole('button',{name:/by email|sign-in link/}).isDisabled(),'Unconfigured provider must not submit');
-  assert(await authRoute.getByTestId('uniloop-auth-avatar').last().isVisible(),'Brand avatar should render');
-  assert.equal(await authRoute.locator('.un-auth-v2').evaluate(el=>getComputedStyle(el).backgroundColor),'rgb(9, 9, 13)','Auth v2 dark theme');
-  assert.equal(await authRoute.locator('input[type="password"]').count(),0,'No fake password login');
-  assert.equal(await authRoute.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,'Auth overflow: '+route);
-  await authRoute.screenshot({path:path.join(output,'auth-'+route.split('?')[0].replaceAll('/','-')+'.png'),fullPage:true,animations:'disabled'});
+ for(const width of [320,390,768,1024,1440])for(const route of ['/login','/signup']){
+  await authRoute.setViewportSize({width,height:900});
+  const response=await authRoute.goto(base+route,{waitUntil:'networkidle'});assert.equal(response.status(),200);
+  assert(await authRoute.getByLabel('Email address').isVisible());
+  assert(await authRoute.getByTestId('uniloop-auth-avatar').isVisible());
+  assert(await authRoute.locator('.un-auth-story').isVisible(),'Story remains visible at '+width);
+  assert.equal(await authRoute.locator('.un-auth-story-steps>div').count(),3);
+  assert((await authRoute.locator('.un-auth-block').boundingBox()).width<=385,'Compact card');
+  assert(await authRoute.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Auth overflow at '+width);
+  await authRoute.screenshot({path:path.join(output,'auth-split-'+route.slice(1)+'-'+width+'.png'),fullPage:true,animations:'disabled'});
+  await authRoute.locator('.un-auth-continue').click();await authRoute.waitForURL('**/dashboard');
+  assert(await authRoute.getByRole('heading',{name:'Overview',exact:true}).isVisible());
+  assert.equal((await authRoute.context().cookies()).length,0,'Preview creates no auth session');
  }
  await authRoute.close();
- const denied=await browser.newPage({viewport:{width:390,height:844}});
+ const guest=await browser.newPage({viewport:{width:390,height:844}});
  for(const route of ['/dashboard','/explore','/post','/rent/post','/saved','/inbox','/settings','/my/listings','/rent/my','/rentals','/offers','/transactions','/notifications']){
-  await denied.goto(base+route,{waitUntil:'networkidle'});assert.equal(new URL(denied.url()).pathname,'/account',route+' requires verified session');
-  assert.equal(await denied.locator('.ul-sidebar').count(),0,'No workspace chrome for guest');
+  await guest.goto(base+route,{waitUntil:'networkidle'});assert.equal(new URL(guest.url()).pathname,route,'Frontend opens in preview');
+  assert(await guest.getByRole('button',{name:'Open navigation',exact:true}).isVisible(),'Mobile menu available: '+route);
  }
- await denied.context().addCookies([{name:'sb-127-auth-token',value:'fabricated-session',url:base}]);
- await denied.goto(base+'/dashboard',{waitUntil:'networkidle'});assert.equal(new URL(denied.url()).pathname,'/account','Unverified cookie cannot enter workspace');
- await denied.close();
- console.log('Production landing, onboarding and anonymous workspace gates: PASSED');
+ await guest.setViewportSize({width:1440,height:900});
+ await guest.goto(base+'/dashboard',{waitUntil:'networkidle'});
+ await guest.getByRole('button',{name:'Open account menu',exact:true}).click();
+ await guest.getByRole('menu',{name:'Account menu'}).getByRole('menuitem',{name:'Sign out',exact:true}).click();
+ await guest.waitForURL('**/login');
+ assert.equal((await guest.context().cookies()).length,0,'Preview exit requires no session');
+ await guest.close();
+ console.log('Production auth split and anonymous frontend preview: PASSED');
+
 }finally{await browser.close();}
 
 // Emulate provider protocol, not user production data. No live credentials/emails.
@@ -85,34 +93,30 @@ const fixture=http.createServer(async(req,res)=>{
  res.statusCode=404;res.end('{}');
 });await new Promise(r=>fixture.listen(3156,'127.0.0.1',r));
 const app=path.join(process.cwd(),'apps/web');
-const dev=spawn(process.execPath,[path.join(app,'node_modules/next/dist/bin/next'),'dev','-p','3158','-H','127.0.0.1'],{cwd:app,env:{...process.env,NEXT_PUBLIC_SUPABASE_URL:'http://127.0.0.1:3156',NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:'sb_publishable_local_fixture_only',ENABLE_MARKETPLACE_WRITES:'false',ENABLE_RENTAL_OPERATIONS:'false',ENABLE_MARKETPLACE_INTERACTIONS:'false',ENABLE_MARKETPLACE_USER_ACTIONS:'false',ENABLE_SALE_TRANSACTIONS:'false'},stdio:['ignore','pipe','pipe']});
+const dev=spawn(process.execPath,[path.join(app,'node_modules/next/dist/bin/next'),'dev','--webpack','-p','3158','-H','127.0.0.1'],{cwd:app,env:{...process.env,NEXT_PUBLIC_SUPABASE_URL:'http://127.0.0.1:3156',NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:'sb_publishable_local_fixture_only',ENABLE_MARKETPLACE_WRITES:'false',ENABLE_RENTAL_OPERATIONS:'false',ENABLE_MARKETPLACE_INTERACTIONS:'false',ENABLE_MARKETPLACE_USER_ACTIONS:'false',ENABLE_SALE_TRANSACTIONS:'false'},stdio:['ignore','pipe','pipe']});
 const log=fs.createWriteStream('/tmp/uniloop-fixture-dev.log');dev.stdout.pipe(log);dev.stderr.pipe(log);
 try{
  await wait('http://localhost:3158');
  browser=await chromium.launch({headless:true,args:['--no-sandbox']});
  const page=await browser.newPage({viewport:{width:390,height:844},reducedMotion:'reduce'});
- await page.context().addCookies([{name:'sb-127-auth-token',value:'base64-'+encode({...session,access_token:token.replace('fixture-only','fixture-invalid')}),url:'http://localhost:3158'}]);
- await page.goto('http://localhost:3158/dashboard',{waitUntil:'networkidle'});assert.equal(new URL(page.url()).pathname,'/account','Configured provider must reject unverified session tokens');
- await page.context().clearCookies();
- await page.goto('http://localhost:3158/signup',{waitUntil:'networkidle'});assert(await page.getByRole('heading',{name:'Join the loop.'}).isVisible());
- await page.goto('http://localhost:3158/account?mode=signup',{waitUntil:'networkidle'});
- await page.getByLabel('Email address').fill('new@example.test');await page.getByRole('button',{name:'Create account by email'}).click();
- await page.getByText(/Check your inbox for a verification link/).waitFor();assert.equal(signupRequest.create_user,true,'Only signup requests enrollment');assert.equal(signupRequest.email,'new@example.test');
- assert.equal(new URL(page.url()).pathname,'/account','Requesting email alone does not authenticate');
- await page.goto('http://localhost:3158/login',{waitUntil:'networkidle'});assert(await page.getByRole('heading',{name:'Welcome back.'}).isVisible());await page.getByLabel('Email address').fill(user.email);await page.getByRole('button',{name:'Email me a sign-in link'}).click();
- await page.getByText(/Check your inbox for a verification link/).waitFor();assert.equal(signinRequest.create_user,false,'Sign-in must not enroll');
+ await page.goto('http://localhost:3158/signup',{waitUntil:'networkidle'});
+ await page.getByLabel('Email address').fill('new@example.test');
+ await page.locator('.un-auth-continue').click();await page.waitForURL('**/dashboard');
+ assert.equal(signupRequest,null,'Preview sends no enrollment request');
+ assert.equal(signinRequest,null,'Preview sends no authentication request');
+ assert.equal((await page.context().cookies()).length,0,'Preview creates no identity');
  await page.goto('http://localhost:3158/auth/confirm?type=email&token_hash='+'a'.repeat(64),{waitUntil:'networkidle'});
  await page.waitForURL('**/dashboard');assert(await page.getByRole('heading',{name:'Overview',exact:true}).isVisible());
  await page.goto('http://localhost:3158/',{waitUntil:'networkidle'});assert.equal(new URL(page.url()).pathname,'/dashboard','Returning verified users enter workspace');
  await page.goto('http://localhost:3158/account',{waitUntil:'networkidle'});
  assert(await page.getByRole('link',{name:'Open your workspace'}).isVisible());
  await page.getByRole('button',{name:'Sign out',exact:true}).click();
- await page.getByRole('button',{name:'Email me a sign-in link'}).waitFor();
- await page.goto('http://localhost:3158/dashboard',{waitUntil:'networkidle'});assert.equal(new URL(page.url()).pathname,'/account','Signout must revoke workspace navigation');
+ await page.locator('.un-auth-continue').waitFor();
+ await page.goto('http://localhost:3158/dashboard',{waitUntil:'networkidle'});assert.equal(new URL(page.url()).pathname,'/dashboard','Preview remains navigable after signout');
  await page.close();await browser.close();browser=null;
  const qa=spawn(process.execPath,['apps/web/tests/browser-workspace.mjs'],{cwd:process.cwd(),env:{...process.env,UI_BASE_URL:'http://localhost:3158',UI_TEST_SESSION:cookie},stdio:'inherit'});
  const code=await new Promise(r=>qa.on('exit',r));assert.equal(code,0,'Existing workspace regression suite');
- console.log('Isolated provider signup, verify, workspace and existing-flow regression checks: PASSED');
+ console.log('Preview without enrollment, real provider verification and workspace regressions: PASSED');
 }finally{
  if(browser)await browser.close();dev.kill('SIGTERM');await new Promise(r=>fixture.close(r));log.end();
 }

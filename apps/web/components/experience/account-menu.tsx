@@ -2,18 +2,22 @@
 
 import {useState} from "react";
 import Link from "next/link";
+import {useRouter} from "next/navigation";
 import {ArrowUpRight,ChevronUp,HelpCircle,LogOut,Settings2,ShieldCheck,UserRound,Heart} from "lucide-react";
 import {Menu,MenuTrigger,MenuPopup,MenuLinkItem,MenuItem,MenuSeparator} from "@/components/spaceui/menu";
 import {ProfileAvatar} from "@/components/experience/profile-avatar";
+import {FRONTEND_PREVIEW} from "@/lib/auth/frontend-preview";
 import {browserSupabase} from "@/lib/supabase/browser";
 
 export function WorkspaceAccountMenu({identity,email,subtitle,verified=true}:{
  identity:string;email:string;subtitle:string;verified?:boolean;
 }){
+ const router=useRouter();
  const [working,setWorking]=useState(false);
  const [feedback,setFeedback]=useState("");
  async function signOut(){
   if(working)return;
+  if(FRONTEND_PREVIEW&&!email){router.push("/login");return;}
   setWorking(true);setFeedback("");
   try{
    const client=browserSupabase();

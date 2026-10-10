@@ -44,7 +44,7 @@ try {
 
   const pages = [
     ["/",200],["/login",200],["/signup",200],["/account",200],["/account?mode=signup",200],["/help",200],["/safety",200],
-    ...["/dashboard","/explore?mode=buy","/explore?mode=rent","/post","/saved","/settings","/inbox","/offers","/rent/post","/rentals","/transactions","/notifications","/my/listings","/rent/my","/listing/not-a-uuid","/rent/not-a-uuid"].map(route=>[route,307]),
+    ...["/dashboard","/explore?mode=buy","/explore?mode=rent","/post","/saved","/settings","/inbox","/offers","/rent/post","/rentals","/transactions","/notifications","/my/listings","/rent/my","/listing/not-a-uuid","/rent/not-a-uuid"].map(route=>[route,route.includes("not-a-uuid")?404:200]),
     ["/admin/reports",404],
   ];
   for(const [route,expected] of pages){
@@ -59,6 +59,9 @@ try {
       assert.match(html,/UNILOOP|UNI/,"Expected brand/page chrome at "+route);
     }
   }
+  const writeRequest=await fetch(base+"/dashboard",{method:"POST",redirect:"manual"});
+  assert.equal(writeRequest.status,307,"Preview must not bypass POST/server-action authentication");
+  assert.equal(new URL(writeRequest.headers.get("location"),base).pathname,"/account");
   const auth = await fetch(base+"/auth/confirm?type=email&token_hash=invalid",
     {redirect:"manual"});
   assert.equal(auth.status,303,"Malformed auth link must not authenticate");

@@ -1,17 +1,25 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import {FRONTEND_PREVIEW} from "@/lib/auth/frontend-preview";
 import { isWorkspacePath } from "@/lib/auth/routes";
 import { supabasePublicConfig } from "@/lib/supabase/config";
 
 export async function refreshSupabaseSession(request: NextRequest) {
   const config = supabasePublicConfig();
+  // Preview opens only page navigation; configured sessions still refresh normally.
+  const previewNavigation=FRONTEND_PREVIEW&&isWorkspacePath(request.nextUrl.pathname)&&["GET","HEAD"].includes(request.method);
   function requireSignIn(){
     const url=new URL("/account?reason=signin",request.url);
     const denied=NextResponse.redirect(url,307);
     denied.headers.set("Cache-Control","private, no-store");
     return denied;
   }
-  if (!config) return isWorkspacePath(request.nextUrl.pathname)?requireSignIn():NextResponse.next({ request });
+  if (!config) {
+    if(isWorkspacePath(request.nextUrl.pathname)&&!previewNavigation)return requireSignIn();
+    const response=NextResponse.next({request});
+    if(previewNavigation)response.headers.set("Cache-Control","private, no-store");
+    return response;
+  }
 
   let response = NextResponse.next({ request });
   const supabase = createServerClient(config.url, config.publishableKey, {
@@ -32,7 +40,7 @@ export async function refreshSupabaseSession(request: NextRequest) {
 
   // Trust verified claims, never the unvalidated getSession() cookie payload.
   const {data,error}=await supabase.auth.getClaims();
-  if(isWorkspacePath(request.nextUrl.pathname)&&(error||!data?.claims?.sub)){
+  if(isWorkspacePath(request.nextUrl.pathname)&&!previewNavigation&&(error||!data?.claims?.sub)){
     const denied=requireSignIn();
     for(const cookie of response.cookies.getAll())denied.cookies.set(cookie);
     return denied;

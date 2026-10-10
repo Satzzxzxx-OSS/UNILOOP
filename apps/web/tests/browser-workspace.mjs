@@ -118,7 +118,10 @@ try{
   const sounds=polish.getByRole("switch",{name:"Interface sounds",exact:true});
   assert.equal(await sounds.getAttribute("aria-checked"),"false","Audio must be opt-in");
   await sounds.click();assert.equal(await sounds.getAttribute("aria-checked"),"true");
+  assert.equal(await polish.evaluate(()=>localStorage.getItem("uniloop:interface-sounds:v1")),"true","Preference is written before reload");
   await polish.reload({waitUntil:"networkidle"});
+  // SSR intentionally renders the opt-in control off; wait for client hydration.
+  await polish.waitForFunction(()=>document.querySelector('[role="switch"][aria-label="Interface sounds"]')?.getAttribute("aria-checked")==="true");
   assert.equal(await polish.getByRole("switch",{name:"Interface sounds",exact:true}).getAttribute("aria-checked"),"true","Preference persists locally");
   await polish.getByRole("switch",{name:"Interface sounds",exact:true}).click();
   await sounds.focus();
@@ -239,6 +242,8 @@ try{
     const response=await page.goto(base+route,{waitUntil:"networkidle"});
     // Moderation intentionally conceals itself from unauthenticated/non-admin accounts.
     assert.equal(response?.status(),route==="/admin/reports"?404:200,"Dark route HTTP: "+route);
+    // Next.js owns the concealed moderation 404; it has no marketplace controls.
+    if(route==="/admin/reports"){await page.close();continue;}
     const theme=await page.evaluate(()=>{
       function luminance(color){
         const rgb=color.match(/[\d.]+/g)?.slice(0,3).map(Number)??[255,255,255];
@@ -262,8 +267,13 @@ try{
   }
   const search=await newPage({viewport:{width:1440,height:900},reducedMotion:"reduce"});
   await search.goto(base+"/dashboard",{waitUntil:"networkidle"});
-  await search.keyboard.press("/");
   const topSearch=search.getByRole("searchbox",{name:"Search the marketplace"});
+  // Document-level shortcuts attach after hydration and are not replayed by React.
+  for(let attempt=0;attempt<10;attempt++){
+    await search.keyboard.press("/");
+    try{await topSearch.waitFor({state:"visible",timeout:1000});break;}
+    catch(error){if(attempt===9)throw error;}
+  }
   await topSearch.fill("headphones");
   await search.keyboard.press("Escape");
   await topSearch.waitFor({state:"hidden"});
