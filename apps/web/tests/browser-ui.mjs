@@ -108,6 +108,7 @@ try{
     const theme=await page.evaluate(()=>{
       function luminance(color){
         const rgb=color.match(/[\d.]+/g)?.slice(0,3).map(Number)??[255,255,255];
+        if(color.startsWith("color(srgb"))for(let i=0;i<3;i++)rgb[i]*=255;
         const linear=rgb.map(v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4;});
         return linear[0]*.2126+linear[1]*.7152+linear[2]*.0722;
       }
@@ -144,7 +145,8 @@ try{
   const dialog=filters.getByRole("dialog");
   assert(await dialog.isVisible(),"Category dialog should open");
   await filters.keyboard.press("Escape");
-  assert(!(await dialog.count()),"Escape should dismiss the category dialog");
+  await dialog.waitFor({state:"hidden"});
+  assert(!(await dialog.isVisible()),"Escape should dismiss the category dialog");
   await filters.getByRole("button",{name:"Categories",exact:true}).click();
   await dialog.getByRole("link",{name:"Creative gear"}).click();
   await filters.waitForURL(/category=cameras-creative/);

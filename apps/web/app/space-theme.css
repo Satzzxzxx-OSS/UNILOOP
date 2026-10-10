@@ -175,3 +175,9 @@ body:has(.ux-hero) { background: var(--background); }
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* Keep high-specificity account and private form actions on the same primary palette. */
+.ux-account-card .auth-form button.button-dark,
+.ux-detail-action-panel .interaction-action button.button-dark { background: var(--primary); color: var(--primary-foreground); }
+.ux-wizard-steps button.ux-step-current span { background: var(--accent); color: var(--primary-foreground); }
+.ux-gallery-arrows button { padding: 0; min-width: 36px; height: 36px; }

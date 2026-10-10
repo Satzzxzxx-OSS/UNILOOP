@@ -8,7 +8,7 @@ export function Separator({
   className,
   orientation = 'horizontal',
   ...props
-}: SeparatorPrimitive.Props): React.ReactElement {
+}: Omit<SeparatorPrimitive.Props, 'className'> & { className?: string }): React.ReactElement {
   return (
     <SeparatorPrimitive
       className={cn(

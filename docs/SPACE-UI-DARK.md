@@ -20,7 +20,7 @@ Pricing and free catalogue can change. No purchase or paid dependency is require
 
 Existing free Space UI Button, Badge, Skeleton and Spinner are retained. Input, Textarea, Card, Dialog and Separator are vendored from the public registry at `https://www.spaceui.one/r/primitives-{name}.json`. MIT attribution is included in each file and `docs/licenses/SPACE-UI-MIT.txt`.
 
-Imports are adapted to local paths. Dialog uses a native overflow container instead of bringing in ScrollArea. Inputs use the official native-input option with UNILOOP's own responsive control styling. Native hidden, radio, checkbox, select and file elements are kept to preserve HTML form behavior. Existing implicit-submit buttons explicitly retain `type="submit"` when migrated to Space UI.
+Imports are adapted to local paths. The Input, Dialog and Separator wrappers accept static class strings to match the local class utility. Dialog uses a native overflow container instead of bringing in ScrollArea. Inputs use the official native-input option with UNILOOP's own responsive control styling. Native hidden, radio, checkbox, select and file elements are kept to preserve HTML form behavior. Existing implicit-submit buttons explicitly retain `type="submit"` when migrated to Space UI.
 
 The publicly available Filters, Gradient File Upload and Date Selector examples were reviewed. Their full dependency graphs were unnecessary for UNILOOP's current URL filters, local photo preview and native date forms. Those flows use adapted free primitives and original styling instead. No unconnected sorting controls, simulated upload success, sample listings or paid components were added.
 
