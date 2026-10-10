@@ -43,7 +43,7 @@ try {
   if (!ready) throw new Error("Next server not reachable: " + serverOutput);
 
   const pages = [
-    ["/",200],["/account",200],["/account?mode=signup",200],["/help",200],["/safety",200],
+    ["/",200],["/login",200],["/signup",200],["/account",200],["/account?mode=signup",200],["/help",200],["/safety",200],
     ...["/dashboard","/explore?mode=buy","/explore?mode=rent","/post","/saved","/settings","/inbox","/offers","/rent/post","/rentals","/transactions","/notifications","/my/listings","/rent/my","/listing/not-a-uuid","/rent/not-a-uuid"].map(route=>[route,307]),
     ["/admin/reports",404],
   ];
