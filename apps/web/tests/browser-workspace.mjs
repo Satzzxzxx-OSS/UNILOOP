@@ -95,7 +95,7 @@ try{
       await accountTrigger.click();
       const accountPopup=page.getByRole("menu",{name:"Account menu"});
       await accountPopup.waitFor({state:"visible"});
-      assert(await accountPopup.getByRole("link",{name:/Profile & settings/}).isVisible(),"Profile settings link");
+      assert(await accountPopup.getByRole("menuitem",{name:/Profile & settings/}).isVisible(),"Profile settings link");
       assert(await accountPopup.getByRole("menuitem",{name:"Sign out"}).isVisible(),"Real sign out action");
       if(width===1024)await page.screenshot({path:path.join(output,"sidebar-account-spaceui-1024.png"),fullPage:true,animations:"disabled"});
       await page.keyboard.press("Escape");
