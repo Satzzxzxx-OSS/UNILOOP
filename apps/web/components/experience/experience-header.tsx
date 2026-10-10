@@ -41,7 +41,6 @@ export function ExperienceHeader(){
   const pathname=usePathname();
   const [menuOpen,setMenuOpen]=useState(false);
   const [searchOpen,setSearchOpen]=useState(false);
-  useEffect(()=>{setMenuOpen(false);setSearchOpen(false);},[pathname]);
   useEffect(()=>{
     if(!menuOpen)return;
     function onEscape(event:KeyboardEvent){if(event.key==="Escape")setMenuOpen(false);}
