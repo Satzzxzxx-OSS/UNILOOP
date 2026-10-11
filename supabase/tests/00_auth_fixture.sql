@@ -8,11 +8,17 @@ begin
   if not exists (select 1 from pg_roles where rolname = 'authenticated') then
     create role authenticated nologin;
   end if;
+  if not exists (select 1 from pg_roles where rolname = 'service_role') then
+    create role service_role nologin;
+  end if;
 end $$;
 create schema auth;
 create table auth.users (
   id uuid primary key,
-  email text
+  email text,
+  -- Default represents a confirmed identity in ordinary domain fixtures only.
+  -- It is not evidence that a hosted provider/email flow has been exercised.
+  email_confirmed_at timestamptz default now()
 );
 create function auth.uid()
 returns uuid

@@ -1,10 +1,12 @@
 "use server";
+import { mutationErrorMessage } from "@/lib/backend-error";
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { isUuid } from "@/lib/interactions/validation";
 import { verifiedMarketplaceContext } from "@/lib/listings/data";
 import { serverSupabase } from "@/lib/supabase/server";
+import { persistDisplayName } from "./profile";
 import { cleanProfileName, parseReportReason, parseReportDetails, type TrustActionState } from "./validation";
 
 const enabled = () => process.env.ENABLE_MARKETPLACE_USER_ACTIONS === "true";
@@ -41,8 +43,8 @@ export async function updateDisplayName(
   if (!client) return { message: "Account service unavailable." };
   const { data: { user }, error: authError } = await client.auth.getUser();
   if (authError || !user) return { message: "Sign in before editing your profile." };
-  const { error } = await client.from("profiles").update({ display_name:name }).eq("id",user.id);
-  if (error) return { message: "Could not save your profile." };
+  if (!await persistDisplayName(client,user.id,name))
+    return { message: "Could not save your profile." };
   revalidatePath("/account");
   revalidatePath("/settings");
   return { message: "Profile name saved.", ok:true };
@@ -87,7 +89,7 @@ export async function sendListingReport(
   });
   if(error){
     if(error.code==="23505") return {message:"You already reported this reason for this item."};
-    return {message:"Unable to submit report. Please try again."};
+    return {message:mutationErrorMessage(error,"Unable to submit report. Please try again.")};
   }
   revalidatePath("/report/"+listing);
   return {message:"Report received for moderation review.",ok:true};

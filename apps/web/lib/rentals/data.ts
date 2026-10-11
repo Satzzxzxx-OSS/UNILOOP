@@ -36,7 +36,7 @@ export async function discoverRentals({category,search,limit=18}:{
   const selected=parseCategory(category);
   if(selected)query=query.eq("category_slug",selected);
   const safe=cleanSearchQuery(search);
-  if(safe)query=query.ilike("title","%"+safe.replace(/[\\%_]/g,"\\$&")+"%");
+  if(safe)query=query.textSearch("search_document",safe,{config:"simple",type:"plain"});
   const {data,error}=await query;
   if(error)return {kind:"error",items:[]};
   const items=(data??[]) as RentalItem[];

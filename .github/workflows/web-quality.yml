@@ -200,7 +200,11 @@ jobs:
         run: |
           psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/00_auth_fixture.sql
           psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/03_storage_fixture.sql
+          psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -c "insert into auth.users(id,email) values ('eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee','existing-before-uniloop@example.test')"
           for migration in supabase/migrations/*.sql; do
+            if [ "$migration" = "supabase/migrations/20261010210000_identity_backfill_and_function_grants.sql" ]; then
+              psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/00_existing_identity_upgrade_fixture.sql
+            fi
             echo "Applying $migration"
             psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f "$migration"
           done
@@ -208,3 +212,39 @@ jobs:
         run: psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/09_notifications_rls.sql
       - name: Verify cross-domain sale/rental state safeguards
         run: psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/10_transaction_guardrails.sql
+      - name: Verify full-chain backend security contract and existing-user backfill
+        run: psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/11_backend_security_contract.sql
+      - name: Verify disabled-category media cannot bypass listing visibility
+        run: psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/12_sale_media_category_access.sql
+      - name: Verify rental counterparty trust and exact idempotency payloads
+        run: psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/13_rental_trust_and_nonce_contracts.sql
+      - name: Verify indexed full-text search preserves campus isolation
+        run: psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/14_marketplace_full_text_search.sql
+      - name: Verify sale retry payloads, decisions and completed handovers
+        run: psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/15_sale_retry_contracts.sql
+      - name: Verify email confirmation is enforced at the database boundary
+        run: psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/16_verified_email_marketplace_identity.sql
+      - name: Verify private transactional outbox, worker leases and retry recovery
+        run: psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/17_transactional_outbox.sql
+      - name: Verify direct API write budgets and rollback semantics
+        run: psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/18_marketplace_write_budgets.sql
+      - name: Verify notification delivery opt-out, revocation and worker-only recipients
+        run: psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/19_notification_delivery_context.sql
+      - name: Verify private worker metrics have accurate counts and no recipient data
+        run: psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/20_backend_job_health.sql
+      - name: Setup Node for native concurrency test
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Verify simultaneous writes cannot overshoot a shared account budget
+        env:
+          PGDATABASE: uniloop_notifications_ci
+        run: node apps/web/tests/write-budget-concurrency.mjs
+      - name: Verify simultaneous sale/rental uploads respect the five-object limit
+        env:
+          PGDATABASE: uniloop_notifications_ci
+        run: node apps/web/tests/media-upload-concurrency.mjs
+      - name: Verify fixture backup restores data, RLS and indexed search
+        env:
+          PGDATABASE: uniloop_notifications_ci
+        run: bash supabase/tests/verify-backup-restore.sh
