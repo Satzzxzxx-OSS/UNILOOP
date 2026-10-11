@@ -246,7 +246,7 @@ continuation. No live providers were activated.
 - Added native competing-transaction quota verification to CI, along with SQL
   eligibility/health tests and transport/configuration unit tests.
 
-Current source: 20 ordered migrations. Local unit suite: 44 passing tests.
+Current source: 21 ordered migrations. Local unit suite: 44 passing tests.
 Full-chain SQL tests 09–20, legacy full-chain regression checks, lint, TypeScript,
 build and HTTP smoke are recorded as checks complete only when observed; native
 concurrency and full browser CI results are recorded on the updated PR.
@@ -258,3 +258,10 @@ behavior, authorized Realtime, external monitoring/alerts, backup/restore,
 load testing and production preview/auth boundary. Those gates require explicit
 implementation or real environment evidence; they are not checked off by this
 checkpoint. Continue from this list, preserving data and current frontend.
+
+Media continuation: upload RLS helpers now serialize the per-parent five-object
+limit with fresh post-lock counts, and fail closed under fixed transaction
+snapshots. Native concurrent sale/rental upload tests were added. Existing bucket
+settings are checked before applying the migration; no bucket configuration or
+user objects are overwritten/deleted. See [media verification](UNILOOP_MEDIA_VERIFICATION.md)
+for the distinct real Storage API, rollback/orphan and signed-URL checks still open.

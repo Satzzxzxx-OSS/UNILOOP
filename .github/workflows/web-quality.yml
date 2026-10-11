@@ -240,3 +240,7 @@ jobs:
         env:
           PGDATABASE: uniloop_notifications_ci
         run: node apps/web/tests/write-budget-concurrency.mjs
+      - name: Verify simultaneous sale/rental uploads respect the five-object limit
+        env:
+          PGDATABASE: uniloop_notifications_ci
+        run: node apps/web/tests/media-upload-concurrency.mjs

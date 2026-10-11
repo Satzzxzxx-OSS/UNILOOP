@@ -2,6 +2,9 @@
 import assert from 'node:assert/strict';
 import {spawn} from 'node:child_process';
 
+assert.equal(process.env.PGDATABASE,'uniloop_notifications_ci','Disposable CI database required');
+assert(['localhost','127.0.0.1'].includes(process.env.PGHOST),'Local CI database required');
+
 function sql(source){
  return new Promise((resolve,reject)=>{
   const process=spawn('psql',['-X','-v','ON_ERROR_STOP=1','-v','VERBOSITY=verbose','-At'],{stdio:['pipe','pipe','pipe']});
