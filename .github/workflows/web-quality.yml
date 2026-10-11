@@ -216,3 +216,13 @@ jobs:
         run: psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/11_backend_security_contract.sql
       - name: Verify disabled-category media cannot bypass listing visibility
         run: psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/12_sale_media_category_access.sql
+      - name: Verify rental counterparty trust and exact idempotency payloads
+        run: psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/13_rental_trust_and_nonce_contracts.sql
+      - name: Verify indexed full-text search preserves campus isolation
+        run: psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/14_marketplace_full_text_search.sql
+      - name: Verify sale retry payloads, decisions and completed handovers
+        run: psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/15_sale_retry_contracts.sql
+      - name: Verify email confirmation is enforced at the database boundary
+        run: psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/16_verified_email_marketplace_identity.sql
+      - name: Verify private transactional outbox, worker leases and retry recovery
+        run: psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/17_transactional_outbox.sql

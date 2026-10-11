@@ -167,6 +167,58 @@ not permission to manufacture a passing result or turn off protections.
 
 ## Continuation rule
 
-Start the next backend session at Gate 1. Append actual files changed, checks,
+Continue from the latest dated checkpoint below. Append actual files changed, checks,
 commit/PR and hosted evidence after each bounded slice. Never mark a checkbox
 complete from plans, screenshots or local fixtures alone.
+
+## Checkpoint — 2026-10-11, domain integrity and async boundary
+
+The tables and unchecked gates above describe the recovered baseline, not the
+latest implementation. Foundation commit `668ca8d` has passed native PostgreSQL
+16 and web CI (run `38106408971`). Seven forward migrations now extend the ten
+original migrations, without replacing historical files or deleting user data.
+
+Implemented since that baseline:
+
+- Existing-user profile backfill, restricted trigger-function grants, accurate
+  profile-save results, disabled-category sale-media authorization and an offline
+  readiness inventory that never confuses configuration with hosted proof.
+- Rental requests and approval/handover check current counterparty eligibility
+  and blocks. Retries require identical dates/listing; existing return/cancel
+  recovery remains possible after a counterparty becomes ineligible.
+- Sale message/offer retries reject changed payloads; null offer decisions are
+  rejected; completed exchange confirmations retry without duplicate notifications.
+- Marketplace eligibility checks confirmed email in trusted Auth records at the
+  database boundary, including direct API/RPC access.
+- Indexed PostgreSQL full-text search over sale/rental titles and descriptions,
+  with existing campus RLS and filters retained.
+- Transactional notification outbox and bounded server worker protocol, including
+  leases, stale-token rejection, timeout, backoff and terminal failure records.
+  **No external delivery adapter or scheduler is enabled.**
+
+Local evidence: all 17 migrations apply in an embedded PostgreSQL test database;
+tests 09–17 pass; legacy tests 01/04/05/06/07/08 also pass against the full chain.
+Legacy test 02 intentionally exercises the pre-media schema in CI. 33 Node unit
+tests, lint, TypeScript and production build pass. These fixtures do not exercise
+hosted Supabase Auth, Storage or SMTP, and do not establish concurrent-load proof.
+
+Continue with hosted staging identification/configuration and vertical-slice
+verification; rate/abuse controls at direct API boundaries; Storage cleanup and
+limits; pagination/multi-campus review; authorized Realtime; real delivery adapter
+and worker scheduling; monitoring, backup/restore and load/rollback checks. None
+of those gates is marked complete by the local results above. The connected
+Vercel project's visible environment inventory was empty; no hosted project
+credentials or deployment settings were invented, changed or enabled.
+
+Deployment order: review/apply the forward migrations on the intended staging
+database **before** deploying application search queries using `search_document`.
+Generated-column/index construction needs a migration window appropriate to the
+actual dataset. Preserve frontend preview and current disabled feature flags
+until hosted verification supports changing them. Never apply test fixtures or
+historical `uniloop_completeALL.sql` to a hosted project.
+
+Sources checked for this slice:
+[Supabase full-text search](https://supabase.com/docs/guides/database/full-text-search),
+[JavaScript textSearch](https://supabase.com/docs/reference/javascript/textsearch),
+[database functions](https://supabase.com/docs/guides/database/functions).
+See [outbox runbook](UNILOOP_OUTBOX_RUNBOOK.md) for the remaining delivery boundary.
