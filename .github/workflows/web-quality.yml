@@ -244,3 +244,7 @@ jobs:
         env:
           PGDATABASE: uniloop_notifications_ci
         run: node apps/web/tests/media-upload-concurrency.mjs
+      - name: Verify fixture backup restores data, RLS and indexed search
+        env:
+          PGDATABASE: uniloop_notifications_ci
+        run: bash supabase/tests/verify-backup-restore.sh

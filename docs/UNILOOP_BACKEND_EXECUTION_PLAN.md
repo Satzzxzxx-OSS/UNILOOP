@@ -265,3 +265,9 @@ snapshots. Native concurrent sale/rental upload tests were added. Existing bucke
 settings are checked before applying the migration; no bucket configuration or
 user objects are overwritten/deleted. See [media verification](UNILOOP_MEDIA_VERIFICATION.md)
 for the distinct real Storage API, rollback/orphan and signed-URL checks still open.
+
+Recovery continuation: native CI now backs up its disposable full-chain database,
+restores into a second database and compares canonical row hashes/counts before
+rerunning security/search contracts. This is fixture regression evidence, not a
+managed Supabase/global-role/Storage-byte disaster-recovery proof. See
+[release verification](UNILOOP_RELEASE_VERIFICATION.md) for remaining hosted gates.
