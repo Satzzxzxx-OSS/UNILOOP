@@ -1,3 +1,5 @@
+import {PageNavigation} from "@/components/page-navigation";
+import {pageWindow} from "@/lib/pagination";
 import type {Metadata} from "next";
 import {getMyListings} from "@/lib/listings/data";
 import {ListingCard} from "@/components/listing-card";
@@ -5,8 +7,9 @@ import {WorkspaceShell,WorkspaceEmpty} from "@/components/experience/workspace-s
 
 export const dynamic="force-dynamic";
 export const metadata:Metadata={title:"My listings",robots:{index:false}};
-export default async function MyListingsPage(){
- const result=await getMyListings();
+export default async function MyListingsPage({searchParams}:{searchParams:Promise<{page?:string}>}){
+ const page=pageWindow((await searchParams).page).page;
+ const result=await getMyListings(page);
  return <WorkspaceShell eyebrow="YOUR MARKETPLACE" title="My listings"
     description="One thoughtful place for your drafts, available items and finished listings."
     action={{href:"/post",label:"List another item"}}>
@@ -19,5 +22,6 @@ export default async function MyListingsPage(){
          "Sign in with approved access to manage your real listings when services are enabled."}
        action={{href:result.kind==="ready"?"/post":"/account",
          label:result.kind==="ready"?"Create your first listing":"Go to account"}}/>}
+ <PageNavigation path="/my/listings" page={page} hasMore={"hasMore" in result && result.hasMore===true}/>
  </WorkspaceShell>;
 }

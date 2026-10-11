@@ -1,3 +1,5 @@
+import {PageNavigation} from "@/components/page-navigation";
+import {pageWindow} from "@/lib/pagination";
 import type {Metadata} from "next";
 import Link from "next/link";
 import {getSaleOfferInbox} from "@/lib/interactions/data";
@@ -6,8 +8,9 @@ import {ExperienceIcon} from "@/components/experience/experience-header";
 
 export const dynamic="force-dynamic";
 export const metadata:Metadata={title:"Offers",robots:{index:false}};
-export default async function OffersPage(){
- const result=await getSaleOfferInbox();
+export default async function OffersPage({searchParams}:{searchParams:Promise<{page?:string}>}){
+ const page=pageWindow((await searchParams).page).page;
+ const result=await getSaleOfferInbox(page);
  return <WorkspaceShell eyebrow="THE ART OF THE DEAL" title="Offers"
    description="Keep track of offers and counter-offers associated with real conversations."
    action={{href:"/inbox",label:"Go to inbox"}}>
@@ -21,5 +24,6 @@ export default async function OffersPage(){
      <WorkspaceEmpty title="No offers to review yet."
        description="Accepted, pending and counter-offers will appear when real negotiations are recorded."
        action={{href:"/inbox",label:"View messages"}}/>}
+ <PageNavigation path="/offers" page={page} hasMore={"hasMore" in result&&result.hasMore===true}/>
  </WorkspaceShell>;
 }

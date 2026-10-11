@@ -1,3 +1,5 @@
+import {PageNavigation} from "@/components/page-navigation";
+import {pageWindow} from "@/lib/pagination";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { serverSupabase } from "@/lib/supabase/server";
@@ -10,19 +12,21 @@ type StaffReport={
  report_id:string;listing_id:string;reason:string;details:string;created_at:string;
 };
 
-export default async function ModerationPage(){
+export default async function ModerationPage({searchParams}:{searchParams:Promise<{page?:string}>}){
+  const window=pageWindow((await searchParams).page);
   const client=await serverSupabase();
   if(!client) notFound();
   const {data:{user},error}=await client.auth.getUser();
   if(error || !user) notFound();
 
   const {data,reportsError}=await (async()=>{
-    const r=await client.rpc("get_open_listing_reports");
+    const r=await client.rpc("get_open_listing_reports_page",{page_number:window.page});
     return {data:r.data,reportsError:r.error};
   })();
   if(reportsError) notFound();
 
-  const reports=(data??[]) as StaffReport[];
+  const hasMore=(data?.length??0)>window.size;
+  const reports=(data??[]).slice(0,window.size) as StaffReport[];
   const enabled=process.env.ENABLE_MARKETPLACE_USER_ACTIONS==="true";
   return <div className="container moderation-page">
     <p className="eyebrow">RESTRICTED OPERATIONS</p>
@@ -42,5 +46,6 @@ export default async function ModerationPage(){
     )}</div>:<section className="feed-notice">
       <h2>No open reports</h2><p>The moderation queue is empty.</p>
     </section>}
+    <PageNavigation path="/admin/reports" page={window.page} hasMore={hasMore}/>
   </div>;
 }

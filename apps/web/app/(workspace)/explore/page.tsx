@@ -1,3 +1,5 @@
+import {PageNavigation} from "@/components/page-navigation";
+import {pageWindow} from "@/lib/pagination";
 import {Button} from "@/components/spaceui/button";
 import {Input} from "@/components/spaceui/input";
 import {CategoryFilterDialog} from "@/components/experience/category-filter-dialog";
@@ -21,15 +23,16 @@ function hrefFor(mode:"buy"|"rent",q:string,category?:string|null){
 }
 
 export default async function ExplorePage({searchParams}:{
-  searchParams:Promise<{mode?:string;q?:string;category?:string}>
+  searchParams:Promise<{mode?:string;q?:string;category?:string;page?:string}>
 }){
   const raw=await searchParams;
+  const page=pageWindow(raw.page).page;
   const mode=parseMarketMode(raw.mode),q=cleanSearchQuery(raw.q);
   const category=parseCategory(raw.category);
   const chosen=categories.find(c=>c.slug===category);
   const result=mode==="buy"
-    ?await discoverListings({category,search:q,limit:24})
-    :await discoverRentals({category,search:q,limit:24});
+    ?await discoverListings({category,search:q,limit:24,page})
+    :await discoverRentals({category,search:q,limit:24,page});
   const number=result.items.length;
   return <div className="ux-explore">
     <section className="ux-explore-hero">
@@ -101,6 +104,7 @@ export default async function ExplorePage({searchParams}:{
               <ListingResults mode="buy" result={result as Awaited<ReturnType<typeof discoverListings>>} search={q}/>:
               <RentalResults result={result as Awaited<ReturnType<typeof discoverRentals>>}/>}
           </div>
+          <PageNavigation path="/explore" page={page} hasMore={result.hasMore===true} filters={{mode,q,category:category??undefined}}/>
         </div>
       </div>
     </section>

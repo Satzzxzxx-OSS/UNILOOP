@@ -1,3 +1,5 @@
+import {PageNavigation} from "@/components/page-navigation";
+import {pageWindow} from "@/lib/pagination";
 import type {Metadata} from "next";
 import {ListingCard} from "@/components/listing-card";
 import {WorkspaceShell,WorkspaceEmpty} from "@/components/experience/workspace-shell";
@@ -5,16 +7,19 @@ import {verifiedMarketplaceContext,type Listing} from "@/lib/listings/data";
 
 export const dynamic="force-dynamic";
 export const metadata:Metadata={title:"Saved items",robots:{index:false}};
-export default async function SavedPage(){
+export default async function SavedPage({searchParams}:{searchParams:Promise<{page?:string}>}){
+ const window=pageWindow((await searchParams).page);
+ let hasMore=false;
   const context=await verifiedMarketplaceContext();
   let items:Listing[]=[];
   let failure=false;
   if(context.kind==="ready"){
-    const {data:saved,error}=await context.client.from("favorites").select("listing_id")
-      .eq("user_id",context.userId).order("created_at",{ascending:false}).limit(24);
+    const {data:saved,error}=await context.client.from("favorites").select("listing_id,created_at")
+      .eq("user_id",context.userId).order("created_at",{ascending:false}).order("listing_id",{ascending:false}).range(window.from,window.to);
     if(error)failure=true;
     else if(saved?.length){
-      const ids=saved.map(item=>item.listing_id);
+      hasMore=saved.length>window.size;
+      const ids=saved.slice(0,window.size).map(item=>item.listing_id);
       const {data:listings,error:listError}=await context.client.from("listings")
         .select("id,owner_id,campus_id,category_slug,title,description,price_inr,item_condition,status,created_at,published_at")
         .in("id",ids).eq("status","active");
@@ -38,5 +43,6 @@ export default async function SavedPage(){
         <ListingCard listing={item} key={item.id}/>)}</div>:
         <WorkspaceEmpty title="Nothing saved just yet." description="Discover something useful, and you can come back to it here when saving is enabled."
           action={{href:"/explore",label:"Find something great"}}/>}
-  </WorkspaceShell>;
+  <PageNavigation path="/saved" page={window.page} hasMore={hasMore}/>
+ </WorkspaceShell>;
 }

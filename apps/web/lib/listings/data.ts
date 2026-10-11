@@ -1,3 +1,6 @@
+import {cache} from "react";
+import { cookies } from "next/headers";
+import { pageWindow } from "@/lib/pagination";
 import { serverSupabase } from "@/lib/supabase/server";
 
 type UserDbClient = NonNullable<Awaited<ReturnType<typeof serverSupabase>>>;
@@ -20,22 +23,24 @@ export type Listing = {
 };
 
 export type ListingsResult =
-  | { kind: "unconfigured" | "login" | "not_eligible" | "error"; items: Listing[] }
-  | { kind: "ready"; items: Listing[] };
+  | { kind: "unconfigured" | "login" | "not_eligible" | "error"; items: Listing[]; hasMore?: boolean }
+  | { kind: "ready"; items: Listing[]; hasMore?: boolean };
 
-export async function verifiedMarketplaceContext() {
+export const verifiedMarketplaceContext = cache(async function verifiedMarketplaceContext() {
   const client = await serverSupabase();
   if (!client) return { kind: "unconfigured" as const };
   const { data: { user }, error } = await client.auth.getUser();
   if (error || !user) return { kind: "login" as const };
 
   // Only rows permitted by campus RLS are selectable here.
-  const { data: campus, error: campusError } = await client
-    .from("campuses").select("id").order("id").limit(1).maybeSingle();
+  const { data: campuses, error: campusError } = await client
+    .from("campuses").select("id,name").order("id");
   if (campusError) return { kind: "error" as const };
+  const selected=(await cookies()).get("uniloop-campus")?.value;
+  const campus=campuses?.find(row=>row.id===selected)??campuses?.[0];
   if (!campus) return { kind: "not_eligible" as const };
-  return { kind: "ready" as const, client, userId: user.id, campusId: campus.id };
-}
+  return { kind: "ready" as const, client, userId: user.id, campusId: campus.id, campuses: campuses ?? [] };
+});
 
 
 async function withCoverImages(client: UserDbClient, listings: Listing[]): Promise<Listing[]> {
@@ -60,21 +65,22 @@ async function withCoverImages(client: UserDbClient, listings: Listing[]): Promi
 }
 
 export async function discoverListings({
-  category, search, limit = 18,
+  category, search, limit = 18, page = 1,
 }: {
   category?: string | null;
   search?: string;
-  limit?: number;
+  limit?: number; page?: number;
 } = {}): Promise<ListingsResult> {
   const context = await verifiedMarketplaceContext();
   if (context.kind !== "ready") return { kind: context.kind, items: [] };
 
+  const window=pageWindow(page,limit);
   let query = context.client.from("listings")
     .select("id, owner_id, campus_id, category_slug, title, description, price_inr, item_condition, status, created_at, published_at")
     .eq("campus_id", context.campusId)
     .eq("status", "active")
     .order("published_at", { ascending: false })
-    .limit(Math.min(Math.max(1, limit), 24));
+    .order("id", {ascending:false}).range(window.from,window.to);
 
   const safeCategory = parseCategory(category);
   if (safeCategory) query = query.eq("category_slug", safeCategory);
@@ -86,7 +92,7 @@ export async function discoverListings({
 
   const { data, error } = await query;
   if (error) return { kind: "error", items: [] };
-  return { kind: "ready", items: await withCoverImages(context.client, (data ?? []) as Listing[]) };
+  return { kind: "ready", items: await withCoverImages(context.client, (data ?? []).slice(0,window.size) as Listing[]),hasMore:(data?.length??0)>window.size };
 }
 
 export async function getListing(listingId: string) {
@@ -112,9 +118,10 @@ export async function getListing(listingId: string) {
   return { listing, userId: context.userId, photos: photos.filter((v): v is string => Boolean(v)), photoCount: media?.length ?? 0 };
 }
 
-export async function getMyListings(): Promise<ListingsResult> {
+export async function getMyListings(page=1): Promise<ListingsResult> {
   const context = await verifiedMarketplaceContext();
   if (context.kind !== "ready") return { kind: context.kind, items: [] };
+  const window=pageWindow(page);
   const { data, error } = await context.client
     .from("listings")
     .select("id, owner_id, campus_id, category_slug, title, description, price_inr, item_condition, status, created_at, published_at")
@@ -122,7 +129,7 @@ export async function getMyListings(): Promise<ListingsResult> {
     .eq("campus_id", context.campusId)
     .neq("status", "removed")
     .order("created_at", { ascending: false })
-    .limit(24);
+    .order("id",{ascending:false}).range(window.from,window.to);
   if (error) return { kind: "error", items: [] };
-  return { kind: "ready", items: await withCoverImages(context.client, (data ?? []) as Listing[]) };
+  return { kind: "ready", items: await withCoverImages(context.client, (data ?? []).slice(0,window.size) as Listing[]),hasMore:(data?.length??0)>window.size };
 }

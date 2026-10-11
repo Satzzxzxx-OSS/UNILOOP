@@ -1,3 +1,5 @@
+import {PageNavigation} from "@/components/page-navigation";
+import {pageWindow} from "@/lib/pagination";
 import {ExchangeTimeline} from "@/components/experience/exchange-timeline";
 import {ItemStatus} from "@/components/experience/item-status";
 import type {Metadata} from "next";
@@ -17,11 +19,12 @@ function periodDates(value:string){
   return match?match[1]+" → "+match[2]+" (return date)":value;
 }
 
-export default async function BookingDetails({params}:{
-  params:Promise<{id:string}>;
+export default async function BookingDetails({params,searchParams}:{
+  params:Promise<{id:string}>;searchParams:Promise<{page?:string}>;
 }){
   const {id}=await params;
-  const result=await getRentalBooking(id);
+  const page=pageWindow((await searchParams).page).page;
+  const result=await getRentalBooking(id,page);
   if(!result)notFound();
   const {booking,item,myId,notes}=result;
   const owner=booking.owner_id===myId;
@@ -85,6 +88,7 @@ export default async function BookingDetails({params}:{
           <time dateTime={note.created_at}>{new Date(note.created_at).toLocaleString("en-IN")}</time>
         </article>)}</div>:
         <p className="interaction-note">No condition notes have been recorded yet.</p>}
+      <PageNavigation path={"/rentals/"+id} page={page} hasMore={result.hasMoreNotes}/>
       {enabled&&["approved","active","returned"].includes(booking.status)&&
         <RentalConditionForm id={booking.id}/>}
     </section>
