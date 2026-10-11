@@ -1,0 +1,27 @@
+name: Backend scheduled operations
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/5 * * * *"
+permissions:
+  contents: read
+concurrency:
+  group: backend-scheduled-operations
+  cancel-in-progress: false
+jobs:
+  scheduled-operations:
+    # Explicit opt-in: fork/preview repositories must not process real jobs.
+    if: vars.ENABLE_BACKEND_SCHEDULES == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Run bounded backend jobs and health check
+        env:
+          APP_ORIGIN: ${{ vars.APP_ORIGIN }}
+          ENABLE_NOTIFICATION_EMAIL_DELIVERY: ${{ vars.ENABLE_NOTIFICATION_EMAIL_DELIVERY }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: node apps/web/scripts/run-scheduled-jobs.mjs

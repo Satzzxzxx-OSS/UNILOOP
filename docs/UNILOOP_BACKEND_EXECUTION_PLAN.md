@@ -271,3 +271,9 @@ restores into a second database and compares canonical row hashes/counts before
 rerunning security/search contracts. This is fixture regression evidence, not a
 managed Supabase/global-role/Storage-byte disaster-recovery proof. See
 [release verification](UNILOOP_RELEASE_VERIFICATION.md) for remaining hosted gates.
+
+
+2026-10-12 continuation: see [launch operations](UNILOOP_LAUNCH_OPERATIONS.md)
+for implemented pagination/campus/realtime/job endpoints, scheduler configuration,
+verification and remaining hosted plus implementation gates. The new source adds
+one realtime publication migration; no production access or writes were enabled.

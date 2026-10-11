@@ -1,3 +1,5 @@
+import {PageNavigation} from "@/components/page-navigation";
+import {pageWindow} from "@/lib/pagination";
 import type {Metadata} from "next";
 import Link from "next/link";
 import {getMyRentalListings} from "@/lib/rentals/data";
@@ -6,8 +8,9 @@ import {ExperienceIcon} from "@/components/experience/experience-header";
 
 export const dynamic="force-dynamic";
 export const metadata:Metadata={title:"My rental items",robots:{index:false}};
-export default async function MyRentalsPage(){
- const result=await getMyRentalListings();
+export default async function MyRentalsPage({searchParams}:{searchParams:Promise<{page?:string}>}){
+ const page=pageWindow((await searchParams).page).page;
+ const result=await getMyRentalListings(page);
  return <WorkspaceShell eyebrow="YOUR LENDING ACTIVITY" title="Rental listings"
    description="The useful things you share deserve a thoughtful home."
    action={{href:"/rent/post",label:"Rent out an item"}}>
@@ -24,5 +27,6 @@ export default async function MyRentalsPage(){
        description="Create a beautiful rental draft with real details and photos when account services are ready."
        action={{href:result.kind==="ready"?"/rent/post":"/account",
         label:result.kind==="ready"?"Create rental draft":"Go to account"}}/>}
+ <PageNavigation path="/rent/my" page={page} hasMore={"hasMore" in result && result.hasMore===true}/>
  </WorkspaceShell>;
 }

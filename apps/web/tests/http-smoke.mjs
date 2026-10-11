@@ -22,6 +22,7 @@ const server = spawn(process.execPath, [nextScript, "start", "-p", String(port),
     ENABLE_MARKETPLACE_USER_ACTIONS: "false",
     ENABLE_RENTAL_OPERATIONS: "false",
     ENABLE_SALE_TRANSACTIONS: "false",
+    CRON_SECRET: "",
   },
   stdio: ["ignore", "pipe", "pipe"],
 });
@@ -58,6 +59,12 @@ try {
       const html = await response.text();
       assert.match(html,/UNILOOP|UNI/,"Expected brand/page chrome at "+route);
     }
+  }
+  for(const job of ["notifications","maintenance","health"]){
+    const response=await fetch(base+"/api/jobs/"+job);
+    assert.equal(response.status,401,"Job requires credentials");
+    assert.match(response.headers.get("cache-control"),/no-store/);
+    assert.equal((await fetch(base+"/api/jobs/"+job,{method:"HEAD"})).status,405);
   }
   const writeRequest=await fetch(base+"/dashboard",{method:"POST",redirect:"manual"});
   assert.equal(writeRequest.status,307,"Preview must not bypass POST/server-action authentication");
