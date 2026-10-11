@@ -1,3 +1,5 @@
+import {PageNavigation} from "@/components/page-navigation";
+import {pageWindow} from "@/lib/pagination";
 import type {Metadata} from "next";
 import Link from "next/link";
 import {serverSupabase} from "@/lib/supabase/server";
@@ -11,7 +13,9 @@ function safeUrl(raw:string):string{
  return /^\/(inbox|rentals|transactions)\/[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(raw)
    ?raw:"/notifications";
 }
-export default async function NotificationsPage(){
+export default async function NotificationsPage({searchParams}:{searchParams:Promise<{page?:string}>}){
+ const window=pageWindow((await searchParams).page);
+ let hasMore=false;
  const client=await serverSupabase();
  const result=client?await client.auth.getUser():null;
  const user=result?.data.user;
@@ -19,8 +23,9 @@ export default async function NotificationsPage(){
  if(client&&user){
    const r=await client.from("notifications")
      .select("id,title,category,link_path,read_at,created_at")
-     .order("created_at",{ascending:false}).limit(50);
-   data=(r.data??[]) as Alert[];error=Boolean(r.error);
+     .order("created_at",{ascending:false}).order("id",{ascending:false}).range(window.from,window.to);
+   hasMore=(r.data?.length??0)>window.size;
+   data=(r.data??[]).slice(0,window.size) as Alert[];error=Boolean(r.error);
  }
  const enabled=process.env.ENABLE_MARKETPLACE_USER_ACTIONS==="true";
  return <WorkspaceShell eyebrow="STAY IN THE KNOW" title="Notifications"
@@ -44,6 +49,7 @@ export default async function NotificationsPage(){
        <WorkspaceEmpty title="It's quiet here, for now."
          description="Your real message, offer and booking notifications will show up when something happens."
          action={{href:"/explore",label:"Explore the marketplace"}}/>}
-   <p className="ux-activity-footnote">Most recent 50 alerts shown. Email and realtime push aren&apos;t active yet.</p>
+   <p className="ux-activity-footnote">Updates from your actual marketplace activity.</p>
+ <PageNavigation path="/notifications" page={window.page} hasMore={hasMore}/>
  </WorkspaceShell>;
 }

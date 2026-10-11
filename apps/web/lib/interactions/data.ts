@@ -1,4 +1,5 @@
 import "server-only";
+import {pageWindow} from "@/lib/pagination";
 import { verifiedMarketplaceContext } from "@/lib/listings/data";
 import { isUuid } from "@/lib/interactions/validation";
 
@@ -16,26 +17,28 @@ export type SaleOffer = {
   amount_inr: number; status: string; created_at: string;
 };
 
-export async function getSaleInbox() {
+export async function getSaleInbox(page=1,onlyOffers=false) {
   const context = await verifiedMarketplaceContext();
   if (context.kind !== "ready") return { kind: context.kind, conversations: [] as Array<SaleThread & { title: string }> };
 
+  const window=pageWindow(page);
   const { data, error } = await context.client.from("sale_conversations")
-    .select("id,listing_id,buyer_id,seller_id,created_at")
-    .order("created_at", { ascending: false }).limit(50);
+    .select(onlyOffers?"id,listing_id,buyer_id,seller_id,created_at,sale_offers!inner(id)":"id,listing_id,buyer_id,seller_id,created_at")
+    .order("created_at", { ascending: false }).order("id",{ascending:false}).range(window.from,window.to).returns<SaleThread[]>();
   if (error) return { kind: "error" as const, conversations: [] as Array<SaleThread & { title: string }> };
 
-  const threads = (data ?? []) as SaleThread[];
+  const hasMore=(data?.length??0)>window.size;
+  const threads = (data ?? []).slice(0,window.size) as SaleThread[];
   if (!threads.length) return { kind: "ready" as const, conversations: [] as Array<SaleThread & { title: string }> };
   const { data: listings } = await context.client.from("listings")
     .select("id,title").in("id", threads.map(t => t.listing_id));
   const names = new Map((listings ?? []).map(x => [x.id, x.title]));
-  return { kind: "ready" as const, conversations: threads.map(t => ({
+  return { kind: "ready" as const, hasMore, conversations: threads.map(t => ({
     ...t, title: names.get(t.listing_id) ?? "Listing no longer available",
   })) };
 }
 
-export async function getSaleThread(conversationId: string) {
+export async function getSaleThread(conversationId: string, page=1,offerPage=1) {
   if (!isUuid(conversationId)) return null;
   const context = await verifiedMarketplaceContext();
   if (context.kind !== "ready") return null;
@@ -46,44 +49,39 @@ export async function getSaleThread(conversationId: string) {
   if (error || !data) return null;
   const thread = data as SaleThread;
 
-  const [messagesResult, offersResult, listingResult, blocksResult] = await Promise.all([
+  const window=pageWindow(page,50);
+  const offerWindow=pageWindow(offerPage,30);
+  const [messagesResult, offersResult, listingResult, blocksResult,currentOffersResult] = await Promise.all([
     context.client.from("sale_messages")
       .select("id,conversation_id,sender_id,message_body,created_at")
       .eq("conversation_id", thread.id)
-      .order("created_at", { ascending: false }).limit(50),
+      .order("created_at", { ascending: false }).order("id",{ascending:false}).range(window.from,window.to),
     context.client.from("sale_offers")
       .select("id,conversation_id,listing_id,proposer_id,recipient_id,parent_offer_id,amount_inr,status,created_at")
       .eq("conversation_id",thread.id)
-      .order("created_at",{ascending:false}).limit(30),
+      .order("created_at",{ascending:false}).order("id",{ascending:false}).range(offerWindow.from,offerWindow.to),
     context.client.from("listings").select("id,title,price_inr,status")
       .eq("id",thread.listing_id).maybeSingle(),
     context.client.from("user_blocks").select("blocked_id")
       .eq("blocker_id",context.userId),
+    context.client.from("sale_offers").select("id,conversation_id,listing_id,proposer_id,recipient_id,parent_offer_id,amount_inr,status,created_at")
+      .eq("conversation_id",thread.id).in("status",["pending","accepted"]).order("created_at",{ascending:false}).limit(2),
   ]);
-  if (messagesResult.error || offersResult.error || blocksResult.error) return null;
+  if (messagesResult.error || offersResult.error || blocksResult.error || currentOffersResult.error) return null;
   const otherId = context.userId === thread.buyer_id ? thread.seller_id : thread.buyer_id;
   return {
     thread,
     myId: context.userId,
     otherId,
-    messages: ((messagesResult.data ?? []) as SaleMessage[]).reverse(),
-    offers: (offersResult.data ?? []) as SaleOffer[],
+    hasMoreMessages:(messagesResult.data?.length??0)>window.size,
+    messages: ((messagesResult.data ?? []).slice(0,window.size) as SaleMessage[]).reverse(),
+    hasMoreOffers:(offersResult.data?.length??0)>offerWindow.size,
+    offers: (offersResult.data ?? []).slice(0,offerWindow.size) as SaleOffer[],
+    currentOffers:(currentOffersResult.data??[]) as SaleOffer[],
     listing: listingResult.data as { id:string; title:string; price_inr:number; status:string } | null,
     iBlockedOther: (blocksResult.data ?? []).some(b => b.blocked_id === otherId),
   };
 }
 
-/** The offers screen lists only conversations containing actual persisted offers. */
-export async function getSaleOfferInbox() {
-  const inbox = await getSaleInbox();
-  if (inbox.kind !== "ready" || inbox.conversations.length === 0) return inbox;
-  const context = await verifiedMarketplaceContext();
-  if (context.kind !== "ready") return { kind: "error" as const, conversations: [] };
-  const { data, error } = await context.client.from("sale_offers")
-    .select("conversation_id")
-    .in("conversation_id", inbox.conversations.map(thread => thread.id))
-    .limit(500);
-  if (error) return { kind: "error" as const, conversations: [] };
-  const allowed = new Set((data ?? []).map(o => o.conversation_id));
-  return { kind: "ready" as const, conversations: inbox.conversations.filter(t => allowed.has(t.id)) };
-}
+/** Filter persisted offers before the page window, retaining RLS on both tables. */
+export async function getSaleOfferInbox(page=1) { return getSaleInbox(page,true); }

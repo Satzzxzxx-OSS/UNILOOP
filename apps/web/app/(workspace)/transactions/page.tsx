@@ -1,3 +1,5 @@
+import {PageNavigation} from "@/components/page-navigation";
+import {pageWindow} from "@/lib/pagination";
 import type {Metadata} from "next";
 import Link from "next/link";
 import {getSaleDeals} from "@/lib/sales/data";
@@ -9,8 +11,9 @@ export const metadata:Metadata={title:"Sale handovers",robots:{index:false}};
 const money=(n:number)=>new Intl.NumberFormat("en-IN",{
  style:"currency",currency:"INR",maximumFractionDigits:0,
 }).format(n);
-export default async function TransactionsPage(){
- const result=await getSaleDeals();
+export default async function TransactionsPage({searchParams}:{searchParams:Promise<{page?:string}>}){
+ const page=pageWindow((await searchParams).page).page;
+ const result=await getSaleDeals(page);
  return <WorkspaceShell eyebrow="THE EXCHANGE JOURNEY" title="Transactions"
    description="Real two-sided handover records, kept separate from payments and offers."
    action={{href:"/inbox",label:"View conversations"}}>
@@ -27,5 +30,6 @@ export default async function TransactionsPage(){
        description="Once an accepted offer leads to a real exchange, both participants can track handover here."
        action={{href:result.kind==="ready"?"/inbox":"/account",
          label:result.kind==="ready"?"Go to messages":"Go to account"}}/>}
+ <PageNavigation path="/transactions" page={page} hasMore={"hasMore" in result && result.hasMore===true}/>
  </WorkspaceShell>;
 }

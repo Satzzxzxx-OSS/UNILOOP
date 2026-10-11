@@ -1,4 +1,5 @@
 import "server-only";
+import {pageWindow} from "@/lib/pagination";
 import {verifiedMarketplaceContext} from "@/lib/listings/data";
 import {isUuid} from "@/lib/interactions/validation";
 
@@ -8,13 +9,14 @@ export type SaleDeal={
   seller_handed_over_at:string|null;created_at:string;completed_at:string|null;
 };
 const select="id,offer_id,listing_id,buyer_id,seller_id,agreed_price_inr,status,buyer_received_at,seller_handed_over_at,created_at,completed_at";
-export async function getSaleDeals(){
+export async function getSaleDeals(page=1){
   const context=await verifiedMarketplaceContext();
   if(context.kind!=="ready")return {kind:context.kind,items:[] as SaleDeal[]};
+  const window=pageWindow(page);
   const {data,error}=await context.client.from("sale_transactions").select(select)
-    .order("created_at",{ascending:false}).limit(40);
+    .order("created_at",{ascending:false}).order("id",{ascending:false}).range(window.from,window.to);
   return error?{kind:"error" as const,items:[] as SaleDeal[]}:
-    {kind:"ready" as const,items:(data??[]) as SaleDeal[]};
+    {kind:"ready" as const,hasMore:(data?.length??0)>window.size,items:(data??[]).slice(0,window.size) as SaleDeal[]};
 }
 export async function getSaleDeal(id:string){
   if(!isUuid(id))return null;

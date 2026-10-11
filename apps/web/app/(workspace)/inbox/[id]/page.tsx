@@ -1,3 +1,6 @@
+import {ConversationLiveUpdates} from "@/components/conversation-live-updates";
+import {PageNavigation} from "@/components/page-navigation";
+import {pageWindow} from "@/lib/pagination";
 import type { Metadata } from "next";
 import { randomUUID } from "node:crypto";
 import Link from "next/link";
@@ -16,16 +19,18 @@ const money = (n: number) => new Intl.NumberFormat("en-IN", {
   style: "currency", currency: "INR", maximumFractionDigits: 0,
 }).format(n);
 
-export default async function ConversationPage({ params }: {
-  params: Promise<{ id: string }>;
+export default async function ConversationPage({ params,searchParams }: {
+  params: Promise<{ id: string }>; searchParams:Promise<{page?:string;offerPage?:string}>;
 }) {
   const { id } = await params;
-  const result = await getSaleThread(id);
+  const raw=await searchParams;
+  const page=pageWindow(raw.page).page,offerPage=pageWindow(raw.offerPage).page;
+  const result = await getSaleThread(id,page,offerPage);
   if (!result) notFound();
   const { thread, myId, otherId, messages, offers, listing, iBlockedOther } = result;
   const enabled = process.env.ENABLE_MARKETPLACE_INTERACTIONS === "true";
-  const pendingOffer = offers.find(o => o.status === "pending");
-  const acceptedOffer = offers.find(o => o.status === "accepted");
+  const pendingOffer = result.currentOffers.find(o => o.status === "pending");
+  const acceptedOffer = result.currentOffers.find(o => o.status === "accepted");
   const showOffers = enabled && !iBlockedOther && listing?.status === "active";
 
   return <div className="ux-shell ux-chat-page conversation-page">
@@ -40,6 +45,7 @@ export default async function ConversationPage({ params }: {
         </p>
       </div>
       <ConversationRefresh />
+      <ConversationLiveUpdates conversationId={thread.id} enabled={process.env.ENABLE_MARKETPLACE_REALTIME==="true"}/>
     </div>
     <div className="conversation-layout">
       <section className="conversation-pane" aria-label="Messages">
@@ -58,10 +64,11 @@ export default async function ConversationPage({ params }: {
             </div>
           ) : <p className="conversation-empty">No messages yet. Start with a question about the item.</p>}
         </div>
+        <PageNavigation path={"/inbox/"+id} page={page} hasMore={result.hasMoreMessages} filters={{offerPage:String(offerPage)}}/>
         {enabled && !iBlockedOther ?
           <SendSaleMessage conversationId={thread.id} nonce={randomUUID()} /> :
           <p className="interaction-notice">Messaging is currently unavailable for this conversation.</p>}
-        <p className="interaction-note">Messages are saved securely. Use Refresh to check replies; live updates are not enabled yet.</p>
+        <p className="interaction-note">Messages are saved securely. Refresh is available if live updates disconnect.</p>
       </section>
       <aside className="negotiation-pane" aria-label="Offers and contact controls">
         <h2>Price offers</h2>
@@ -75,6 +82,7 @@ export default async function ConversationPage({ params }: {
             </div>
           ) : <p className="conversation-empty">No offers yet.</p>}
         </div>
+        <PageNavigation path={"/inbox/"+id} page={offerPage} pageKey="offerPage" hasMore={result.hasMoreOffers} filters={{page:String(page)}}/>
         {showOffers && !acceptedOffer && (pendingOffer ?
           pendingOffer.recipient_id === myId ?
             <div className="offer-controls">

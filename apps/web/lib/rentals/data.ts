@@ -1,4 +1,5 @@
 import "server-only";
+import {pageWindow} from "@/lib/pagination";
 import { verifiedMarketplaceContext } from "@/lib/listings/data";
 import { cleanSearchQuery,parseCategory } from "@/lib/catalog";
 import { isUuid } from "@/lib/interactions/validation";
@@ -19,34 +20,35 @@ export type RentalBooking={
 };
 export type RentalResult={
   kind:"ready"|"login"|"unconfigured"|"not_eligible"|"error";
-  items:RentalItem[];
+  items:RentalItem[]; hasMore?:boolean;
 };
 const rentalSelect="id,owner_id,campus_id,category_slug,title,description,daily_rate_inr,refundable_deposit_inr,min_days,max_days,item_condition,status,created_at,published_at";
 const bookingSelect="id,rental_id,owner_id,renter_id,booking_period,days_count,daily_rate_snapshot_inr,rental_total_inr,deposit_snapshot_inr,status,owner_handover_at,renter_handover_at,owner_return_at,renter_return_at,created_at";
 
-export async function discoverRentals({category,search,limit=18}:{
-  category?:string|null;search?:string;limit?:number;
+export async function discoverRentals({category,search,limit=18,page=1}:{
+  category?:string|null;search?:string;limit?:number;page?:number;
 }={}):Promise<RentalResult>{
   const context=await verifiedMarketplaceContext();
   if(context.kind!=="ready")return {kind:context.kind,items:[]};
+  const window=pageWindow(page,limit);
   let query=context.client.from("rental_listings")
     .select(rentalSelect).eq("campus_id",context.campusId)
     .eq("status","active").order("published_at",{ascending:false})
-    .limit(Math.min(Math.max(limit,1),24));
+    .order("id",{ascending:false}).range(window.from,window.to);
   const selected=parseCategory(category);
   if(selected)query=query.eq("category_slug",selected);
   const safe=cleanSearchQuery(search);
   if(safe)query=query.textSearch("search_document",safe,{config:"simple",type:"plain"});
   const {data,error}=await query;
   if(error)return {kind:"error",items:[]};
-  const items=(data??[]) as RentalItem[];
+  const items=(data??[]).slice(0,window.size) as RentalItem[];
   if(!items.length)return {kind:"ready",items};
   const {data:photos}=await context.client.from("rental_photos")
     .select("rental_id,storage_path,position")
     .in("rental_id",items.map(r=>r.id)).order("position",{ascending:true});
   const covers=new Map<string,string>();
   for(const row of photos??[])if(!covers.has(row.rental_id))covers.set(row.rental_id,row.storage_path);
-  return {kind:"ready",items:await Promise.all(items.map(async item=>{
+  return {kind:"ready",hasMore:(data?.length??0)>window.size,items:await Promise.all(items.map(async item=>{
     const path=covers.get(item.id);
     if(!path)return {...item,photo_url:null};
     const {data:signed,error:signError}=await context.client.storage.from("rental-media")
@@ -78,26 +80,28 @@ export async function getRental(rentalId:string){
     unavailable:busyResult.error?[]:(busyResult.data??[]) as Array<{start_date:string;return_date:string}>};
 }
 
-export async function getMyRentalListings():Promise<RentalResult>{
+export async function getMyRentalListings(page=1):Promise<RentalResult>{
   const context=await verifiedMarketplaceContext();
   if(context.kind!=="ready")return {kind:context.kind,items:[]};
+  const window=pageWindow(page);
   const {data,error}=await context.client.from("rental_listings")
     .select(rentalSelect).eq("campus_id",context.campusId)
     .eq("owner_id",context.userId).neq("status","removed")
-    .order("created_at",{ascending:false}).limit(30);
-  return error?{kind:"error",items:[]}:{kind:"ready",items:(data??[]) as RentalItem[]};
+    .order("created_at",{ascending:false}).order("id",{ascending:false}).range(window.from,window.to);
+  return error?{kind:"error",items:[]}:{kind:"ready",hasMore:(data?.length??0)>window.size,items:(data??[]).slice(0,window.size) as RentalItem[]};
 }
 
-export async function getRentalBookings(){
+export async function getRentalBookings(page=1){
   const context=await verifiedMarketplaceContext();
   if(context.kind!=="ready")return {kind:context.kind,items:[] as RentalBooking[]};
+  const window=pageWindow(page);
   const {data,error}=await context.client.from("rental_bookings")
-    .select(bookingSelect).order("created_at",{ascending:false}).limit(50);
+    .select(bookingSelect).order("created_at",{ascending:false}).order("id",{ascending:false}).range(window.from,window.to);
   return error?{kind:"error" as const,items:[] as RentalBooking[]}:
-    {kind:"ready" as const,items:(data??[]) as RentalBooking[]};
+    {kind:"ready" as const,hasMore:(data?.length??0)>window.size,items:(data??[]).slice(0,window.size) as RentalBooking[]};
 }
 
-export async function getRentalBooking(id:string){
+export async function getRentalBooking(id:string,page=1){
   if(!isUuid(id))return null;
   const context=await verifiedMarketplaceContext();
   if(context.kind!=="ready")return null;
@@ -105,12 +109,13 @@ export async function getRentalBooking(id:string){
     .select(bookingSelect).eq("id",id).maybeSingle();
   if(error||!data)return null;
   const booking=data as RentalBooking;
+  const window=pageWindow(page,50);
   const [itemResponse,notes]=await Promise.all([
     context.client.from("rental_listings").select("id,title,status")
       .eq("id",booking.rental_id).maybeSingle(),
     context.client.from("rental_condition_notes")
       .select("id,author_id,stage,note,created_at")
-      .eq("booking_id",booking.id).order("created_at",{ascending:true}).limit(50),
+      .eq("booking_id",booking.id).order("created_at",{ascending:false}).order("id",{ascending:false}).range(window.from,window.to),
   ]);
-  return {booking,item:itemResponse.data,myId:context.userId,notes:notes.data??[]};
+  return {booking,item:itemResponse.data,myId:context.userId,hasMoreNotes:(notes.data?.length??0)>window.size,notes:(notes.data??[]).slice(0,window.size).reverse()};
 }

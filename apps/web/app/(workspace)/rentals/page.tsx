@@ -1,3 +1,5 @@
+import {PageNavigation} from "@/components/page-navigation";
+import {pageWindow} from "@/lib/pagination";
 import type {Metadata} from "next";
 import Link from "next/link";
 import {getRentalBookings} from "@/lib/rentals/data";
@@ -9,8 +11,9 @@ export const metadata:Metadata={title:"Rental bookings",robots:{index:false}};
 const money=(n:number)=>new Intl.NumberFormat("en-IN",{
  style:"currency",currency:"INR",maximumFractionDigits:0,
 }).format(n);
-export default async function RentalsPage(){
- const result=await getRentalBookings();
+export default async function RentalsPage({searchParams}:{searchParams:Promise<{page?:string}>}){
+ const page=pageWindow((await searchParams).page).page;
+ const result=await getRentalBookings(page);
  return <WorkspaceShell eyebrow="YOUR RENTAL JOURNEY" title="Rental activity"
    description="Real requests, confirmed dates, handovers and returns in one place."
    action={{href:"/explore?mode=rent",label:"Explore rentals"}}>
@@ -27,5 +30,6 @@ export default async function RentalsPage(){
        description="When genuine booking requests are recorded, you can follow them here from approval through return."
        action={{href:result.kind==="ready"?"/explore?mode=rent":"/account",
          label:result.kind==="ready"?"Discover rentals":"Go to account"}}/>}
+ <PageNavigation path="/rentals" page={page} hasMore={"hasMore" in result && result.hasMore===true}/>
  </WorkspaceShell>;
 }
