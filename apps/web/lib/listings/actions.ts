@@ -1,4 +1,5 @@
 "use server";
+import { mutationErrorMessage } from "@/lib/backend-error";
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -37,7 +38,7 @@ export async function createListingDraft(
     mode: "sell",
   }).select("id").single();
 
-  if (error || !data) return { message: "Unable to save the draft. Please try again." };
+  if (error || !data) return { message: mutationErrorMessage(error,"Unable to save the draft. Please try again.") };
   revalidatePath("/my/listings");
   redirect("/listing/" + data.id);
 }

@@ -80,9 +80,8 @@ export async function discoverListings({
   if (safeCategory) query = query.eq("category_slug", safeCategory);
   const text = cleanSearchQuery(search);
   if (text) {
-    // Wildcard characters are treated as literal characters.
-    const literal = text.replace(/[\\%_]/g, "\\$&");
-    query = query.ilike("title", "%" + literal + "%");
+    // Plain text, not caller-supplied tsquery operators. Existing RLS/campus scope applies.
+    query = query.textSearch("search_document", text, {config:"simple",type:"plain"});
   }
 
   const { data, error } = await query;
