@@ -101,7 +101,7 @@ export async function getRentalBookings(page=1){
     {kind:"ready" as const,hasMore:(data?.length??0)>window.size,items:(data??[]).slice(0,window.size) as RentalBooking[]};
 }
 
-export async function getRentalBooking(id:string){
+export async function getRentalBooking(id:string,page=1){
   if(!isUuid(id))return null;
   const context=await verifiedMarketplaceContext();
   if(context.kind!=="ready")return null;
@@ -109,12 +109,13 @@ export async function getRentalBooking(id:string){
     .select(bookingSelect).eq("id",id).maybeSingle();
   if(error||!data)return null;
   const booking=data as RentalBooking;
+  const window=pageWindow(page,50);
   const [itemResponse,notes]=await Promise.all([
     context.client.from("rental_listings").select("id,title,status")
       .eq("id",booking.rental_id).maybeSingle(),
     context.client.from("rental_condition_notes")
       .select("id,author_id,stage,note,created_at")
-      .eq("booking_id",booking.id).order("created_at",{ascending:true}).limit(50),
+      .eq("booking_id",booking.id).order("created_at",{ascending:false}).order("id",{ascending:false}).range(window.from,window.to),
   ]);
-  return {booking,item:itemResponse.data,myId:context.userId,notes:notes.data??[]};
+  return {booking,item:itemResponse.data,myId:context.userId,hasMoreNotes:(notes.data?.length??0)>window.size,notes:(notes.data??[]).slice(0,window.size).reverse()};
 }

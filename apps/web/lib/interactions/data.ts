@@ -38,7 +38,7 @@ export async function getSaleInbox(page=1,onlyOffers=false) {
   })) };
 }
 
-export async function getSaleThread(conversationId: string, page=1) {
+export async function getSaleThread(conversationId: string, page=1,offerPage=1) {
   if (!isUuid(conversationId)) return null;
   const context = await verifiedMarketplaceContext();
   if (context.kind !== "ready") return null;
@@ -50,7 +50,8 @@ export async function getSaleThread(conversationId: string, page=1) {
   const thread = data as SaleThread;
 
   const window=pageWindow(page,50);
-  const [messagesResult, offersResult, listingResult, blocksResult] = await Promise.all([
+  const offerWindow=pageWindow(offerPage,30);
+  const [messagesResult, offersResult, listingResult, blocksResult,currentOffersResult] = await Promise.all([
     context.client.from("sale_messages")
       .select("id,conversation_id,sender_id,message_body,created_at")
       .eq("conversation_id", thread.id)
@@ -58,13 +59,15 @@ export async function getSaleThread(conversationId: string, page=1) {
     context.client.from("sale_offers")
       .select("id,conversation_id,listing_id,proposer_id,recipient_id,parent_offer_id,amount_inr,status,created_at")
       .eq("conversation_id",thread.id)
-      .order("created_at",{ascending:false}).limit(30),
+      .order("created_at",{ascending:false}).order("id",{ascending:false}).range(offerWindow.from,offerWindow.to),
     context.client.from("listings").select("id,title,price_inr,status")
       .eq("id",thread.listing_id).maybeSingle(),
     context.client.from("user_blocks").select("blocked_id")
       .eq("blocker_id",context.userId),
+    context.client.from("sale_offers").select("id,conversation_id,listing_id,proposer_id,recipient_id,parent_offer_id,amount_inr,status,created_at")
+      .eq("conversation_id",thread.id).in("status",["pending","accepted"]).order("created_at",{ascending:false}).limit(2),
   ]);
-  if (messagesResult.error || offersResult.error || blocksResult.error) return null;
+  if (messagesResult.error || offersResult.error || blocksResult.error || currentOffersResult.error) return null;
   const otherId = context.userId === thread.buyer_id ? thread.seller_id : thread.buyer_id;
   return {
     thread,
@@ -72,7 +75,9 @@ export async function getSaleThread(conversationId: string, page=1) {
     otherId,
     hasMoreMessages:(messagesResult.data?.length??0)>window.size,
     messages: ((messagesResult.data ?? []).slice(0,window.size) as SaleMessage[]).reverse(),
-    offers: (offersResult.data ?? []) as SaleOffer[],
+    hasMoreOffers:(offersResult.data?.length??0)>offerWindow.size,
+    offers: (offersResult.data ?? []).slice(0,offerWindow.size) as SaleOffer[],
+    currentOffers:(currentOffersResult.data??[]) as SaleOffer[],
     listing: listingResult.data as { id:string; title:string; price_inr:number; status:string } | null,
     iBlockedOther: (blocksResult.data ?? []).some(b => b.blocked_id === otherId),
   };

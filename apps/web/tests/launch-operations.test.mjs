@@ -6,6 +6,7 @@ test("page input is bounded and filters survive navigation",()=>{
  assert.deepEqual(pageWindow("2",24),{page:2,size:24,from:24,to:48});
  for(const raw of ["-1","Infinity","1e9","1 OR true",undefined])assert.equal(pageWindow(raw).page,1);
  assert.equal(pageWindow(999999).page,1000);
+ assert.equal(pageHref("/inbox/id",3,{page:"2",offerPage:"8"},"offerPage"),"/inbox/id?page=2&offerPage=3");
  assert.equal(pageHref("/explore",2,{q:"books & notes",mode:"rent",page:"99"}),"/explore?q=books+%26+notes&mode=rent&page=2");
 });
 test("job auth fails closed for missing/weak/mismatched credentials",()=>{

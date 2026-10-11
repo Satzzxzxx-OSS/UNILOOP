@@ -56,8 +56,9 @@ schema, bucket, credentials, production flag or user data was changed.
    queue capacity; up to 25 events per nominal 5-minute run is not unlimited.
 5. Test actual PostgREST offer join, page 2+ for each screen, campus switching,
    websocket publication/auth/current RLS, reconnect, logout and revocation.
-   Offer history inside a conversation still has its existing 30-row cap, rental
-   condition notes 50-row cap and moderation list needs pagination review.
+   Conversation offer history, rental condition notes and the moderation queue
+   now have separate bounded page windows. Current pending/accepted offer controls
+   are fetched independently of history pages.
 6. Complete host-level read/IP/write-attempt limits and provider Auth/Storage
    limits. Existing successful-write budgets do not cover these request paths.
    Vercel firewall discovery returned 404 even with the known explicit team;

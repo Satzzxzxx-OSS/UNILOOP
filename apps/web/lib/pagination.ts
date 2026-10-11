@@ -6,9 +6,9 @@ export function pageWindow(raw: unknown, size = 24) {
  const limit = Math.min(50, Math.max(1, Math.floor(size) || 24));
  return {page, size:limit, from:(page-1)*limit, to:page*limit};
 }
-export function pageHref(path:string, page:number, filters:Record<string,string|undefined>={}) {
+export function pageHref(path:string, page:number, filters:Record<string,string|undefined>={},pageKey:"page"|"offerPage"="page") {
  const params = new URLSearchParams();
- for(const [key,value] of Object.entries(filters)) if(value && key!=="page") params.set(key,value);
- params.set("page",String(pageWindow(page).page));
+ for(const [key,value] of Object.entries(filters)) if(value && key!==pageKey) params.set(key,value);
+ params.set(pageKey,String(pageWindow(page).page));
  return path+"?"+params.toString();
 }

@@ -253,3 +253,8 @@ jobs:
         env:
           PGDATABASE: uniloop_notifications_ci
         run: psql -X -v ON_ERROR_STOP=1 -f supabase/tests/22_realtime_publication.sql
+
+      - name: Verify non-staff moderation paging denial
+        env:
+          PGDATABASE: uniloop_notifications_ci
+        run: psql -X -v ON_ERROR_STOP=1 -f supabase/tests/23_moderation_paging.sql

@@ -20,16 +20,17 @@ const money = (n: number) => new Intl.NumberFormat("en-IN", {
 }).format(n);
 
 export default async function ConversationPage({ params,searchParams }: {
-  params: Promise<{ id: string }>; searchParams:Promise<{page?:string}>;
+  params: Promise<{ id: string }>; searchParams:Promise<{page?:string;offerPage?:string}>;
 }) {
   const { id } = await params;
-  const page=pageWindow((await searchParams).page).page;
-  const result = await getSaleThread(id,page);
+  const raw=await searchParams;
+  const page=pageWindow(raw.page).page,offerPage=pageWindow(raw.offerPage).page;
+  const result = await getSaleThread(id,page,offerPage);
   if (!result) notFound();
   const { thread, myId, otherId, messages, offers, listing, iBlockedOther } = result;
   const enabled = process.env.ENABLE_MARKETPLACE_INTERACTIONS === "true";
-  const pendingOffer = offers.find(o => o.status === "pending");
-  const acceptedOffer = offers.find(o => o.status === "accepted");
+  const pendingOffer = result.currentOffers.find(o => o.status === "pending");
+  const acceptedOffer = result.currentOffers.find(o => o.status === "accepted");
   const showOffers = enabled && !iBlockedOther && listing?.status === "active";
 
   return <div className="ux-shell ux-chat-page conversation-page">
@@ -63,7 +64,7 @@ export default async function ConversationPage({ params,searchParams }: {
             </div>
           ) : <p className="conversation-empty">No messages yet. Start with a question about the item.</p>}
         </div>
-        <PageNavigation path={"/inbox/"+id} page={page} hasMore={result.hasMoreMessages}/>
+        <PageNavigation path={"/inbox/"+id} page={page} hasMore={result.hasMoreMessages} filters={{offerPage:String(offerPage)}}/>
         {enabled && !iBlockedOther ?
           <SendSaleMessage conversationId={thread.id} nonce={randomUUID()} /> :
           <p className="interaction-notice">Messaging is currently unavailable for this conversation.</p>}
@@ -81,6 +82,7 @@ export default async function ConversationPage({ params,searchParams }: {
             </div>
           ) : <p className="conversation-empty">No offers yet.</p>}
         </div>
+        <PageNavigation path={"/inbox/"+id} page={offerPage} pageKey="offerPage" hasMore={result.hasMoreOffers} filters={{page:String(page)}}/>
         {showOffers && !acceptedOffer && (pendingOffer ?
           pendingOffer.recipient_id === myId ?
             <div className="offer-controls">
