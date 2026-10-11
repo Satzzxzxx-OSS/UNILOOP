@@ -1,4 +1,5 @@
 "use server";
+import { mutationErrorMessage } from "@/lib/backend-error";
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -25,7 +26,7 @@ export async function openConversation(
     requested_listing: listing,
   });
   if (error || typeof data !== "string" || !isUuid(data))
-    return { message: "Unable to start this conversation." };
+    return { message: mutationErrorMessage(error,"Unable to start this conversation.") };
   redirect("/inbox/" + data);
 }
 
@@ -44,7 +45,7 @@ export async function sendMessage(
   const { error } = await context.client.rpc("send_sale_message", {
     requested_conversation: conversation, content: body, request_nonce: nonce,
   });
-  if (error) return { message: "Could not send. You may need to wait before sending again." };
+  if (error) return { message: mutationErrorMessage(error,"Could not send. You may need to wait before sending again.") };
   revalidatePath("/inbox");
   revalidatePath("/inbox/" + conversation);
   redirect("/inbox/" + conversation);
@@ -71,7 +72,7 @@ export async function submitOffer(
     parent_offer: parent,
     request_nonce: nonce,
   });
-  if (error) return { message: "Offer could not be placed. Refresh to see the latest negotiation state." };
+  if (error) return { message: mutationErrorMessage(error,"Offer could not be placed. Refresh to see the latest negotiation state.") };
   revalidatePath("/inbox/" + conversation);
   redirect("/inbox/" + conversation);
 }

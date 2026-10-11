@@ -226,3 +226,17 @@ jobs:
         run: psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/16_verified_email_marketplace_identity.sql
       - name: Verify private transactional outbox, worker leases and retry recovery
         run: psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/17_transactional_outbox.sql
+      - name: Verify direct API write budgets and rollback semantics
+        run: psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/18_marketplace_write_budgets.sql
+      - name: Verify notification delivery opt-out, revocation and worker-only recipients
+        run: psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/19_notification_delivery_context.sql
+      - name: Verify private worker metrics have accurate counts and no recipient data
+        run: psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/20_backend_job_health.sql
+      - name: Setup Node for native concurrency test
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Verify simultaneous writes cannot overshoot a shared account budget
+        env:
+          PGDATABASE: uniloop_notifications_ci
+        run: node apps/web/tests/write-budget-concurrency.mjs

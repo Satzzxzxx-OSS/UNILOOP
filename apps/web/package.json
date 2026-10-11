@@ -10,7 +10,9 @@
     "typecheck": "tsc --noEmit",
     "test": "node --experimental-strip-types --test tests/*.test.mjs",
     "backend:inventory": "node --experimental-strip-types scripts/backend-readiness.mjs",
-    "backend:release-check": "node --experimental-strip-types scripts/backend-readiness.mjs --release-check"
+    "backend:release-check": "node --experimental-strip-types scripts/backend-readiness.mjs --release-check",
+    "backend:notifications": "node --experimental-strip-types scripts/notification-worker.mjs --once",
+    "backend:health": "node --experimental-strip-types scripts/backend-health.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",

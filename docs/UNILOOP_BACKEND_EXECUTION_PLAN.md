@@ -222,3 +222,39 @@ Sources checked for this slice:
 [JavaScript textSearch](https://supabase.com/docs/reference/javascript/textsearch),
 [database functions](https://supabase.com/docs/guides/database/functions).
 See [outbox runbook](UNILOOP_OUTBOX_RUNBOOK.md) for the remaining delivery boundary.
+
+## Checkpoint — 2026-10-11, continued operational implementation
+
+The preceding checkpoint's "no delivery adapter" statement is superseded by this
+continuation. No live providers were activated.
+
+- Added successful-write budgets for seven existing creation paths, enforced by
+  PostgreSQL triggers even when clients skip application actions. Canonical retries
+  and rolled-back transactions do not consume budget. Existing forms show a fixed
+  quota message. See [write budgets](UNILOOP_WRITE_BUDGETS.md) for defaults/limits.
+- Implemented lease-bound notification delivery context with current identity,
+  campus/category, participant/block and saved preference checks. Suppressed lookup
+  results contain no recipient email. Existing preference scope covers only
+  messages/offers; rental/sale external emails are suppressed.
+- Added optional Resend HTTPS transport and explicit one-batch worker command;
+  secrets stay private, requests have cancellation/deadlines, redirects are denied,
+  provider acknowledgements are checked and idempotency keys remain stable.
+  Notification freshness is limited to 20 hours against the documented 24-hour
+  provider deduplication window. No real email or Auth SMTP configuration changed.
+- Added service-only outbox counts/ages and a privacy-safe operator health command.
+  It is outbox monitoring preparation, not global health or external alerting.
+- Added native competing-transaction quota verification to CI, along with SQL
+  eligibility/health tests and transport/configuration unit tests.
+
+Current source: 20 ordered migrations. Local unit suite: 44 passing tests.
+Full-chain SQL tests 09–20, legacy full-chain regression checks, lint, TypeScript,
+build and HTTP smoke are recorded as checks complete only when observed; native
+concurrency and full browser CI results are recorded on the updated PR.
+
+Remaining work still includes hosted staging/Auth/Storage/SMTP verification,
+private worker/cleanup scheduling, provider/domain verification, account-wide
+gateway limits, storage concurrency/orphan cleanup audit, pagination/multi-campus
+behavior, authorized Realtime, external monitoring/alerts, backup/restore,
+load testing and production preview/auth boundary. Those gates require explicit
+implementation or real environment evidence; they are not checked off by this
+checkpoint. Continue from this list, preserving data and current frontend.

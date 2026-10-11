@@ -1,4 +1,5 @@
 "use server";
+import { mutationErrorMessage } from "@/lib/backend-error";
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -28,7 +29,7 @@ export async function createRentalDraft(
   const {data,error}=await context.client.from("rental_listings").insert({
     ...values.value,owner_id:context.userId,campus_id:context.campusId,
   }).select("id").single();
-  if(error||!data)return {message:"Unable to save rental draft."};
+  if(error||!data)return {message:mutationErrorMessage(error,"Unable to save rental draft.")};
   revalidatePath("/rent/my");
   redirect("/rent/"+data.id);
 }
@@ -65,7 +66,7 @@ export async function requestRental(
   const {data,error}=await context.client.rpc("request_rental_booking",{
     requested_rental:rental,start_date:from,return_date:until,p_nonce:nonce,
   });
-  if(error||typeof data!=="string")return {message:"These dates could not be requested. Check availability and duration."};
+  if(error||typeof data!=="string")return {message:mutationErrorMessage(error,"These dates could not be requested. Check availability and duration.")};
   revalidatePath("/rentals");
   redirect("/rentals/"+data);
 }

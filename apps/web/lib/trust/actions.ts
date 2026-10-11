@@ -1,4 +1,5 @@
 "use server";
+import { mutationErrorMessage } from "@/lib/backend-error";
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -88,7 +89,7 @@ export async function sendListingReport(
   });
   if(error){
     if(error.code==="23505") return {message:"You already reported this reason for this item."};
-    return {message:"Unable to submit report. Please try again."};
+    return {message:mutationErrorMessage(error,"Unable to submit report. Please try again.")};
   }
   revalidatePath("/report/"+listing);
   return {message:"Report received for moderation review.",ok:true};
