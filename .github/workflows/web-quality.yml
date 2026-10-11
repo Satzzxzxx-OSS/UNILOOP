@@ -200,7 +200,11 @@ jobs:
         run: |
           psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/00_auth_fixture.sql
           psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/03_storage_fixture.sql
+          psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -c "insert into auth.users(id,email) values ('eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee','existing-before-uniloop@example.test')"
           for migration in supabase/migrations/*.sql; do
+            if [ "$migration" = "supabase/migrations/20261010210000_identity_backfill_and_function_grants.sql" ]; then
+              psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/00_existing_identity_upgrade_fixture.sql
+            fi
             echo "Applying $migration"
             psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f "$migration"
           done
@@ -208,3 +212,7 @@ jobs:
         run: psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/09_notifications_rls.sql
       - name: Verify cross-domain sale/rental state safeguards
         run: psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/10_transaction_guardrails.sql
+      - name: Verify full-chain backend security contract and existing-user backfill
+        run: psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/11_backend_security_contract.sql
+      - name: Verify disabled-category media cannot bypass listing visibility
+        run: psql -X -d uniloop_notifications_ci -v ON_ERROR_STOP=1 -f supabase/tests/12_sale_media_category_access.sql
