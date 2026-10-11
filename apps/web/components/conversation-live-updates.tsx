@@ -16,7 +16,8 @@ export function ConversationLiveUpdates({conversationId,enabled}:{conversationId
  };
  const channel=client.channel("conversation-"+conversationId)
  .on("postgres_changes",{event:"INSERT",schema:"public",table:"sale_messages",filter:"conversation_id=eq."+conversationId},refresh)
- .on("postgres_changes",{event:"*",schema:"public",table:"sale_offers",filter:"conversation_id=eq."+conversationId},refresh)
+ .on("postgres_changes",{event:"INSERT",schema:"public",table:"sale_offers",filter:"conversation_id=eq."+conversationId},refresh)
+ .on("postgres_changes",{event:"UPDATE",schema:"public",table:"sale_offers",filter:"conversation_id=eq."+conversationId},refresh)
  .subscribe(status=>{if(alive)setState(status==="SUBSCRIBED"?"Live updates connected":"Refresh available while live updates reconnect");});
  // Re-fetch authoritative RLS data periodically, even without a new message,
  // and after foregrounding. Never render websocket payloads directly.
